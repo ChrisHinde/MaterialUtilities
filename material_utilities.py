@@ -145,7 +145,7 @@ def select_material_by_name(self, find_mat_name, extend_selection=False):
             elif not extend_selection:
                 ob.select_set(state=False)
 
-        if found_material:
+        if not found_material:
             self.report({'INFO'}, "No objects found with the material " + find_mat_name + "!")
     else:
         # it's editmode, so select the polygons
@@ -229,9 +229,8 @@ class MaterialUtilitiessSelectByMaterialMenu(bpy.types.Menu):
         if ob.mode == 'OBJECT':
             #show all used materials in entire blend file
             for material_name, material in bpy.data.materials.items():
-                print("Mat:")
-                print(material_name)
-                print(material.users)
+                # There's no point in showing materials with 0 users
+                #  (It will still show materials with fake user though)
                 if material.users > 0:
                     layout.operator("view3d.select_material_by_name",
                                     text=material_name,
