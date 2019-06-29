@@ -91,18 +91,17 @@ This script has several functions and operators, grouped for convenience:
 
 
 import bpy
+import bmesh
 from bpy.props import StringProperty, BoolProperty, EnumProperty
 
 #from .functions import *
 
 # -----------------------------------------------------------------------------
 # functions  (To be moved to separate file)
-def select_material_by_name(self, find_mat_name):
+
+def select_material_by_name(self, find_mat_name, extend_selection=False):
     # in object mode selects all objects with material find_mat_name
     # in edit mode selects all polygons with material find_mat_name
-    print("SelMatByName:" + find_mat_name)
-    print("Self:")
-    print(self)
 
     find_mat = bpy.data.materials.get(find_mat_name)
 
@@ -111,9 +110,9 @@ def select_material_by_name(self, find_mat_name):
 
     # check for editmode
     editmode = False
+    found_material = False
 
     scn = bpy.context.scene
-
 
     # set selection mode to polygons
     scn.tool_settings.mesh_select_mode = False, False, True
@@ -122,7 +121,6 @@ def select_material_by_name(self, find_mat_name):
 
     if actob.mode == 'EDIT':
         editmode = True
-        bpy.ops.object.mode_set()
 
     if not editmode:
         objs = bpy.data.objects
@@ -131,25 +129,37 @@ def select_material_by_name(self, find_mat_name):
                 ms = ob.material_slots
                 for m in ms:
                     if m.material == find_mat:
-                        ob.select_set(True)
+                        ob.select_set(state=True)
+
+                        found_material = True
+
                         # the active object may not have the mat!
                         # set it to one that does!
                         bpy.context.view_layer.objects.active = ob
                         break
                     else:
-                        self.report({'INFO'}, "No objects found with the material " + find_mat_name + "!")
-                        ob.select_set(False)
+                        if not extend_selection:
+                            ob.select_set(state=False)
 
             #deselect non-meshes
-            else:
-                ob.select_set(False)
+            elif not extend_selection:
+                ob.select_set(state=False)
 
+        if found_material:
+            self.report({'INFO'}, "No objects found with the material " + find_mat_name + "!")
     else:
         # it's editmode, so select the polygons
+
+        # if not extending the selection, deselect all first
+        #  (Without this, edges/faces were still selected
+        #   while the faces were deselcted)
+        if not extend_selection:
+            bpy.ops.mesh.select_all(action='DESELECT')
+
+        bpy.ops.object.mode_set()
+
         ob = actob
         ms = ob.material_slots
-
-        found_material = False
 
         # same material can be on multiple slots
         slot_indeces = []
@@ -160,19 +170,19 @@ def select_material_by_name(self, find_mat_name):
             i += 1
 
         me = ob.data
+
         for f in me.polygons:
             if f.material_index in slot_indeces:
                 f.select = True
-
                 found_material = True
-            else:
+            elif not extend_selection:
                 f.select = False
+
         me.update()
 
         if not found_material:
-            self.report({'INFO'}, "Material " + find_mat_name + " is not assigned to any faces!")
+            self.report({'INFO'}, "Material " + find_mat_name + " isn't assigned to any faces!")
 
-    if editmode:
         bpy.ops.object.mode_set(mode='EDIT')
 
 # -----------------------------------------------------------------------------
@@ -184,6 +194,10 @@ class VIEW3D_OT_select_material_by_name(bpy.types.Operator):
     bl_label = "Select Material By Name (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
+    extend: BoolProperty(
+            name='Extend Selection',
+            description='Keeps the current selection and adds faces with the material'
+            )
     matname: StringProperty(
             name='Material Name',
             description='Name of Material to Select',
@@ -196,8 +210,8 @@ class VIEW3D_OT_select_material_by_name(bpy.types.Operator):
 
     def execute(self, context):
         mn = self.matname
-        print("SelMatByName EXEC:" + mn)
-        select_material_by_name(self, mn)
+        ext = self.extend
+        select_material_by_name(self, mn, ext)
         return {'FINISHED'}
 
 # -----------------------------------------------------------------------------
@@ -209,10 +223,6 @@ class MaterialUtilitiessSelectByMaterialMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        #layout.operator_context = 'INVOKE_REGION_WIN'
-        print("MU SelByMat!")
-#        print(layout.operator_context)
-        print("objectmode:" + context.object.mode)
 
         ob = context.object
         layout.label
@@ -243,13 +253,9 @@ class MaterialUtilitiesMainMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 #        layout.operator_context = 'INVOKE_REGION_WIN'
-        print("MU main!")
-#        print(layout.operator_context)
-        print(context.object.mode)
 
-        layout.separator()
 #        layout.menu("VIEW3D_MT_assign_material", icon='ZOOMIN')
-        layout.menu(MaterialUtilitiessSelectByMaterialMenu.bl_idname, icon='HAND')
+        layout.menu(MaterialUtilitiessSelectByMaterialMenu.bl_idname, icon='VIEWZOOM')
         layout.separator()
 #        layout.operator("view3d.clean_material_slots",
 #                        text="Clean Material Slots",
@@ -283,10 +289,7 @@ classes = (
 register, unregister = bpy.utils.register_classes_factory(classes)
 
 def mu_register():
-    print("register!")
     register()
-#    for cls in classes:
-#        bpy.utils.register_class(cls)
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
