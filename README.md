@@ -1,7 +1,7 @@
 # Material utilities v0.1
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport (via a keyboard shortcut and a pop up menu), as well as select by material and more!
 
-**This Pre-ALPHA, and still under development**
+**This Pre-ALPHA, and still under development, it's not ready for use!**
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@ The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`[^1]
 
 ## Support
 
-Please [open an issue](https://github.com/fraction/readme-boilerplate/issues/new) for support.
+
 
 ## Contributing
 
