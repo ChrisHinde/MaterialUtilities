@@ -98,8 +98,8 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty
 # -----------------------------------------------------------------------------
 # functions  (To be moved to separate file)
 def select_material_by_name(self, find_mat_name):
-    #in object mode selects all objects with material find_mat_name
-    #in edit mode selects all polygons with material find_mat_name
+    # in object mode selects all objects with material find_mat_name
+    # in edit mode selects all polygons with material find_mat_name
     print("SelMatByName:" + find_mat_name)
     print("Self:")
     print(self)
@@ -109,13 +109,13 @@ def select_material_by_name(self, find_mat_name):
     if find_mat is None:
         return
 
-    #check for editmode
+    # check for editmode
     editmode = False
 
     scn = bpy.context.scene
 
 
-    #set selection mode to polygons
+    # set selection mode to polygons
     scn.tool_settings.mesh_select_mode = False, False, True
 
     actob = bpy.context.active_object
@@ -145,27 +145,33 @@ def select_material_by_name(self, find_mat_name):
                 ob.select_set(False)
 
     else:
-        #it's editmode, so select the polygons
+        # it's editmode, so select the polygons
         ob = actob
         ms = ob.material_slots
 
-        #same material can be on multiple slots
+        found_material = False
+
+        # same material can be on multiple slots
         slot_indeces = []
         i = 0
-        # found = False  # UNUSED
         for m in ms:
             if m.material == find_mat:
                 slot_indeces.append(i)
-                # found = True  # UNUSED
             i += 1
+
         me = ob.data
         for f in me.polygons:
             if f.material_index in slot_indeces:
-                f.select.set(True)
+                f.select = True
+
+                found_material = True
             else:
-                self.report({'INFO'}, "Material " + find_mat_name + " is not assigned to any faces!")
-                f.select.set(False)
+                f.select = False
         me.update()
+
+        if not found_material:
+            self.report({'INFO'}, "Material " + find_mat_name + " is not assigned to any faces!")
+
     if editmode:
         bpy.ops.object.mode_set(mode='EDIT')
 
