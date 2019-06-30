@@ -14,7 +14,6 @@ An add-on for Blender 2.8x that lets the user assign materials directly in the 3
 ## Background
 
 This is based on the Add-on Material Utils by Michael Williamson (michaelw), originally written for Blender 2.4, and then ported by him to Blender 2.6.
-Since it haven't seen any development since 2010, and it's an add-on that I've found usefull (and missed instantly in Blender 2.8), I decided to port it to 2.8 myself, while also adding some more functinality.
 
 ## Installation
 
@@ -26,7 +25,7 @@ Since it haven't seen any development since 2010, and it's an add-on that I've f
 
 ## Usage
 
-The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`[^1]
+The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`
 
 
 
@@ -37,5 +36,3 @@ The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`[^1]
 ## Contributing
 
 Please contribute!
-
-[^1]: The original Add-on used `Q` as the default shortcut, but since that now is used for "Quick Favorites" `Shift + Q` was selected instead.
