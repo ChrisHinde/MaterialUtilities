@@ -70,7 +70,7 @@ This script has several functions and operators, grouped for convenience:
 * material to texface
     transfers material assignments to the UV editor. This is useful if you
     assigned materials in the properties editor, as it will use the already
-    set up materials to assign the UV images per-face. It will use the first
+    set up materials to assign the UV imag  es per-face. It will use the first
     enabled image texture it finds.
 
 * texface to materials
@@ -99,13 +99,16 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty
 # -----------------------------------------------------------------------------
 # functions  (To be moved to separate file)
 
-def select_material_by_name(self, find_mat_name, extend_selection=False):
-    # in object mode selects all objects with material find_mat_name
-    # in edit mode selects all polygons with material find_mat_name
+def mu_select_by_material_name(self, find_material_name, extend_selection=False):
+    """Searches through all (mesh) objects, or the polygons of the current object
+    to find and select objects/polygons with the desired material"""
 
-    find_mat = bpy.data.materials.get(find_mat_name)
+    # in object mode selects all objects with material find_material_name
+    # in edit mode selects all polygons with material find_material_name
 
-    if find_mat is None:
+    find_material = bpy.data.materials.get(find_material_name)
+
+    if find_material is None:
         return
 
     # check for editmode
@@ -117,36 +120,36 @@ def select_material_by_name(self, find_mat_name, extend_selection=False):
     # set selection mode to polygons
     scn.tool_settings.mesh_select_mode = False, False, True
 
-    actob = bpy.context.active_object
+    active_obj = bpy.context.active_object
 
-    if actob.mode == 'EDIT':
+    if active_obj.mode == 'EDIT':
         editmode = True
 
     if not editmode:
         objs = bpy.data.objects
-        for ob in objs:
-            if ob.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}:
-                ms = ob.material_slots
-                for m in ms:
-                    if m.material == find_mat:
-                        ob.select_set(state=True)
+        for obj in objs:
+            if obj.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}:
+                mat_slots = obj.material_slots
+                for material in mat_slots:
+                    if material.material == find_material:
+                        obj.select_set(state=True)
 
                         found_material = True
 
-                        # the active object may not have the mat!
+                        # the active object may not have the material!
                         # set it to one that does!
-                        bpy.context.view_layer.objects.active = ob
+                        bpy.context.view_layer.objects.active = obj
                         break
                     else:
                         if not extend_selection:
-                            ob.select_set(state=False)
+                            obj.select_set(state=False)
 
             #deselect non-meshes
             elif not extend_selection:
-                ob.select_set(state=False)
+                obj.select_set(state=False)
 
         if not found_material:
-            self.report({'INFO'}, "No objects found with the material " + find_mat_name + "!")
+            self.report({'INFO'}, "No objects found with the material " + find_material_name + "!")
     else:
         # it's editmode, so select the polygons
 
@@ -158,45 +161,48 @@ def select_material_by_name(self, find_mat_name, extend_selection=False):
 
         bpy.ops.object.mode_set()
 
-        ob = actob
-        ms = ob.material_slots
+        obj = active_obj
+        mat_slots = obj.material_slots
 
         # same material can be on multiple slots
         slot_indeces = []
         i = 0
-        for m in ms:
-            if m.material == find_mat:
+        for material in mat_slots:
+            if material.material == find_material:
                 slot_indeces.append(i)
             i += 1
 
-        me = ob.data
+        mesh = obj.data
 
-        for f in me.polygons:
-            if f.material_index in slot_indeces:
-                f.select = True
+        for poly in mesh.polygons:
+            if poly.material_index in slot_indeces:
+                poly.select = True
                 found_material = True
             elif not extend_selection:
-                f.select = False
+                poly.select = False
 
-        me.update()
+        mesh.update()
 
         if not found_material:
-            self.report({'INFO'}, "Material " + find_mat_name + " isn't assigned to any faces!")
+            self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to any faces!")
 
         bpy.ops.object.mode_set(mode='EDIT')
 
 # -----------------------------------------------------------------------------
-# operator classes:
+# operator classes (To be moved to separate file)
 
-class VIEW3D_OT_select_material_by_name(bpy.types.Operator):
-    """Select geometry with this material assigned to it"""
-    bl_idname = "view3d.select_material_by_name"
-    bl_label = "Select Material By Name (Material Utilities)"
+
+
+class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
+    """Select geometry that has the defined material assigned to it
+    It also allows the user to extend what's currently selected"""
+    bl_idname = "view3d.materialutilities_select_by_material_name"
+    bl_label = "Select By Material Name (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     extend: BoolProperty(
             name='Extend Selection',
-            description='Keeps the current selection and adds faces with the material'
+            description='Keeps the current selection and adds faces with the material to the selection'
             )
     matname: StringProperty(
             name='Material Name',
@@ -209,52 +215,59 @@ class VIEW3D_OT_select_material_by_name(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        mn = self.matname
+        material_name = self.matname
         ext = self.extend
-        select_material_by_name(self, mn, ext)
+        mu_select_by_material_name(self, material_name, ext)
         return {'FINISHED'}
 
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
 
-class MaterialUtilitiessSelectByMaterialMenu(bpy.types.Menu):
-    bl_idname = "VIEW3D_MT_materialutils_select_menu"
+
+class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
+    """Submenu for selecting which material should be used for selection
+
+    The menu is filled programmatically with available materials"""
+
+    bl_idname = "VIEW3D_MT_materialutilities_select_by_material"
     bl_label = "Select by Material"
 
     def draw(self, context):
         layout = self.layout
 
-        ob = context.object
+        obj = context.object
         layout.label
-        if ob.mode == 'OBJECT':
+        if obj.mode == 'OBJECT':
             #show all used materials in entire blend file
             for material_name, material in bpy.data.materials.items():
                 # There's no point in showing materials with 0 users
                 #  (It will still show materials with fake user though)
                 if material.users > 0:
-                    layout.operator("view3d.select_material_by_name",
+                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
                                     text=material_name,
                                     icon='MATERIAL_DATA',
                                     ).matname = material_name
 
-        elif ob.mode == 'EDIT':
+        elif obj.mode == 'EDIT':
             #show only the materials on this object
-            mats = ob.material_slots.keys()
+            mats = obj.material_slots.keys()
             for m in mats:
-                layout.operator("view3d.select_material_by_name",
+                layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
                     text=m,
                     icon='MATERIAL_DATA').matname = m
 
-class MaterialUtilitiesMainMenu(bpy.types.Menu):
-    bl_idname = "VIEW3D_MT_materialutils_main_menu"
+
+class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
+    """Main menu for the Material utilities"""
+
+    bl_idname = "VIEW3D_MT_materialutilities_main"
     bl_label = "Material Utilities"
 
     def draw(self, context):
         layout = self.layout
-#        layout.operator_context = 'INVOKE_REGION_WIN'
+        layout.operator_context = 'INVOKE_REGION_WIN'
 
-#        layout.menu("VIEW3D_MT_assign_material", icon='ZOOMIN')
-        layout.menu(MaterialUtilitiessSelectByMaterialMenu.bl_idname, icon='VIEWZOOM')
+        layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname, icon='VIEWZOOM')
         layout.separator()
 #        layout.operator("view3d.clean_material_slots",
 #                        text="Clean Material Slots",
@@ -279,26 +292,27 @@ class MaterialUtilitiesMainMenu(bpy.types.Menu):
 #                        icon='UNPINNED')
 
 classes = (
-    VIEW3D_OT_select_material_by_name,
+    VIEW3D_OT_materialutilities_select_by_material_name,
 
-    MaterialUtilitiessSelectByMaterialMenu,
-    MaterialUtilitiesMainMenu,
+    VIEW3D_MT_materialutilities_select_by_material,
+    VIEW3D_MT_materialutilities_main,
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)
 
 def mu_register():
+    """Register the classes of Material Utilities together with the default shortcut (Shift+Q)"""
     register()
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
         km = kc.keymaps.new(name="3D View", space_type="VIEW_3D")
         kmi = km.keymap_items.new('wm.call_menu', 'Q', 'PRESS', ctrl=False, shift=True)
-        kmi.properties.name = MaterialUtilitiesMainMenu.bl_idname
+        kmi.properties.name = VIEW3D_MT_materialutilities_main.bl_idname
 
 
 def mu_unregister():
-    #from bpy.utils import unregister_class
+    """Unregister the classes of Material Utilities together with the default shortcut for the menu"""
     unregister()
 #    for cls in reversed(classes):
 #        unregister_class(cls)
@@ -308,7 +322,7 @@ def mu_unregister():
         km = kc.keymaps["3D View"]
         for kmi in km.keymap_items:
             if kmi.idname == 'wm.call_menu':
-                if kmi.properties.name == MaterialUtilitiesMainMenu.bl_idname:
+                if kmi.properties.name == VIEW3D_MT_materialutilities_main.bl_idname:
                     km.keymap_items.remove(kmi)
                     break
 
