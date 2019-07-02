@@ -1,13 +1,14 @@
 # Material utilities v0.1
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport (via a keyboard shortcut and a pop up menu), as well as select by material and more!
 
-**This Pre-ALPHA, and still under development, it's not ready for use!**
+**This ALPHA, and still under development, you're welcome to use it, but be aware that it might not work smoothly!**
 
 ## Table of Contents
 
 - [Background](#background)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Known issues](#knownissues)
 - [Support](#support)
 - [Contributing](#contributing)
 
@@ -28,6 +29,13 @@ This is based on the Add-on Material Utils by Michael Williamson (michaelw), ori
 The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`
 
 
+## Known issues
+
+- The selection by material only works for the active object in Edit mode.
+  If you have multiple objects selected and "open" in Edit mode, it won't select any of the faces,
+  with the selected material, of the other objects.
+- The assignment of material when you have multiple objects selected in Edit mode doesn't work correctly
+  and give Unexpected results.
 
 ## Support
 
