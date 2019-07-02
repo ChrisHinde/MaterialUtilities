@@ -4,3 +4,5 @@ o Fix problems with assigning materials when having multiple objects selected in
   It currently assigns to faces of the other objects that aren't selected. ("Polygon ID" conflicts?)
 o Fix problems with selecting by material not selecting faces for "not active" objects
   when you have multiple objects selected in Edit mode
+
+o Move classes and functions to separate files.
