@@ -32,7 +32,10 @@ bl_info = {
     "blender": (2, 80, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
-    "warning": "Under development!"}
+    "warning": "Under development!",
+    "wiki_url": "https://github.com/ChrisHinde/MaterialUtils",
+    "category": "Materials"
+}
 
 """
 This script has several functions and operators, grouped for convenience:
@@ -383,13 +386,6 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
             items = override_types
             )
 
-#    override: BoolProperty(
-#            name = 'Override materials',
-#            description = 'For objects with multiple materials: Remove all existing materials from the object '
-#                            + 'and assign only the selected material',
-#            default = True
-#            )
-
     @classmethod
     def poll(cls, context):
         return context.active_object is not None
@@ -530,7 +526,15 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
 #                        text='Set Fake User',
 #                        icon='UNPINNED')
 
-
+# This allows you to right click on a button and link to the manual
+def materialutilities_manual_map():
+    url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtils/"
+    url_manual_mapping = (
+        ("bpy.ops.view3d.materialutilities_assign_material_object", ""),
+        ("bpy.ops.view3d.materialutilities_assign_material_edit", ""),
+        ("bpy.ops.view3d.materialutilities_select_by_material_name", ""),
+    )
+    return url_manual_prefix, url_manual_mapping
 
 classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
@@ -556,12 +560,14 @@ def mu_register():
         kmi = km.keymap_items.new('wm.call_menu', 'Q', 'PRESS', ctrl = False, shift = True)
         kmi.properties.name = VIEW3D_MT_materialutilities_main.bl_idname
 
+        bpy.utils.register_manual_map(materialutilities_manual_map)
+
 
 def mu_unregister():
     """Unregister the classes of Material Utilities together with the default shortcut for the menu"""
     unregister()
-#    for cls in reversed(classes):
-#        unregister_class(cls)
+
+    bpy.utils.unregister_manual_map(materialutilities_manual_map)
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
@@ -573,7 +579,7 @@ def mu_unregister():
                     break
 
 #if __name__ == "__main__":
-#    register()
+#    mu_register()
 
 print("MU Start!")
 mu_register()
