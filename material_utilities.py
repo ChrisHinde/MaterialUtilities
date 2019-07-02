@@ -29,7 +29,7 @@ bl_info = {
     "name": "Material Utilities",
     "author": "chrishinde",
     "version": (0, 1),
-    "blender": (2, 8, 0),
+    "blender": (2, 80, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
     "warning": "Under development!"}
@@ -92,7 +92,9 @@ This script has several functions and operators, grouped for convenience:
 
 import bpy
 import bmesh
+from bpy.types import Operator
 from bpy.props import StringProperty, BoolProperty, EnumProperty
+#from bpy.types import EnumPropertyItem
 
 #from .functions import *
 
@@ -108,21 +110,21 @@ def mu_assign_material_slots(obj, material_ist):
     active_obj = bpy.context.active_object
     bpy.context.view_layer.objects.active = obj
 
-    for s in ob.material_slots:
+    for s in obj.material_slots:
         bpy.ops.object.material_slot_remove()
 
     # re-add them and assign material
     i = 0
     for mat in material_list:
         material = bpy.data.materials[mat]
-        ob.data.materials.append(material)
+        obj.data.materials.append(material)
         i += 1
 
     # restore active object:
     bpy.context.view_layer.objects.active = ob_active
 
 
-def mu_assign_material(material_name="Default", override_materialslots=True):
+def mu_assign_material(material_name = "Default", override_type = 0):
     """Assign the defined material to selected polygons/objects"""
 
     # get active object so we can restore it later
@@ -137,7 +139,7 @@ def mu_assign_material(material_name="Default", override_materialslots=True):
             break
     if not found:
         target = bpy.data.materials.new(material_name)
-        target.use_nodes = True
+        target.use_nodes = True         # When do we not want nodes today?
 
     # if objectmode then set all polygons
     editmode = False
@@ -170,48 +172,63 @@ def mu_assign_material(material_name="Default", override_materialslots=True):
             mu_assign_material_slots(obj, targetlist)
 
         elif obj.type == 'MESH':
-            found = False
 
-            # If we should override current material slots, remove them completely
-            if override_materialslots:
+            # If we should override all current material slots
+            if override_type == 'OVERRIDE_ALL':
+                # Clear out the material slots
                 obj.data.materials.clear()
-            else:
-                # check material slots for material_name material
+                # and then append the target material (no need spend time on assigning to each ploygon)
+                obj.data.materials.append(target)
+
+            # If we should override each material slot
+            elif override_type == 'OVERRIDE_SLOTS':
+                i = 0
+                # go through each slot
+                for material in obj.material_slots:
+                    # assign the target material to current slot
+                    obj.data.materials[i] = target
+                    i += 1
+
+            # if we should keep the material slots and just append the selected material (if not already assigned)
+            elif override_type == 'APPEND_MATERIAL':
+                found = False
                 i = 0
                 material_slots = obj.material_slots
+
+                # check material slots for material_name materia
                 for material in material_slots:
                     if material.name == material_name:
                         found = True
                         index = i
-                        #make slot active
+                        # make slot active
                         obj.active_material_index = i
                         break
                     i += 1
 
-            if not found:
-                # the material is not attached to the object
-                if (len(obj.data.materials) == 1) and not editmode:
-                    # in object mode, override the material if it's just one slot used
-                    obj.data.materials[0] = target
-                    index = 0
-                else:
-                    # In Edit mode, or if there's not one slots, append the assigned material
-                    #  If we're overriding, there's currently no materials at all, so after this there will be 1
-                    #  If not, this adds another slot with the assigned material
-                    index = len(obj.data.materials)
-                    obj.data.materials.append(target)
+                if not found:
+                    # the material is not attached to the object
+                    if (len(obj.data.materials) == 1) and not editmode:
+                        # in object mode, override the material if it's just one slot used
+                        obj.data.materials[0] = target
+                        index = 0
+                    else:
+                        # In Edit mode, or if there's not one slots, append the assigned material
+                        #  If we're overriding, there's currently no materials at all, so after this there will be 1
+                        #  If not, this adds another slot with the assigned material
+                        index = len(obj.data.materials)
+                        obj.data.materials.append(target)
 
-            # now assign the material to the mesh
-            mesh = obj.data
-            if allpolygons:
-                for poly in mesh.polygons:
-                    poly.material_index = index
-            elif allpolygons == False:
-                for poly in mesh.polygons:
-                    if poly.select:
+                # now assign the material to the mesh
+                mesh = obj.data
+                if allpolygons:
+                    for poly in mesh.polygons:
                         poly.material_index = index
+                elif allpolygons == False:
+                    for poly in mesh.polygons:
+                        if poly.select:
+                            poly.material_index = index
 
-            mesh.update()
+                mesh.update()
 
     #restore the active object
     bpy.context.view_layer.objects.active = active_obj
@@ -220,7 +237,7 @@ def mu_assign_material(material_name="Default", override_materialslots=True):
         bpy.ops.object.mode_set(mode='EDIT')
 
 
-def mu_select_by_material_name(self, find_material_name, extend_selection=False):
+def mu_select_by_material_name(self, find_material_name, extend_selection = False):
     """Searches through all (mesh) objects, or the polygons of the current object
     to find and select objects/polygons with the desired material"""
 
@@ -321,10 +338,10 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     material_name: StringProperty(
-            name='Material Name',
-            description='Name of Material to assign to current selection',
-            default="",
-            maxlen=63,
+            name = 'Material Name',
+            description = 'Name of Material to assign to current selection',
+            default = "",
+            maxlen = 63,
             )
 
     @classmethod
@@ -333,10 +350,19 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
 
     def execute(self, context):
         material_name = self.material_name
-        mu_assign_material(material_name,False)
+        mu_assign_material(material_name,'APPEND_MATERIAL')
         #cleanmatslots()
         #mat_to_texface()
         return {'FINISHED'}
+
+override_types = [
+    ('OVERRIDE_ALL', "Override all assigned slots",
+        "Remove any current material slots, and assign the current material"),
+    ('OVERRIDE_SLOTS', 'Assign material to each slot',
+        'Keep the material slots, but assign the selected material in each slot'),
+    ('APPEND_MATERIAL', 'Append Material',
+        'Add the material in a new slot, and assign it to the whole object')
+]
 
 class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     """Assign a material to the current selection"""
@@ -346,18 +372,23 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     material_name: StringProperty(
-            name='Material Name',
-            description='Name of Material to assign to current selection',
-            default="",
-            maxlen=63,
+            name = 'Material Name',
+            description = 'Name of Material to assign to current selection',
+            default = "",
+            maxlen = 63,
+            )
+    override_type: EnumProperty(
+            name = 'Assignment method',
+            description = '',
+            items = override_types
             )
 
-    override: BoolProperty(
-            name='Override materials',
-            description='For objects with multiple materials: Remove all existing materials from the object '
-                            + 'and assign only the selected material',
-            default=True
-            )
+#    override: BoolProperty(
+#            name = 'Override materials',
+#            description = 'For objects with multiple materials: Remove all existing materials from the object '
+#                            + 'and assign only the selected material',
+#            default = True
+#            )
 
     @classmethod
     def poll(cls, context):
@@ -365,8 +396,8 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
 
     def execute(self, context):
         material_name = self.material_name
-        override = self.override
-        mu_assign_material(material_name,override)
+        override_type = self.override_type
+        mu_assign_material(material_name,override_type)
         #cleanmatslots()
         #mat_to_texface()
         return {'FINISHED'}
@@ -381,13 +412,13 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     extend: BoolProperty(
-            name='Extend Selection',
-            description='Keeps the current selection and adds faces with the material to the selection'
+            name = 'Extend Selection',
+            description = 'Keeps the current selection and adds faces with the material to the selection'
             )
     material_name: StringProperty(
-            name='Material Name',
-            description='Name of Material to Select',
-            maxlen=63,
+            name = 'Material Name',
+            description = 'Name of Material to Select',
+            maxlen = 63,
             )
 
     @classmethod
@@ -424,12 +455,12 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
         for material_name in bpy.data.materials.keys():
             layout.operator(bl_id,
-                text=material_name,
-                icon='MATERIAL_DATA').material_name = material_name
+                text = material_name,
+                icon = 'MATERIAL_DATA').material_name = material_name
 
         layout.operator(bl_id,
-                        text="Add New Material",
-                        icon='ADD')
+                        text = "Add New Material",
+                        icon = 'ADD')
 
 class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
     """Submenu for selecting which material should be used for selection
@@ -451,8 +482,8 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                 #  (It will still show materials with fake user though)
                 if material.users > 0:
                     layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
-                                    text=material_name,
-                                    icon='MATERIAL_DATA',
+                                    text = material_name,
+                                    icon = 'MATERIAL_DATA',
                                     ).material_name = material_name
 
         elif obj.mode == 'EDIT':
@@ -460,8 +491,8 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
             materials = obj.material_slots.keys()
             for material in materials:
                 layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
-                    text=material,
-                    icon='MATERIAL_DATA').material_name = material
+                    text = material,
+                    icon = 'MATERIAL_DATA').material_name = material
 
 
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
@@ -474,8 +505,8 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
 
-        layout.menu(VIEW3D_MT_materialutilities_assign_material.bl_idname, icon='ADD')
-        layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname, icon='VIEWZOOM')
+        layout.menu(VIEW3D_MT_materialutilities_assign_material.bl_idname, icon = 'ADD')
+        layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname, icon = 'VIEWZOOM')
         layout.separator()
 #        layout.operator("view3d.clean_material_slots",
 #                        text="Clean Material Slots",
@@ -521,8 +552,8 @@ def mu_register():
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
-        km = kc.keymaps.new(name="3D View", space_type="VIEW_3D")
-        kmi = km.keymap_items.new('wm.call_menu', 'Q', 'PRESS', ctrl=False, shift=True)
+        km = kc.keymaps.new(name = "3D View", space_type = "VIEW_3D")
+        kmi = km.keymap_items.new('wm.call_menu', 'Q', 'PRESS', ctrl = False, shift = True)
         kmi.properties.name = VIEW3D_MT_materialutilities_main.bl_idname
 
 
