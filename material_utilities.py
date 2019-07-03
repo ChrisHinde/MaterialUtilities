@@ -105,7 +105,7 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty
 # functions  (To be moved to separate file)
 
 
-def mu_assign_material_slots(obj, material_ist):
+def mu_assign_material_slots(obj, material_list):
     """Given an object and a list of material names removes all material slots from the object
        adds new ones for each material in matlist adds the materials to the slots as well."""
 
@@ -144,7 +144,6 @@ def mu_assign_material(material_name = "Default", override_type = 0):
         target = bpy.data.materials.new(material_name)
         target.use_nodes = True         # When do we not want nodes today?
 
-    # if objectmode then set all polygons
     editmode = False
     allpolygons = True
     if active_obj.mode == 'EDIT':
@@ -160,78 +159,85 @@ def mu_assign_material(material_name = "Default", override_type = 0):
         scn = bpy.context.scene
         bpy.context.view_layer.objects.active = obj
 
-        if obj.type in {'CURVE', 'SURFACE', 'FONT', 'META'}:
+        print(obj.name)
+
+        # if obj.type in {'CURVE', 'SURFACE', 'FONT', 'META'}:
+        #     print("NOT MESH")
+        #     found = False
+        #     i = 0
+        #     print(bpy.data.materials)
+        #     for material in bpy.data.materials:
+        #         print(material.name)
+        #         if material.name == material_name:
+        #             found = True
+        #             index = i
+        #             break
+        #         i += 1
+        #         if not found:
+        #             index = i - 1
+        #
+        #     #targetlist = [index]
+        #     #print(targetlist)
+        #     #mu_assign_material_slots(obj, targetlist)
+        #
+        # elif obj.type == 'MESH':
+
+        # If we should override all current material slots
+        if override_type == 'OVERRIDE_ALL':
+            # Clear out the material slots
+            obj.data.materials.clear()
+            # and then append the target material (no need spend time on assigning to each ploygon)
+            obj.data.materials.append(target)
+
+        # If we should override each material slot
+        elif override_type == 'OVERRIDE_SLOTS':
+            i = 0
+            # go through each slot
+            for material in obj.material_slots:
+                # assign the target material to current slot
+                obj.data.materials[i] = target
+                i += 1
+
+        # if we should keep the material slots and just append the selected material (if not already assigned)
+        elif override_type == 'APPEND_MATERIAL':
             found = False
             i = 0
-            for material in bpy.data.materials:
+            material_slots = obj.material_slots
+
+            # check material slots for material_name materia
+            for material in material_slots:
                 if material.name == material_name:
                     found = True
                     index = i
+                    # make slot active
+                    obj.active_material_index = i
                     break
                 i += 1
-                if not found:
-                    index = i - 1
-            targetlist = [index]
-            mu_assign_material_slots(obj, targetlist)
 
-        elif obj.type == 'MESH':
+            if not found:
+                # the material is not attached to the object
+                if (len(obj.data.materials) == 1) and not editmode:
+                    # in object mode, override the material if it's just one slot used
+                    obj.data.materials[0] = target
+                    index = 0
+                else:
+                    # In Edit mode, or if there's not one slots, append the assigned material
+                    #  If we're overriding, there's currently no materials at all, so after this there will be 1
+                    #  If not, this adds another slot with the assigned material
+                    index = len(obj.data.materials)
+                    obj.data.materials.append(target)
 
-            # If we should override all current material slots
-            if override_type == 'OVERRIDE_ALL':
-                # Clear out the material slots
-                obj.data.materials.clear()
-                # and then append the target material (no need spend time on assigning to each ploygon)
-                obj.data.materials.append(target)
-
-            # If we should override each material slot
-            elif override_type == 'OVERRIDE_SLOTS':
-                i = 0
-                # go through each slot
-                for material in obj.material_slots:
-                    # assign the target material to current slot
-                    obj.data.materials[i] = target
-                    i += 1
-
-            # if we should keep the material slots and just append the selected material (if not already assigned)
-            elif override_type == 'APPEND_MATERIAL':
-                found = False
-                i = 0
-                material_slots = obj.material_slots
-
-                # check material slots for material_name materia
-                for material in material_slots:
-                    if material.name == material_name:
-                        found = True
-                        index = i
-                        # make slot active
-                        obj.active_material_index = i
-                        break
-                    i += 1
-
-                if not found:
-                    # the material is not attached to the object
-                    if (len(obj.data.materials) == 1) and not editmode:
-                        # in object mode, override the material if it's just one slot used
-                        obj.data.materials[0] = target
-                        index = 0
-                    else:
-                        # In Edit mode, or if there's not one slots, append the assigned material
-                        #  If we're overriding, there's currently no materials at all, so after this there will be 1
-                        #  If not, this adds another slot with the assigned material
-                        index = len(obj.data.materials)
-                        obj.data.materials.append(target)
-
-                # now assign the material to the mesh
-                mesh = obj.data
-                if allpolygons:
-                    for poly in mesh.polygons:
+            # now assign the material to the mesh
+            mesh = obj.data
+            if allpolygons:
+                for poly in mesh.polygons:
+                    poly.material_index = index
+            elif allpolygons == False:
+                for poly in mesh.polygons:
+                    if poly.select:
                         poly.material_index = index
-                elif allpolygons == False:
-                    for poly in mesh.polygons:
-                        if poly.select:
-                            poly.material_index = index
 
-                mesh.update()
+            mesh.update()
 
     #restore the active object
     bpy.context.view_layer.objects.active = active_obj
@@ -241,8 +247,8 @@ def mu_assign_material(material_name = "Default", override_type = 0):
 
 
 def mu_select_by_material_name(self, find_material_name, extend_selection = False):
-    """Searches through all (mesh) objects, or the polygons of the current object
-    to find and select objects/polygons with the desired material"""
+    """Searches through all objects, or the polygons/curves of the current object
+    to find and select objects/data with the desired material"""
 
     # in object mode selects all objects with material find_material_name
     # in edit mode selects all polygons with material find_material_name
@@ -294,40 +300,73 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
     else:
         # it's editmode, so select the polygons
 
-        # if not extending the selection, deselect all first
-        #  (Without this, edges/faces were still selected
-        #   while the faces were deselcted)
-        if not extend_selection:
-            bpy.ops.mesh.select_all(action='DESELECT')
-
-        bpy.ops.object.mode_set()
-
         obj = active_obj
-        mat_slots = obj.material_slots
 
-        # same material can be on multiple slots
-        slot_indeces = []
-        i = 0
-        for material in mat_slots:
-            if material.material == find_material:
-                slot_indeces.append(i)
-            i += 1
+        if obj.type == 'MESH':
+            # if not extending the selection, deselect all first
+            #  (Without this, edges/faces were still selected
+            #   while the faces were deselcted)
+            if not extend_selection:
+                bpy.ops.mesh.select_all(action='DESELECT')
 
-        mesh = obj.data
+            bpy.ops.object.mode_set()
 
-        for poly in mesh.polygons:
-            if poly.material_index in slot_indeces:
-                poly.select = True
-                found_material = True
-            elif not extend_selection:
-                poly.select = False
+            mat_slots = obj.material_slots
 
-        mesh.update()
+            # same material can be on multiple slots
+            slot_indeces = []
+            i = 0
+            for material in mat_slots:
+                if material.material == find_material:
+                    slot_indeces.append(i)
+                i += 1
 
-        if not found_material:
-            self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to any faces!")
+            mesh = obj.data
 
-        bpy.ops.object.mode_set(mode='EDIT')
+            for poly in mesh.polygons:
+                if poly.material_index in slot_indeces:
+                    poly.select = True
+                    found_material = True
+                elif not extend_selection:
+                    poly.select = False
+
+            mesh.update()
+
+            if not found_material:
+                self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to any faces!")
+
+            bpy.ops.object.mode_set(mode='EDIT')
+        elif obj.type == 'CURVE':
+            # For Curve objects, there can only be one material per spline
+            #  but still need to select each point
+            #  (or we could select by setting active material slot and bpy.ops.object.material_slot_select() !?)
+
+            mat_slots = obj.material_slots
+
+            slot_indeces = []
+            i = 0
+            for material in mat_slots:
+                if material.material == find_material:
+                    slot_indeces.append(i)
+                i += 1
+
+            splines = obj.data.splines
+
+            for spline in splines:
+                for point in spline.bezier_points:
+                    if spline.material_index in slot_indeces:
+                        point.select_control_point = True
+                        point.select_left_handle = True
+                        point.select_right_handle = True
+                        found_material = True
+                    elif not extend_selection:
+                        point.select_control_point = False
+                        point.select_left_handle = False
+                        point.select_right_handle = False
+
+        else:
+            print("Unsopported type (Edit mode Select): '" + obj.type + "'")
+            self.report({'WARNING'}, "The type '" + obj.type + "' isn't supported in Edit mode by Material Utilities yet!")
 
 
 # -----------------------------------------------------------------------------
