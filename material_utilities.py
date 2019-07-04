@@ -140,6 +140,7 @@ def mu_assign_material(material_name = "Default", override_type = 0):
             target = material
             found = True
             break
+
     if not found:
         target = bpy.data.materials.new(material_name)
         target.use_nodes = True         # When do we not want nodes today?
@@ -158,29 +159,6 @@ def mu_assign_material(material_name = "Default", override_type = 0):
         # set the active object to our object
         scn = bpy.context.scene
         bpy.context.view_layer.objects.active = obj
-
-        print(obj.name)
-
-        # if obj.type in {'CURVE', 'SURFACE', 'FONT', 'META'}:
-        #     print("NOT MESH")
-        #     found = False
-        #     i = 0
-        #     print(bpy.data.materials)
-        #     for material in bpy.data.materials:
-        #         print(material.name)
-        #         if material.name == material_name:
-        #             found = True
-        #             index = i
-        #             break
-        #         i += 1
-        #         if not found:
-        #             index = i - 1
-        #
-        #     #targetlist = [index]
-        #     #print(targetlist)
-        #     #mu_assign_material_slots(obj, targetlist)
-        #
-        # elif obj.type == 'MESH':
 
         # If we should override all current material slots
         if override_type == 'OVERRIDE_ALL':
@@ -245,6 +223,7 @@ def mu_assign_material(material_name = "Default", override_type = 0):
     if editmode:
         bpy.ops.object.mode_set(mode='EDIT')
 
+    return {'FINISHED'}
 
 def mu_select_by_material_name(self, find_material_name, extend_selection = False):
     """Searches through all objects, or the polygons/curves of the current object
@@ -256,7 +235,8 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
     find_material = bpy.data.materials.get(find_material_name)
 
     if find_material is None:
-        return
+        self.report({'INFO'}, "The material " + find_material_name + " doesn't exists!")
+        return {'CANCELLED'}
 
     # check for editmode
     editmode = False
@@ -297,6 +277,8 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
         if not found_material:
             self.report({'INFO'}, "No objects found with the material " + find_material_name + "!")
+            return {'CANCELLED'}
+
     else:
         # it's editmode, so select the polygons
 
@@ -332,42 +314,45 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
             mesh.update()
 
+            bpy.ops.object.mode_set(mode='EDIT')
+
             if not found_material:
                 self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to any faces!")
+                return {'CANCELLED'}
 
-            bpy.ops.object.mode_set(mode='EDIT')
-        elif obj.type == 'CURVE':
+        elif obj.type in {'CURVE', 'SURFACE'}:
             # For Curve objects, there can only be one material per spline
-            #  but still need to select each point
-            #  (or we could select by setting active material slot and bpy.ops.object.material_slot_select() !?)
+            #  and thus each spline is linked to one material slot.
+            #  So to not have to care for different data structures for different curve types,
+            #  we use the material slots and the built in selection methods
+            #  (Technically, this should work for meshes as well)
 
             mat_slots = obj.material_slots
 
-            slot_indeces = []
             i = 0
             for material in mat_slots:
+                bpy.context.active_object.active_material_index = i
+
                 if material.material == find_material:
-                    slot_indeces.append(i)
+                    bpy.ops.object.material_slot_select()
+                    found_material = True
+                elif not extend_selection:
+                    bpy.ops.object.material_slot_deselect()
+
                 i += 1
 
-            splines = obj.data.splines
-
-            for spline in splines:
-                for point in spline.bezier_points:
-                    if spline.material_index in slot_indeces:
-                        point.select_control_point = True
-                        point.select_left_handle = True
-                        point.select_right_handle = True
-                        found_material = True
-                    elif not extend_selection:
-                        point.select_control_point = False
-                        point.select_left_handle = False
-                        point.select_right_handle = False
+            if not found_material:
+                self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to slots!")
 
         else:
+            # Some object types are not supported
+            #  mostly because don't really support selecting by material (like Font/Text objects)
+            #  ore that they don't support multiple materials/are just "weird" (i.e. Meta balls)
             print("Unsopported type (Edit mode Select): '" + obj.type + "'")
-            self.report({'WARNING'}, "The type '" + obj.type + "' isn't supported in Edit mode by Material Utilities yet!")
+            self.report({'WARNING'}, "The type '" + obj.type + "' isn't supported in Edit mode by Material Utilities!")
+            return {'CANCELLED'}
 
+    return {'FINISHED'}
 
 # -----------------------------------------------------------------------------
 # operator classes (To be moved to separate file)
