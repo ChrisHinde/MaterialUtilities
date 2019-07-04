@@ -127,8 +127,10 @@ def mu_assign_material_slots(obj, material_list):
     bpy.context.view_layer.objects.active = ob_active
 
 
-def mu_assign_material(material_name = "Default", override_type = 0):
+def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_MATERIAL'):
     """Assign the defined material to selected polygons/objects"""
+
+    print("ASSMat: " + material_name + " : " + override_type)
 
     # get active object so we can restore it later
     active_obj = bpy.context.active_object
@@ -145,6 +147,7 @@ def mu_assign_material(material_name = "Default", override_type = 0):
         target = bpy.data.materials.new(material_name)
         target.use_nodes = True         # When do we not want nodes today?
 
+
     editmode = False
     allpolygons = True
     if active_obj.mode == 'EDIT':
@@ -160,12 +163,16 @@ def mu_assign_material(material_name = "Default", override_type = 0):
         scn = bpy.context.scene
         bpy.context.view_layer.objects.active = obj
 
+
         # If we should override all current material slots
-        if override_type == 'OVERRIDE_ALL':
+        if override_type == 'OVERRIDE_ALL' or obj.type == 'META':
             # Clear out the material slots
             obj.data.materials.clear()
             # and then append the target material (no need spend time on assigning to each ploygon)
             obj.data.materials.append(target)
+
+            if obj.type == 'META':
+                self.report({'INFO'}, "Meta balls only support one material, all other materials overriden!")
 
         # If we should override each material slot
         elif override_type == 'OVERRIDE_SLOTS':
@@ -199,23 +206,38 @@ def mu_assign_material(material_name = "Default", override_type = 0):
                     obj.data.materials[0] = target
                     index = 0
                 else:
-                    # In Edit mode, or if there's not one slots, append the assigned material
+                    # In Edit mode, or if there's not a slot, append the assigned material
                     #  If we're overriding, there's currently no materials at all, so after this there will be 1
                     #  If not, this adds another slot with the assigned material
                     index = len(obj.data.materials)
                     obj.data.materials.append(target)
+                    obj.active_material_index = index
 
-            # now assign the material to the mesh
-            mesh = obj.data
-            if allpolygons:
-                for poly in mesh.polygons:
-                    poly.material_index = index
-            elif allpolygons == False:
-                for poly in mesh.polygons:
-                    if poly.select:
+            if obj.type == 'MESH':
+                # now assign the material to the mesh
+                mesh = obj.data
+                if allpolygons:
+                    for poly in mesh.polygons:
                         poly.material_index = index
+                elif allpolygons == False:
+                    for poly in mesh.polygons:
+                        if poly.select:
+                            poly.material_index = index
 
-            mesh.update()
+                mesh.update()
+
+            elif obj.type in {'CURVE', 'SURFACE', 'TEXT'}:
+                bpy.ops.object.mode_set(mode='EDIT')    # This only works in Edit mode
+
+                # If operator was run in Object mode
+                if not editmode:
+                    # Select everything in Edit mode
+                    bpy.ops.curve.select_all(action='SELECT')
+
+                bpy.ops.object.material_slot_assign()   # Assign material of the current slot to selection
+
+                if not editmode:
+                    bpy.ops.object.mode_set(mode='OBJECT')
 
     #restore the active object
     bpy.context.view_layer.objects.active = active_obj
@@ -223,6 +245,7 @@ def mu_assign_material(material_name = "Default", override_type = 0):
     if editmode:
         bpy.ops.object.mode_set(mode='EDIT')
 
+    print("End of Assign material!")
     return {'FINISHED'}
 
 def mu_select_by_material_name(self, find_material_name, extend_selection = False):
@@ -348,7 +371,6 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
             # Some object types are not supported
             #  mostly because don't really support selecting by material (like Font/Text objects)
             #  ore that they don't support multiple materials/are just "weird" (i.e. Meta balls)
-            print("Unsopported type (Edit mode Select): '" + obj.type + "'")
             self.report({'WARNING'}, "The type '" + obj.type + "' isn't supported in Edit mode by Material Utilities!")
             return {'CANCELLED'}
 
@@ -377,10 +399,9 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
 
     def execute(self, context):
         material_name = self.material_name
-        mu_assign_material(material_name,'APPEND_MATERIAL')
+        return mu_assign_material(self, material_name, 'APPEND_MATERIAL')
         #cleanmatslots()
         #mat_to_texface()
-        return {'FINISHED'}
 
 override_types = [
     ('OVERRIDE_ALL', "Override all assigned slots",
@@ -417,10 +438,9 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     def execute(self, context):
         material_name = self.material_name
         override_type = self.override_type
-        mu_assign_material(material_name,override_type)
+        return mu_assign_material(self, material_name, override_type)
         #cleanmatslots()
         #mat_to_texface()
-        return {'FINISHED'}
 
 
 class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
@@ -448,8 +468,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     def execute(self, context):
         material_name = self.material_name
         ext = self.extend
-        mu_select_by_material_name(self, material_name, ext)
-        return {'FINISHED'}
+        return mu_select_by_material_name(self, material_name, ext)
 
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
@@ -469,7 +488,6 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         bl_id = VIEW3D_OT_materialutilities_assign_material_object.bl_idname
         obj = context.object
 
-        print(obj.mode)
         if obj.mode == 'EDIT':
             bl_id = VIEW3D_OT_materialutilities_assign_material_edit.bl_idname
 

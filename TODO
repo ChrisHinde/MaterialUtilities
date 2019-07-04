@@ -1,5 +1,6 @@
-o Select By Material for Curves (Edit mode)
-o Assign Material for Curves (Object & Odit mode)
+- FIXED: Select By Material for Curves (Edit mode)
+- FIXED: Assign Material for Curves in Edit mode
+o Assign material for Curves crashes when the curve object has more than one object slot!
 o Fix problems with assigning materials when having multiple objects selected in Edit mode
   It currently assigns to faces of the other objects that aren't selected. ("Polygon ID" conflicts?)
 o Fix problems with selecting by material not selecting faces for "not active" objects
