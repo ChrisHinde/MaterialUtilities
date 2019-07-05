@@ -376,6 +376,13 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
     return {'FINISHED'}
 
+def mu_copy_material_to_others(self):
+    #active_object = context.active_object
+
+    bpy.ops.object.material_slot_copy()
+
+    return {'FINISHED'}
+
 # -----------------------------------------------------------------------------
 # operator classes (To be moved to separate file)
 
@@ -472,12 +479,26 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
         ext = self.extend
         return mu_select_by_material_name(self, material_name, ext)
 
+
+class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
+    """Copy the material(s) of the active object to other select objects"""
+
+    bl_idname = "view3d.materialutilities_copy_material_to_others"
+    bl_label = "Copy material(s) to others (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.active_object is not None) and (context.active_object.mode != 'EDIT')
+
+    def execute(self, context):
+        return mu_copy_material_to_others(self)
+
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
 
 class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
     """Submenu for selecting which material should be assigned to current selection
-
     The menu is filled programmatically with available materials"""
 
     bl_idname = "VIEW3D_MT_materialutilities_assign_material"
@@ -504,7 +525,6 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
 class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
     """Submenu for selecting which material should be used for selection
-
     The menu is filled programmatically with available materials"""
 
     bl_idname = "VIEW3D_MT_materialutilities_select_by_material"
@@ -534,6 +554,36 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     text = material,
                     icon = 'MATERIAL_DATA').material_name = material
 
+class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
+    """Submenu for selecting which material should be used for selection
+    The menu is filled programmatically with available materials"""
+
+    bl_idname = "VIEW3D_MT_materialutilities_select_by_material"
+    bl_label = "Select by Material"
+
+    def draw(self, context):
+        layout = self.layout
+
+        obj = context.object
+        layout.label
+        if obj.mode == 'OBJECT':
+            #show all used materials in entire blend file
+            for material_name, material in bpy.data.materials.items():
+                # There's no point in showing materials with 0 users
+                #  (It will still show materials with fake user though)
+                if material.users > 0:
+                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
+                                    text = material_name,
+                                    icon = 'MATERIAL_DATA',
+                                    ).material_name = material_name
+
+        elif obj.mode == 'EDIT':
+            #show only the materials on this object
+            materials = obj.material_slots.keys()
+            for material in materials:
+                layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
+                    text = material,
+                    icon = 'MATERIAL_DATA').material_name = material
 
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
     """Main menu for the Material utilities"""
@@ -542,12 +592,23 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
     bl_label = "Material Utilities"
 
     def draw(self, context):
+        obj = context.object
+
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
 
-        layout.menu(VIEW3D_MT_materialutilities_assign_material.bl_idname, icon = 'ADD')
-        layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname, icon = 'VIEWZOOM')
+        layout.menu(VIEW3D_MT_materialutilities_assign_material.bl_idname,
+                     icon = 'ADD')
+        layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname,
+                     icon = 'VIEWZOOM')
         layout.separator()
+
+        layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
+                         text = 'Copy material to others',
+                         icon = 'COPY_ID')
+
+        layout.separator()
+
 #        layout.operator("view3d.clean_material_slots",
 #                        text="Clean Material Slots",
 #                        icon='CANCEL')
@@ -584,6 +645,7 @@ classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
     VIEW3D_OT_materialutilities_assign_material_edit,
     VIEW3D_OT_materialutilities_select_by_material_name,
+    VIEW3D_OT_materialutilities_copy_material_to_others,
 
     VIEW3D_MT_materialutilities_assign_material,
     VIEW3D_MT_materialutilities_select_by_material,
