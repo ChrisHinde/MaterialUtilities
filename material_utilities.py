@@ -105,26 +105,55 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty
 # functions  (To be moved to separate file)
 
 
-def mu_assign_material_slots(obj, material_list):
+def mu_assign_material_slots(object, material_list):
     """Given an object and a list of material names removes all material slots from the object
        adds new ones for each material in matlist adds the materials to the slots as well."""
 
     scn = bpy.context.scene
-    active_obj = bpy.context.active_object
-    bpy.context.view_layer.objects.active = obj
+    active_object = bpy.context.active_object
+    bpy.context.view_layer.objects.active = object
 
-    for s in obj.material_slots:
+    for s in object.material_slots:
         bpy.ops.object.material_slot_remove()
 
     # re-add them and assign material
     i = 0
     for mat in material_list:
         material = bpy.data.materials[mat]
-        obj.data.materials.append(material)
+        object.data.materials.append(material)
         i += 1
 
     # restore active object:
-    bpy.context.view_layer.objects.active = ob_active
+    bpy.context.view_layer.objects.active = active_object
+
+def mu_assign_to_data(object, material, index, editmode, all = True):
+    """Assign the material to the object data (polygons/splines)"""
+
+    if object.type == 'MESH':
+        # now assign the material to the mesh
+        mesh = object.data
+        if all:
+            for poly in mesh.polygons:
+                poly.material_index = index
+        else:
+            for poly in mesh.polygons:
+                if poly.select:
+                    poly.material_index = index
+
+        mesh.update()
+
+    elif object.type in {'CURVE', 'SURFACE', 'TEXT'}:
+        bpy.ops.object.mode_set(mode='EDIT')    # This only works in Edit mode
+
+        # If operator was run in Object mode
+        if not editmode:
+            # Select everything in Edit mode
+            bpy.ops.curve.select_all(action='SELECT')
+
+        bpy.ops.object.material_slot_assign()   # Assign material of the current slot to selection
+
+        if not editmode:
+            bpy.ops.object.mode_set(mode='OBJECT')
 
 
 def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_MATERIAL'):
@@ -134,6 +163,13 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
 
     # get active object so we can restore it later
     active_obj = bpy.context.active_object
+
+    editmode = False
+    allpolygons = True
+    if active_obj.mode == 'EDIT':
+        editmode = True
+        allpolygons = False
+        bpy.ops.object.mode_set()
 
     # check if material exists, if it doesn't then create it
     found = False
@@ -147,13 +183,6 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
         target = bpy.data.materials.new(material_name)
         target.use_nodes = True         # When do we not want nodes today?
 
-
-    editmode = False
-    allpolygons = True
-    if active_obj.mode == 'EDIT':
-        editmode = True
-        allpolygons = False
-        bpy.ops.object.mode_set()
 
     index = 0
     objects = bpy.context.selected_editable_objects
@@ -170,6 +199,9 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
             obj.data.materials.clear()
             # and then append the target material (no need spend time on assigning to each ploygon)
             obj.data.materials.append(target)
+
+            #
+            mu_assign_to_data(obj, target, 0, editmode, True)
 
             if obj.type == 'META':
                 self.report({'INFO'}, "Meta balls only support one material, all other materials overriden!")
@@ -213,31 +245,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                     obj.data.materials.append(target)
                     obj.active_material_index = index
 
-            if obj.type == 'MESH':
-                # now assign the material to the mesh
-                mesh = obj.data
-                if allpolygons:
-                    for poly in mesh.polygons:
-                        poly.material_index = index
-                elif allpolygons == False:
-                    for poly in mesh.polygons:
-                        if poly.select:
-                            poly.material_index = index
-
-                mesh.update()
-
-            elif obj.type in {'CURVE', 'SURFACE', 'TEXT'}:
-                bpy.ops.object.mode_set(mode='EDIT')    # This only works in Edit mode
-
-                # If operator was run in Object mode
-                if not editmode:
-                    # Select everything in Edit mode
-                    bpy.ops.curve.select_all(action='SELECT')
-
-                bpy.ops.object.material_slot_assign()   # Assign material of the current slot to selection
-
-                if not editmode:
-                    bpy.ops.object.mode_set(mode='OBJECT')
+                mu_assign_to_data(obj, target, index, editmode, allpolygons)
 
     #restore the active object
     bpy.context.view_layer.objects.active = active_obj
@@ -397,7 +405,7 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
             name = 'Material Name',
             description = 'Name of Material to assign to current selection',
             default = "",
-            maxlen = 63,
+            maxlen = 63
             )
 
     @classmethod
@@ -430,7 +438,7 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
             name = 'Material Name',
             description = 'Name of Material to assign to current selection',
             default = "",
-            maxlen = 63,
+            maxlen = 63
             )
     override_type: EnumProperty(
             name = 'Assignment method',
