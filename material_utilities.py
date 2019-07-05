@@ -320,7 +320,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
             #  (Without this, edges/faces were still selected
             #   while the faces were deselcted)
             if not extend_selection:
-                bpy.ops.mesh.select_all(action='DESELECT')
+                bpy.ops.mesh.select_all(action = 'DESELECT')
 
             bpy.ops.object.mode_set()
 
@@ -345,7 +345,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
             mesh.update()
 
-            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.object.mode_set(mode = 'EDIT')
 
             if not found_material:
                 self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to any faces!")
@@ -410,35 +410,42 @@ def mu_cleanmatslots(self):
     objects = bpy.context.selected_editable_objects
 
     for obj in objects:
-        if obj.type == 'MESH':
-            materials = obj.material_slots.keys()
+        used_mat_index = []  # we'll store used materials indices here
+        assigned_materials = []
+        material_list = []
+        material_names = []
 
+        materials = obj.material_slots.keys()
+
+        if obj.type == 'MESH':
             # check the polygons on the mesh to build a list of used materials
-            used_mat_index = []  # we'll store used materials indices here
-            face_materials = []
             mesh = obj.data
+
             for poly in mesh.polygons:
                 # get the material index for this face...
-                face_index = poly.material_index
+                material_index = poly.material_index
+
+                if material_index >= len(materials):
+                    poly.select = True
+                    self.report({'ERROR'},
+                                "A poly with an invalid material was found, this should not happen! Canceling!")
+                    return {'CANCELLED'}
 
                 # indices will be lost: Store face mat use by name
-                current_face_mat = materials[face_index]
-                face_materials.append(current_face_mat)
+                current_mat = materials[material_index]
+                assigned_materials.append(current_mat)
 
                 # check if index is already listed as used or not
-                found = 0
-                for m in used_mat_index:
-                    if m == face_index:
-                        found = 1
-                        #break
+                found = False
+                for mat in used_mat_index:
+                    if mat == material_index:
+                        found = True
 
-                if found == 0:
+                if not found:
                     # add this index to the list
-                    used_mat_index.append(face_index)
+                    used_mat_index.append(material_index)
 
             # re-assign the used materials to the mesh and leave out the unused
-            material_list = []
-            material_names = []
             for u in used_mat_index:
                 material_list.append(materials[u])
                 # we'll need a list of names to get the face indices...
@@ -449,9 +456,53 @@ def mu_cleanmatslots(self):
             # restore face indices:
             i = 0
             for poly in mesh.polygons:
-                material_index = material_names.index(face_materials[i])
+                material_index = material_names.index(assigned_materials[i])
                 poly.material_index = material_index
                 i += 1
+
+        elif obj.type in {'CURVE', 'SURFACE'}:
+
+            splines = obj.data.splines
+
+            for spline in splines:
+                # Get the material index of this spline
+                material_index = spline.material_index
+
+                # indices will be last: Store material use by name
+                current_mat = materials[material_index]
+                assigned_materials.append(current_mat)
+
+                # check if indek is already listed as used or not
+                found = False
+                for mat in used_mat_index:
+                    if mat == material_index:
+                        found = True
+
+                if not found:
+                    # add this index to the list
+                    used_mat_index.append(material_index)
+
+            # re-assigned the used materials to the curve and leave out the unused
+            for u in used_mat_index:
+                material_list.append(materials[u])
+                # we'll need a list of names to get the face indices
+                material_names.append(materials[u])
+
+            mu_assign_material_slots(obj, material_list)
+
+            # restore spline indices
+            i = 0
+            for spline in splines:
+                material_index = material_names.index(assigned_materials[i])
+                spline.material_index = material_index
+                i += 1
+
+        else:
+            # Some object types are not supported
+            self.report({'WARNING'},
+                        "The type '" + obj.type + "' isn't currently supported " +
+                        "for Material slots cleaning by Material Utilities!")
+
 
     if edit_mode:
         bpy.ops.object.mode_set(mode='EDIT')
@@ -759,7 +810,7 @@ classes = (
     VIEW3D_OT_materialutilities_copy_material_to_others,
 
     VIEW3D_OT_clean_material_slots,
-    
+
 
     VIEW3D_MT_materialutilities_assign_material,
     VIEW3D_MT_materialutilities_select_by_material,
