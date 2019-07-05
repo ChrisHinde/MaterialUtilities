@@ -6,4 +6,7 @@ o Fix problems with assigning materials when having multiple objects selected in
 o Fix problems with selecting by material not selecting faces for "not active" objects
   when you have multiple objects selected in Edit mode
 
+o (?) Add "Copy material to others" to Edit mode,
+  where the material of the active face is copied to the other selected faces
+
 o Move classes and functions to separate files.
