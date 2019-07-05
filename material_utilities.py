@@ -438,9 +438,11 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     def execute(self, context):
         material_name = self.material_name
         override_type = self.override_type
-        return mu_assign_material(self, material_name, override_type)
+        result = mu_assign_material(self, material_name, override_type)
+        print("Material Assigned!")
         #cleanmatslots()
         #mat_to_texface()
+        return result
 
 
 class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):

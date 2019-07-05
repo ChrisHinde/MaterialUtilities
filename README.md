@@ -36,6 +36,9 @@ The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`
   with the selected material, of the other objects.
 - The assignment of material when you have multiple objects selected in Edit mode doesn't work correctly
   and give Unexpected results.
+- **CRASHES:** Blender crashes (8 out of 10 times) when the user try to assign a material to a Curve object
+  that has more than one material (slot) in Object mode. This has only been experienced during those conditions.
+  (i.e A Curve object, with more than one material, and only in Object mode [it works fine in Edit mode])
 
 ## Support
 
