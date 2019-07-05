@@ -109,7 +109,7 @@ def mu_assign_material_slots(object, material_list):
     """Given an object and a list of material names removes all material slots from the object
        adds new ones for each material in matlist adds the materials to the slots as well."""
 
-    scn = bpy.context.scene
+    scene = bpy.context.scene
     active_object = bpy.context.active_object
     bpy.context.view_layer.objects.active = object
 
@@ -126,7 +126,7 @@ def mu_assign_material_slots(object, material_list):
     # restore active object:
     bpy.context.view_layer.objects.active = active_object
 
-def mu_assign_to_data(object, material, index, editmode, all = True):
+def mu_assign_to_data(object, material, index, edit_mode, all = True):
     """Assign the material to the object data (polygons/splines)"""
 
     if object.type == 'MESH':
@@ -146,13 +146,13 @@ def mu_assign_to_data(object, material, index, editmode, all = True):
         bpy.ops.object.mode_set(mode='EDIT')    # This only works in Edit mode
 
         # If operator was run in Object mode
-        if not editmode:
+        if not edit_mode:
             # Select everything in Edit mode
             bpy.ops.curve.select_all(action='SELECT')
 
         bpy.ops.object.material_slot_assign()   # Assign material of the current slot to selection
 
-        if not editmode:
+        if not edit_mode:
             bpy.ops.object.mode_set(mode='OBJECT')
 
 
@@ -162,13 +162,13 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
     print("ASSMat: " + material_name + " : " + override_type)
 
     # get active object so we can restore it later
-    active_obj = bpy.context.active_object
+    active_object = bpy.context.active_object
 
-    editmode = False
-    allpolygons = True
-    if active_obj.mode == 'EDIT':
-        editmode = True
-        allpolygons = False
+    edit_mode = False
+    all_polygons = True
+    if active_object.mode == 'EDIT':
+        edit_mode = True
+        all_polygons = False
         bpy.ops.object.mode_set()
 
     # check if material exists, if it doesn't then create it
@@ -189,9 +189,8 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
 
     for obj in objects:
         # set the active object to our object
-        scn = bpy.context.scene
+        scene = bpy.context.scene
         bpy.context.view_layer.objects.active = obj
-
 
         # If we should override all current material slots
         if override_type == 'OVERRIDE_ALL' or obj.type == 'META':
@@ -201,7 +200,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
             obj.data.materials.append(target)
 
             #
-            mu_assign_to_data(obj, target, 0, editmode, True)
+            mu_assign_to_data(obj, target, 0, edit_mode, True)
 
             if obj.type == 'META':
                 self.report({'INFO'}, "Meta balls only support one material, all other materials overriden!")
@@ -233,7 +232,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
 
             if not found:
                 # the material is not attached to the object
-                if (len(obj.data.materials) == 1) and not editmode:
+                if (len(obj.data.materials) == 1) and not edit_mode:
                     # in object mode, override the material if it's just one slot used
                     obj.data.materials[0] = target
                     index = 0
@@ -245,16 +244,17 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                     obj.data.materials.append(target)
                     obj.active_material_index = index
 
-                mu_assign_to_data(obj, target, index, editmode, allpolygons)
+                mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
 
     #restore the active object
-    bpy.context.view_layer.objects.active = active_obj
+    bpy.context.view_layer.objects.active = active_object
 
-    if editmode:
+    if edit_mode:
         bpy.ops.object.mode_set(mode='EDIT')
 
     print("End of Assign material!")
     return {'FINISHED'}
+
 
 def mu_select_by_material_name(self, find_material_name, extend_selection = False):
     """Searches through all objects, or the polygons/curves of the current object
@@ -269,21 +269,21 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
         self.report({'INFO'}, "The material " + find_material_name + " doesn't exists!")
         return {'CANCELLED'}
 
-    # check for editmode
-    editmode = False
+    # check for edit_mode
+    edit_mode = False
     found_material = False
 
-    scn = bpy.context.scene
+    scene = bpy.context.scene
 
     # set selection mode to polygons
-    scn.tool_settings.mesh_select_mode = False, False, True
+    scene.tool_settings.mesh_select_mode = False, False, True
 
-    active_obj = bpy.context.active_object
+    active_object = bpy.context.active_object
 
-    if active_obj.mode == 'EDIT':
-        editmode = True
+    if active_object.mode == 'EDIT':
+        edit_mode = True
 
-    if not editmode:
+    if not edit_mode:
         objects = bpy.data.objects
         for obj in objects:
             if obj.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}:
@@ -311,9 +311,9 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
             return {'CANCELLED'}
 
     else:
-        # it's editmode, so select the polygons
+        # it's edit_mode, so select the polygons
 
-        obj = active_obj
+        obj = active_object
 
         if obj.type == 'MESH':
             # if not extending the selection, deselect all first
@@ -384,12 +384,78 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
     return {'FINISHED'}
 
+
 def mu_copy_material_to_others(self):
+    """Copy the material to of the current object to the other seleceted all_objects"""
+    # Currently uses the built-in method
+    #  This could be extended to work in edit mode as well
+
     #active_object = context.active_object
 
     bpy.ops.object.material_slot_copy()
 
     return {'FINISHED'}
+
+
+def mu_cleanmatslots(self):
+    """Clean the material slots of the seleceted objects"""
+
+    # check for edit mode
+    edit_mode = False
+    active_object = bpy.context.active_object
+    if active_object.mode == 'EDIT':
+        edit_mode = True
+        bpy.ops.object.mode_set()
+
+    objects = bpy.context.selected_editable_objects
+
+    for obj in objects:
+        if obj.type == 'MESH':
+            materials = obj.material_slots.keys()
+
+            # check the polygons on the mesh to build a list of used materials
+            used_mat_index = []  # we'll store used materials indices here
+            face_materials = []
+            mesh = obj.data
+            for poly in mesh.polygons:
+                # get the material index for this face...
+                face_index = poly.material_index
+
+                # indices will be lost: Store face mat use by name
+                current_face_mat = materials[face_index]
+                face_materials.append(current_face_mat)
+
+                # check if index is already listed as used or not
+                found = 0
+                for m in used_mat_index:
+                    if m == face_index:
+                        found = 1
+                        #break
+
+                if found == 0:
+                    # add this index to the list
+                    used_mat_index.append(face_index)
+
+            # re-assign the used materials to the mesh and leave out the unused
+            material_list = []
+            material_names = []
+            for u in used_mat_index:
+                material_list.append(materials[u])
+                # we'll need a list of names to get the face indices...
+                material_names.append(materials[u])
+
+            mu_assign_material_slots(obj, material_list)
+
+            # restore face indices:
+            i = 0
+            for poly in mesh.polygons:
+                material_index = material_names.index(face_materials[i])
+                poly.material_index = material_index
+                i += 1
+
+    if edit_mode:
+        bpy.ops.object.mode_set(mode='EDIT')
+
 
 # -----------------------------------------------------------------------------
 # operator classes (To be moved to separate file)
@@ -502,6 +568,24 @@ class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
     def execute(self, context):
         return mu_copy_material_to_others(self)
 
+
+class VIEW3D_OT_clean_material_slots(bpy.types.Operator):
+    """Removes any material slots from selected objects
+    that are not used by the mesh"""
+
+    bl_idname = "view3d.materialutilities_clean_material_slots"
+    bl_label = "Clean Material Slots (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        mu_cleanmatslots(self)
+        return {'FINISHED'}
+
+
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
 
@@ -562,6 +646,22 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     text = material,
                     icon = 'MATERIAL_DATA').material_name = material
 
+class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
+    """Submenu for material slots maintenance"""
+
+    bl_idname = "VIEW3D_MT_materialutilities_clean_slots"
+    bl_label = "Clean Slots"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.label
+        layout.operator(VIEW3D_OT_clean_material_slots.bl_idname,
+                        text="Clean Material Slots",
+                        icon='CANCEL')
+        layout.separator()
+
+
 class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
     """Submenu for selecting which material should be used for selection
     The menu is filled programmatically with available materials"""
@@ -593,6 +693,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     text = material,
                     icon = 'MATERIAL_DATA').material_name = material
 
+
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
     """Main menu for the Material utilities"""
 
@@ -617,6 +718,8 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
 
         layout.separator()
 
+        layout.menu(VIEW3D_MT_materialutilities_clean_slots.bl_idname,
+                    icon = 'NODE_MATERIAL')
 #        layout.operator("view3d.clean_material_slots",
 #                        text="Clean Material Slots",
 #                        icon='CANCEL')
@@ -655,8 +758,14 @@ classes = (
     VIEW3D_OT_materialutilities_select_by_material_name,
     VIEW3D_OT_materialutilities_copy_material_to_others,
 
+    VIEW3D_OT_clean_material_slots,
+    
+
     VIEW3D_MT_materialutilities_assign_material,
     VIEW3D_MT_materialutilities_select_by_material,
+
+    VIEW3D_MT_materialutilities_clean_slots,
+
     VIEW3D_MT_materialutilities_main,
 )
 
