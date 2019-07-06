@@ -568,8 +568,6 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
     def execute(self, context):
         material_name = self.material_name
         return mu_assign_material(self, material_name, 'APPEND_MATERIAL')
-        #cleanmatslots()
-        #mat_to_texface()
 
 override_types = [
     ('OVERRIDE_ALL', "Override all assigned slots",
@@ -609,8 +607,6 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
         override_type = self.override_type
         result = mu_assign_material(self, material_name, override_type)
         print("Material Assigned!")
-        #cleanmatslots()
-        #mat_to_texface()
         return result
 
 
@@ -688,7 +684,7 @@ class VIEW3D_OT_remove_material_slot(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return (context.active_object is not None) and (context.active_object.mode != 'EDIT')
 
     def execute(self, context):
         return mu_remove_material(self, self.only_active)
@@ -709,7 +705,7 @@ class VIEW3D_OT_remove_all_material_slots(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return (context.active_object is not None) and (context.active_object.mode != 'EDIT')
 
     def execute(self, context):
         return mu_remove_all_materials(self, self.only_active)
@@ -855,12 +851,6 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
 
         layout.menu(VIEW3D_MT_materialutilities_clean_slots.bl_idname,
                     icon = 'NODE_MATERIAL')
-#        layout.operator("view3d.material_to_texface",
-#                        text="Material to Texface",
-#                        icon='MATERIAL_DATA')
-#        layout.operator("view3d.texface_to_material",
-#                        text="Texface to Material",
-#                        icon='MATERIAL_DATA')
 
         layout.separator()
 #        layout.operator("view3d.replace_material",
