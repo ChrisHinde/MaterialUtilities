@@ -131,17 +131,17 @@ def mu_assign_to_data(object, material, index, edit_mode, all = True):
         mesh.update()
 
     elif object.type in {'CURVE', 'SURFACE', 'TEXT'}:
-        bpy.ops.object.mode_set(mode='EDIT')    # This only works in Edit mode
+        bpy.ops.object.mode_set(mode = 'EDIT')    # This only works in Edit mode
 
         # If operator was run in Object mode
         if not edit_mode:
             # Select everything in Edit mode
-            bpy.ops.curve.select_all(action='SELECT')
+            bpy.ops.curve.select_all(action = 'SELECT')
 
         bpy.ops.object.material_slot_assign()   # Assign material of the current slot to selection
 
         if not edit_mode:
-            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.mode_set(mode = 'OBJECT')
 
 
 def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_MATERIAL'):
@@ -278,7 +278,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
                 mat_slots = obj.material_slots
                 for material in mat_slots:
                     if material.material == find_material:
-                        obj.select_set(state=True)
+                        obj.select_set(state = True)
 
                         found_material = True
 
@@ -491,9 +491,9 @@ def mu_cleanmatslots(self):
                         "The type '" + obj.type + "' isn't currently supported " +
                         "for Material slots cleaning by Material Utilities!")
 
-
     if edit_mode:
         bpy.ops.object.mode_set(mode='EDIT')
+
 
 def mu_remove_material(self, for_active_object = False):
     """Remove the active material slot from selected object(s)"""
@@ -528,9 +528,48 @@ def mu_remove_all_materials(self, for_active_object = False):
         for obj in objects:
             obj.data.materials.clear()
 
-        bpy.context.view_layer.objects.active =  last_active
+        bpy.context.view_layer.objects.active = last_active
 
     return {'FINISHED'}
+
+
+def mu_replace_material(material_a, material_b, all_objects=False, update_selection=False):
+    """Replace one material with another material"""
+
+    # material_a is the name of original material
+    # material_b is the name of the material to replace it with
+    # 'all' will replace throughout the blend file
+
+    mat_org = bpy.data.materials.get(material_a)
+    mat_rep = bpy.data.materials.get(material_b)
+
+    if mat_org != mat_rep and None not in (mat_org, mat_rep):
+        # Store active object
+        scn = bpy.context.scene
+
+        if all_objects:
+            objs = bpy.data.objects
+        else:
+            objs = bpy.context.selected_editable_objects
+
+        for obj in objs:
+            if obj.type == 'MESH':
+                match = False
+
+                for mat in obj.material_slots:
+                    if mat.material == mat_org:
+                        mat.material = mat_rep
+
+                        # Indicate which objects were affected
+                        if update_selection:
+                            obj.select_set(state = True)
+                            match = True
+
+                if update_selection and not match:
+                    obj.select_set(state = False)
+
+    return {'FINISHED'}
+
 
 def mu_set_fake_user(self, fake_user, materials):
     """Set the fake user flag for the objects material"""
@@ -738,6 +777,46 @@ class VIEW3D_OT_remove_all_material_slots(bpy.types.Operator):
         return mu_remove_all_materials(self, self.only_active)
 
 
+class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
+    """Replace a material by name"""
+    bl_idname = "view3d.materialutilities_replace_material"
+    bl_label = "Replace Material (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    matorg: StringProperty(
+            name = "Original",
+            description = "Material to replace",
+            maxlen = 63,
+            )
+    matrep: StringProperty(name="Replacement",
+            description = "Replacement material",
+            maxlen = 63,
+            )
+    all_objects: BoolProperty(
+            name = "All objects",
+            description = "Replace for all objects in this blend file",
+            default = True,
+            )
+    update_selection: BoolProperty(
+            name = "Update Selection",
+            description = "Select affected objects and deselect unaffected",
+            default = True,
+            )
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop_search(self, "matorg", bpy.data, "materials")
+        layout.prop_search(self, "matrep", bpy.data, "materials")
+        layout.prop(self, "all_objects")
+        layout.prop(self, "update_selection")
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        return mu_replace_material(self.matorg, self.matrep, self.all_objects, self.update_selection)
+
+
 class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
     """Enable/disable fake user for materials"""
 
@@ -780,8 +859,6 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
 
     def execute(self, context):
         return mu_set_fake_user(self, self.fake_user, self.materials)
-
-
 
 
 # -----------------------------------------------------------------------------
@@ -927,13 +1004,13 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
                     icon = 'NODE_MATERIAL')
 
         layout.separator()
-        #        layout.operator("view3d.replace_material",
-        #                        text='Replace Material',
-        #                        icon='ARROW_LEFTRIGHT')
+        layout.operator(VIEW3D_OT_materialutilities_replace_material.bl_idname,
+                        text = 'Replace Material',
+                        icon = 'ARROW_LEFTRIGHT')
 
         layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
-                       text='Set Fake User',
-                       icon='FAKE_USER_OFF')
+                       text = 'Set Fake User',
+                       icon = 'FAKE_USER_OFF')
 
 
 classes = (
@@ -946,6 +1023,7 @@ classes = (
     VIEW3D_OT_remove_material_slot,
     VIEW3D_OT_remove_all_material_slots,
 
+    VIEW3D_OT_materialutilities_replace_material,
     VIEW3D_OT_materialutilities_fake_user_set,
 
     VIEW3D_MT_materialutilities_assign_material,
@@ -959,16 +1037,21 @@ classes = (
 
 # This allows you to right click on a button and link to the manual
 def materialutilities_manual_map():
+    print("ManMap")
     url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtils/"
-    url_manual_mapping = []
+    url_manual_map = []
+    #url_manual_mapping = ()
+        #("bpy.ops.view3d.materialutilities_*", ""),
+        #("bpy.ops.view3d.materialutilities_assign_material_edit", ""),
+        #("bpy.ops.view3d.materialutilities_select_by_material_name", ""),)
 
     for cls in classes:
         if issubclass(cls, bpy.types.Operator):
-            url_manual_mapping.append(("bpy.ops." + cls.bl_idname, ""))
+            url_manual_map.append(("bpy.ops." + cls.bl_idname, ""))
 
-    url_manual_map = tuple(url_manual_mapping)
-    print(url_manual_map)
-    return url_manual_prefix, url_manual_map
+    url_manual_mapping = tuple(url_manual_map)
+    #print(url_manual_mapping)
+    return url_manual_prefix, url_manual_mapping
 
 register, unregister = bpy.utils.register_classes_factory(classes)
 
