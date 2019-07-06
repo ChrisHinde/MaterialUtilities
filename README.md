@@ -22,7 +22,11 @@ The goal is to include (almost?) every feature it had in 2.7x, but I'm also addi
 will be useful!
 
 Some examples:
+<<<<<<< HEAD
 - Some functions (like "Clean Material Slots") now also work on Curve and Surface objects
+=======
+- Some functions (like "Clean Material Slots") now work on Curve and Surface objects
+>>>>>>> 479e717e1c575e631f31b0569e4e17c4c1cc37d6
 - The Select By Material have the option to extend the current selecction
 - Assign Material have options to override or append materials in Object Mode
 
