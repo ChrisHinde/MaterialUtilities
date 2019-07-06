@@ -107,7 +107,7 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty
 
 def mu_assign_material_slots(object, material_list):
     """Given an object and a list of material names removes all material slots from the object
-       adds new ones for each material in matlist adds the materials to the slots as well."""
+       adds new ones for each material in the material list, adds the materials to the slots as well."""
 
     scene = bpy.context.scene
     active_object = bpy.context.active_object
@@ -507,6 +507,42 @@ def mu_cleanmatslots(self):
     if edit_mode:
         bpy.ops.object.mode_set(mode='EDIT')
 
+def mu_remove_material(self, for_active_object = False):
+    """Remove the active material slot from selected object(s)"""
+
+    if for_active_object:
+        bpy.ops.object.material_slot_remove()
+    else:
+        last_active = bpy.context.active_object
+        objects = bpy.context.selected_editable_objects
+
+        for obj in objects:
+            bpy.context.view_layer.objects.active = obj
+            bpy.ops.object.material_slot_remove()
+
+        bpy.context.view_layer.objects.active =  last_active
+
+    return {'FINISHED'}
+
+def mu_remove_all_materials(self, for_active_object = False):
+    """Remove all material slots from selected object(s)"""
+
+    if for_active_object:
+        obj = bpy.context.active_object
+
+        # Clear out the material slots
+        obj.data.materials.clear()
+
+    else:
+        last_active = bpy.context.active_object
+        objects = bpy.context.selected_editable_objects
+
+        for obj in objects:
+            obj.data.materials.clear()
+
+        bpy.context.view_layer.objects.active =  last_active
+
+    return {'FINISHED'}
 
 # -----------------------------------------------------------------------------
 # operator classes (To be moved to separate file)
@@ -545,7 +581,8 @@ override_types = [
 ]
 
 class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
-    """Assign a material to the current selection"""
+    """Assign a material to the current selection
+    (See the operator panel [F9] for more options)"""
 
     bl_idname = "view3d.materialutilities_assign_material_object"
     bl_label = "Assign Material (Material Utilities)"
@@ -578,8 +615,8 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
 
 
 class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
-    """Select geometry that has the defined material assigned to it
-    It also allows the user to extend what's currently selected"""
+    """Select geometry that has the chosen material assigned to it
+    (See the operator panel [F9] for more options)"""
 
     bl_idname = "view3d.materialutilities_select_by_material_name"
     bl_label = "Select By Material Name (Material Utilities)"
@@ -606,7 +643,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
 
 
 class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
-    """Copy the material(s) of the active object to other select objects"""
+    """Copy the material(s) of the active object to the other selected objects"""
 
     bl_idname = "view3d.materialutilities_copy_material_to_others"
     bl_label = "Copy material(s) to others (Material Utilities)"
@@ -621,8 +658,7 @@ class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
 
 
 class VIEW3D_OT_clean_material_slots(bpy.types.Operator):
-    """Removes any material slots from selected objects
-    that are not used by the mesh"""
+    """Removes any material slots from the selected objects that are not used"""
 
     bl_idname = "view3d.materialutilities_clean_material_slots"
     bl_label = "Clean Material Slots (Material Utilities)"
@@ -636,13 +672,55 @@ class VIEW3D_OT_clean_material_slots(bpy.types.Operator):
         mu_cleanmatslots(self)
         return {'FINISHED'}
 
+class VIEW3D_OT_remove_material_slot(bpy.types.Operator):
+    """Remove the active material slot from selected object(s)
+    (See the operator panel [F9] for more options)"""
+
+    bl_idname = "view3d.materialutilities_remove_material_slot"
+    bl_label = "Remove Active Material Slot (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    only_active: BoolProperty(
+            name = 'Only active object',
+            description = 'Only remove the active material slot for the active object ' +
+                            '(otherwise do it for every selected object)'
+            )
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        return mu_remove_material(self, self.only_active)
+
+class VIEW3D_OT_remove_all_material_slots(bpy.types.Operator):
+    """Remove all material slots from selected object(s)
+    (See the operator panel [F9] for more options)"""
+
+    bl_idname = "view3d.materialutilities_remove_all_material_slots"
+    bl_label = "Remove All Material Slots (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    only_active: BoolProperty(
+            name = 'Only active object',
+            description = 'Only remove the material slots for the active object ' +
+                            '(otherwise do it for every selected object)'
+            )
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        return mu_remove_all_materials(self, self.only_active)
+
 
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
 
 class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
-    """Submenu for selecting which material should be assigned to current selection
-    The menu is filled programmatically with available materials"""
+    """Menu for choosing which material should be assigned to current selection"""
+    # The menu is filled programmatically with available materials
 
     bl_idname = "VIEW3D_MT_materialutilities_assign_material"
     bl_label = "Assign Material"
@@ -667,8 +745,8 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
                         icon = 'ADD')
 
 class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
-    """Submenu for selecting which material should be used for selection
-    The menu is filled programmatically with available materials"""
+    """Menu for choosing which material should be used for selection"""
+    # The menu is filled programmatically with available materials
 
     bl_idname = "VIEW3D_MT_materialutilities_select_by_material"
     bl_label = "Select by Material"
@@ -698,7 +776,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     icon = 'MATERIAL_DATA').material_name = material
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
-    """Submenu for material slots maintenance"""
+    """Menu for cleaning up the material slots"""
 
     bl_idname = "VIEW3D_MT_materialutilities_clean_slots"
     bl_label = "Clean Slots"
@@ -708,14 +786,20 @@ class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
 
         layout.label
         layout.operator(VIEW3D_OT_clean_material_slots.bl_idname,
-                        text="Clean Material Slots",
-                        icon='CANCEL')
+                        text = "Clean Material Slots",
+                        icon = 'TRASH')
         layout.separator()
+        layout.operator(VIEW3D_OT_remove_material_slot.bl_idname,
+                        text = "Remove Active Material Slot",
+                        icon = 'REMOVE')
+        layout.operator(VIEW3D_OT_remove_all_material_slots.bl_idname,
+                        text = "Remove All Material Slot",
+                        icon = 'CANCEL')
 
 
 class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
-    """Submenu for selecting which material should be used for selection
-    The menu is filled programmatically with available materials"""
+    """Menu for choosing which material should be used for selection"""
+    # The menu is filled programmatically with available materials
 
     bl_idname = "VIEW3D_MT_materialutilities_select_by_material"
     bl_label = "Select by Material"
@@ -746,7 +830,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
 
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
-    """Main menu for the Material utilities"""
+    """Main menu for Material Utilities"""
 
     bl_idname = "VIEW3D_MT_materialutilities_main"
     bl_label = "Material Utilities"
@@ -764,19 +848,13 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
         layout.separator()
 
         layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
-                         text = 'Copy material to others',
+                         text = 'Copy materials to others',
                          icon = 'COPY_ID')
 
         layout.separator()
 
         layout.menu(VIEW3D_MT_materialutilities_clean_slots.bl_idname,
                     icon = 'NODE_MATERIAL')
-#        layout.operator("view3d.clean_material_slots",
-#                        text="Clean Material Slots",
-#                        icon='CANCEL')
-#        layout.operator("view3d.material_remove",
-#                        text="Remove Material Slots",
-#                        icon='CANCEL')
 #        layout.operator("view3d.material_to_texface",
 #                        text="Material to Texface",
 #                        icon='MATERIAL_DATA')
@@ -810,6 +888,8 @@ classes = (
     VIEW3D_OT_materialutilities_copy_material_to_others,
 
     VIEW3D_OT_clean_material_slots,
+    VIEW3D_OT_remove_material_slot,
+    VIEW3D_OT_remove_all_material_slots,
 
 
     VIEW3D_MT_materialutilities_assign_material,
