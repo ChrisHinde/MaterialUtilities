@@ -14,12 +14,22 @@ An add-on for Blender 2.8x that lets the user assign materials directly in the 3
 
 ## Background
 
-This is based on the Add-on Material Utils by Michael Williamson (michaelw), originally written for Blender 2.4, and then ported by him to Blender 2.6.
+This is based on the Add-on Material Utils by Michael Williamson (michaelw), originally written for Blender 2.4 (and then ported to 2.6, 2.7x).
+I was really missing this Add-on when I started using Blender 2.80. But I couldn't find any ports of it (or even any in development),
+so I decided to port it myself, and this is the result!
+
+The goal is to include (almost?) every feature it had in 2.7x, but I'm also adding some features that I think (and hope others will as well)
+will be useful!
+
+Some examples:
+- Some functions (like "Clean Material Slots") now also work on Curve and Surface objects
+- The Select By Material have the option to extend the current selecction
+- Assign Material have options to override or append materials in Object Mode
 
 ## Installation
 
 1. Download the Add-on as a ZIP-file.
-2. In Blender 2.8 go to *Edit* > *Preferences*, select *Add-ons* in the left panel, and then *Install* in the upper right.
+2. In Blender 2.8x go to *Edit* > *Preferences*, select *Add-ons* in the left panel, and then *Install* in the upper right.
 3. Browse to where you saved the ZIP-file, select it and click on *Install Add-on from File*.
 4. Click the checkbox to the left to enable the Add-on.
 5. (Click the menu icon in the lower left and select *Save Current State*, unless you have Auto-save Preferences on)
