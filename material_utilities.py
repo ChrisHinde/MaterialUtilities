@@ -2,7 +2,7 @@
 #    Christopher Hindefjord (chrishinde) 2019
 #
 # ## Original:
-#   (c) 2010 Michael Williamson (michaelw)
+#   (c) 2010+ Michael Williamson (michaelw)
 #   ported from original by Michael Williamson
 # ###
 #
@@ -49,9 +49,6 @@ This script has several functions and operators, grouped for convenience:
 
     if the user chose "new" the new material can be renamed using the
     "last operator" section of the toolbox.
-    After assigning the material "clean material slots" and
-    "material to texface" are auto run to keep things tidy
-    (see description bellow)
 
 
 * select by material
@@ -65,19 +62,10 @@ This script has several functions and operators, grouped for convenience:
 
 * clean material slots
     for all selected objects any empty material slots or material slots with
-    materials that are not used by the mesh polygons will be removed.
+    materials that are not used by the mesh polygons or splines will be removed.
 
 * remove material slots
-    removes all material slots of the active object.
-
-* material to texface
-    transfers material assignments to the UV editor. This is useful if you
-    assigned materials in the properties editor, as it will use the already
-    set up materials to assign the UV imag  es per-face. It will use the first
-    enabled image texture it finds.
-
-* texface to materials
-    creates texture materials from images assigned in UV editor.
+    removes all material slots of the active (or selected) object(s).
 
 * replace materials
     lets your replace one material by another. Optionally for all objects in
@@ -196,10 +184,10 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
         if override_type == 'OVERRIDE_ALL' or obj.type == 'META':
             # Clear out the material slots
             obj.data.materials.clear()
-            # and then append the target material (no need spend time on assigning to each ploygon)
+            # and then append the target material
             obj.data.materials.append(target)
 
-            #
+            # Assign the material to the data/palys, to avoid weird problems
             mu_assign_to_data(obj, target, 0, edit_mode, True)
 
             if obj.type == 'META':
@@ -544,6 +532,44 @@ def mu_remove_all_materials(self, for_active_object = False):
 
     return {'FINISHED'}
 
+def mu_set_fake_user(self, fake_user, materials):
+    """Set the fake user flag for the objects material"""
+
+    if materials == 'ALL':
+        mats = (mat for mat in bpy.data.materials if mat.library is None)
+    elif materials == 'UNUSED':
+        mats = (mat for mat in bpy.data.materials if mat.library is None and mat.users == 0)
+    else:
+        mats = []
+        if materials == 'ACTIVE':
+            objs = [bpy.context.active_object]
+        elif materials == 'SELECTED':
+            objs = bpy.context.selected_objects
+        elif materials == 'SCENE':
+            objs = bpy.context.scene.objects
+        else: # materials == 'USED'
+            objs = bpy.data.objects
+            # Maybe check for users > 0 instead?
+
+        mats = (mat for ob in objs if hasattr(ob.data, "materials") for mat in ob.data.materials if mat.library is None)
+
+    if fake_user == 'TOGGLE':
+        done_mats = []
+        for mat in mats:
+            if  not mat.name in done_mats:
+                mat.use_fake_user = not mat.use_fake_user
+            done_mats.append(mat.name)
+    else:
+        fake_user_val = fake_user == 'ON'
+        for mat in mats:
+            mat.use_fake_user = fake_user_val
+
+    for area in bpy.context.screen.areas:
+        if area.type in ('PROPERTIES', 'NODE_EDITOR'):
+            area.tag_redraw()
+
+    return {'FINISHED'}
+
 # -----------------------------------------------------------------------------
 # operator classes (To be moved to separate file)
 
@@ -668,6 +694,7 @@ class VIEW3D_OT_clean_material_slots(bpy.types.Operator):
         mu_cleanmatslots(self)
         return {'FINISHED'}
 
+
 class VIEW3D_OT_remove_material_slot(bpy.types.Operator):
     """Remove the active material slot from selected object(s)
     (See the operator panel [F9] for more options)"""
@@ -711,6 +738,52 @@ class VIEW3D_OT_remove_all_material_slots(bpy.types.Operator):
         return mu_remove_all_materials(self, self.only_active)
 
 
+class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
+    """Enable/disable fake user for materials"""
+
+    bl_idname = "view3d.materialutilities_fake_user_set"
+    bl_label = "Set Fake User (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    fake_user: EnumProperty(
+            name = "Fake User",
+            description = "Turn fake user on or off",
+            items = (('ON', "On", "Enable fake user"),
+                     ('OFF', "Off", "Disable fake user"),
+                     ('TOGGLE', "Toggle", "Toggle fake user")),
+            default = 'TOGGLE'
+            )
+
+    materials: EnumProperty(
+            name = "Materials",
+            description = "Which materials of objects to affect",
+            items = (('ACTIVE', "Active object", "Materials of active object only"),
+                     ('SELECTED', "Selected objects", "Materials of selected objects"),
+                     ('SCENE', "Scene objects", "Materials of objects in current scene"),
+                     ('USED', "Used", "All materials used by objects"),
+                     ('UNUSED', "Unused", "Currently unused materials"),
+                     ('ALL', "All", "All materials in this blend file")),
+            default = 'UNUSED'
+            )
+
+    @classmethod
+    def poll(cls, context):
+        return (context.active_object is not None)
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "fake_user", expand=True)
+        layout.prop(self, "materials")
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        return mu_set_fake_user(self, self.fake_user, self.materials)
+
+
+
+
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
 
@@ -739,6 +812,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         layout.operator(bl_id,
                         text = "Add New Material",
                         icon = 'ADD')
+
 
 class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
     """Menu for choosing which material should be used for selection"""
@@ -853,23 +927,14 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
                     icon = 'NODE_MATERIAL')
 
         layout.separator()
-#        layout.operator("view3d.replace_material",
-#                        text='Replace Material',
-#                        icon='ARROW_LEFTRIGHT')
+        #        layout.operator("view3d.replace_material",
+        #                        text='Replace Material',
+        #                        icon='ARROW_LEFTRIGHT')
 
-#        layout.operator("view3d.fake_user_set",
-#                        text='Set Fake User',
-#                        icon='UNPINNED')
+        layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
+                       text='Set Fake User',
+                       icon='FAKE_USER_OFF')
 
-# This allows you to right click on a button and link to the manual
-def materialutilities_manual_map():
-    url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtils/"
-    url_manual_mapping = (
-        ("bpy.ops.view3d.materialutilities_assign_material_object", ""),
-        ("bpy.ops.view3d.materialutilities_assign_material_edit", ""),
-        ("bpy.ops.view3d.materialutilities_select_by_material_name", ""),
-    )
-    return url_manual_prefix, url_manual_mapping
 
 classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
@@ -881,6 +946,7 @@ classes = (
     VIEW3D_OT_remove_material_slot,
     VIEW3D_OT_remove_all_material_slots,
 
+    VIEW3D_OT_materialutilities_fake_user_set,
 
     VIEW3D_MT_materialutilities_assign_material,
     VIEW3D_MT_materialutilities_select_by_material,
@@ -890,6 +956,19 @@ classes = (
     VIEW3D_MT_materialutilities_main,
 )
 
+
+# This allows you to right click on a button and link to the manual
+def materialutilities_manual_map():
+    url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtils/"
+    url_manual_mapping = []
+
+    for cls in classes:
+        if issubclass(cls, bpy.types.Operator):
+            url_manual_mapping.append(("bpy.ops." + cls.bl_idname, ""))
+
+    url_manual_map = tuple(url_manual_mapping)
+    print(url_manual_map)
+    return url_manual_prefix, url_manual_map
 
 register, unregister = bpy.utils.register_classes_factory(classes)
 
