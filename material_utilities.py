@@ -609,6 +609,36 @@ def mu_set_fake_user(self, fake_user, materials):
 
     return {'FINISHED'}
 
+
+def mu_change_material_link(self, link, affect, override_data_material = False):
+    """Change what the materials are linked to (Object or Data), while keeping materials assigned"""
+
+    objects = []
+
+    if affect == "ACTIVE":
+        objects = [bpy.context.active_object]
+    elif affect == "SELECTED":
+        objects = bpy.context.selected_objects
+    elif affect == "SCENE":
+        objects = bpy.context.scene.objects
+    elif affect == "ALL":
+        objects = bpy.data.objects
+
+    for object in objects:
+        for slot in object.material_slots:
+            present_material = slot.material
+
+            if link == 'TOGGLE':
+                slot.link = ('DATA' if slot.link == 'OBJECT' else 'OBJECT')
+            else:
+                slot.link = link
+
+            if slot.link == 'OBJECT' or override_data_material:
+                slot.material = present_material
+
+    return {'FINISHED'}
+
+
 # -----------------------------------------------------------------------------
 # operator classes (To be moved to separate file)
 
@@ -718,7 +748,7 @@ class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
         return mu_copy_material_to_others(self)
 
 
-class VIEW3D_OT_clean_material_slots(bpy.types.Operator):
+class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
     """Removes any material slots from the selected objects that are not used"""
 
     bl_idname = "view3d.materialutilities_clean_material_slots"
@@ -734,7 +764,7 @@ class VIEW3D_OT_clean_material_slots(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class VIEW3D_OT_remove_material_slot(bpy.types.Operator):
+class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
     """Remove the active material slot from selected object(s)
     (See the operator panel [F9] for more options)"""
 
@@ -755,7 +785,7 @@ class VIEW3D_OT_remove_material_slot(bpy.types.Operator):
     def execute(self, context):
         return mu_remove_material(self, self.only_active)
 
-class VIEW3D_OT_remove_all_material_slots(bpy.types.Operator):
+class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
     """Remove all material slots from selected object(s)
     (See the operator panel [F9] for more options)"""
 
@@ -851,7 +881,7 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "fake_user", expand=True)
+        layout.prop(self, "fake_user", expand = True)
         layout.prop(self, "materials")
 
     def invoke(self, context, event):
@@ -860,6 +890,56 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
     def execute(self, context):
         return mu_set_fake_user(self, self.fake_user, self.materials)
 
+
+class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
+    """Link the materials to Data or Object, while keepng materials assigned"""
+
+    bl_idname = "view3d.materialutilities_change_material_link"
+    bl_label = "Change Material Linking (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+
+    override: BoolProperty(
+            name = "Override Data material",
+            description = "Override the materials assigned to the object data/mesh when switching to 'Linked to Data'\n" +
+                            "(WARNING: This will override the materials of other linked objects, " +
+                             "which have the materials linked to Data)",
+            default = False,
+            )
+    link_to: EnumProperty(
+            name = "Link",
+            description = "What should the material be linked to",
+            items = (('DATA', "Data", "Link the materials to the data"),
+                     ('OBJECT', "Object", "Link the materials to the object"),
+                     ('TOGGLE', "Toggle", "Toggle what the materials are currently linked to")),
+            default = 'OBJECT'
+            )
+
+    affect: EnumProperty(
+            name = "Materials",
+            description = "Which materials of objects to affect",
+            items = (('ACTIVE', "Active object", "Materials of active object only"),
+                     ('SELECTED', "Selected objects", "Materials of selected objects"),
+                     ('SCENE', "Scene objects", "Materials of objects in current scene"),
+                     ('ALL', "All", "All materials in this blend file")),
+            default = 'SELECTED'
+            )
+
+    @classmethod
+    def poll(cls, context):
+        return (context.active_object is not None)
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "override")
+        layout.prop(self, "link_to")
+        layout.prop(self, "affect")
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        return mu_change_material_link(self, self.link_to, self.affect, self.override)
 
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
@@ -932,14 +1012,14 @@ class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
         layout = self.layout
 
         layout.label
-        layout.operator(VIEW3D_OT_clean_material_slots.bl_idname,
+        layout.operator(VIEW3D_OT_materialutilities_clean_material_slots.bl_idname,
                         text = "Clean Material Slots",
                         icon = 'TRASH')
         layout.separator()
-        layout.operator(VIEW3D_OT_remove_material_slot.bl_idname,
+        layout.operator(VIEW3D_OT_materialutilities_remove_material_slot.bl_idname,
                         text = "Remove Active Material Slot",
                         icon = 'REMOVE')
-        layout.operator(VIEW3D_OT_remove_all_material_slots.bl_idname,
+        layout.operator(VIEW3D_OT_materialutilities_remove_all_material_slots.bl_idname,
                         text = "Remove All Material Slot",
                         icon = 'CANCEL')
 
@@ -1006,12 +1086,15 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
         layout.separator()
         layout.operator(VIEW3D_OT_materialutilities_replace_material.bl_idname,
                         text = 'Replace Material',
-                        icon = 'ARROW_LEFTRIGHT')
+                        icon = 'OVERLAY')
 
         layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
                        text = 'Set Fake User',
                        icon = 'FAKE_USER_OFF')
 
+        layout.operator(VIEW3D_OT_materialutilities_change_material_link.bl_idname,
+                       text = 'Change Material Link',
+                       icon = 'OUTLINER_OB_MESH')
 
 classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
@@ -1019,12 +1102,13 @@ classes = (
     VIEW3D_OT_materialutilities_select_by_material_name,
     VIEW3D_OT_materialutilities_copy_material_to_others,
 
-    VIEW3D_OT_clean_material_slots,
-    VIEW3D_OT_remove_material_slot,
-    VIEW3D_OT_remove_all_material_slots,
+    VIEW3D_OT_materialutilities_clean_material_slots,
+    VIEW3D_OT_materialutilities_remove_material_slot,
+    VIEW3D_OT_materialutilities_remove_all_material_slots,
 
     VIEW3D_OT_materialutilities_replace_material,
     VIEW3D_OT_materialutilities_fake_user_set,
+    VIEW3D_OT_materialutilities_change_material_link,
 
     VIEW3D_MT_materialutilities_assign_material,
     VIEW3D_MT_materialutilities_select_by_material,
