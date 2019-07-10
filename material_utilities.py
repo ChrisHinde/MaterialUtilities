@@ -1116,7 +1116,7 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
                 name = "Move",
                 description = "How to move the material slot",
                 items = (('TOP', "Top", "Move slot to the top"),
-                         ('BOTTOM', "Bottom", "Move slot bottom"))
+                         ('BOTTOM', "Bottom", "Move slot to the bottom"))
                 )
 
     @classmethod
