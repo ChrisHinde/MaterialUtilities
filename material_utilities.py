@@ -1116,8 +1116,6 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
                 name = "Move",
                 description = "How to move the material slot",
                 items = (('TOP', "Top", "Move slot to the top"),
-                         ('UP', "Up", "Move slot up"),
-                         ('DOWN', "Down", "Move slot down"),
                          ('BOTTOM', "Bottom", "Move slot bottom"))
                 )
 
@@ -1135,31 +1133,23 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
         active_object = context.active_object
         active_material = context.object.active_material
 
-        if self.movement in {'UP', 'DOWN'}:
-            result = bpy.ops.object.material_slot_move(direction = self.movement)
+        if self.movement == 'TOP':
+            dir = 'UP'
 
-            if 'FINISHED' in result:
-                self.report({'INFO'}, active_material.name + ' moved ' + self.movement.lower() + ' one step')
-            else:
-                self.report({'WARNING'}, active_material.name + " can't be moved " + self.movement.lower() + '!')
+            steps = active_object.active_material_index
         else:
-            if self.movement == 'TOP':
-                dir = 'UP'
+            dir = 'DOWN'
 
-                steps = active_object.active_material_index
-            else:
-                dir = 'DOWN'
+            last_slot_index = len(active_object.material_slots) - 1
+            steps = last_slot_index - active_object.active_material_index
 
-                last_slot_index = len(active_object.material_slots) - 1
-                steps = last_slot_index - active_object.active_material_index
+        if steps == 0:
+            self.report({'WARNING'}, active_material.name + " already at " + self.movement.lower() + '!')
+        else:
+            for i in range(steps):
+                bpy.ops.object.material_slot_move(direction = dir)
 
-            if steps == 0:
-                self.report({'WARNING'}, active_material.name + " already at " + self.movement.lower() + '!')
-            else:
-                for i in range(steps):
-                    bpy.ops.object.material_slot_move(direction = dir)
-
-                self.report({'INFO'}, active_material.name + ' moved to ' + self.movement.lower())
+            self.report({'INFO'}, active_material.name + ' moved to ' + self.movement.lower())
 
         return {'FINISHED'}
 
@@ -1379,12 +1369,6 @@ def materialutilities_menu_move(self, context):
     layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
                     icon = 'TRIA_UP_BAR',
                     text = 'Move slot to top').movement = 'TOP'
-    layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
-                    icon = 'TRIA_UP',
-                    text = 'Move slot up').movement = 'UP'
-    layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
-                    icon = 'TRIA_DOWN',
-                    text = 'Move slot down').movement = 'DOWN'
     layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
                     icon = 'TRIA_DOWN_BAR',
                     text = 'Move slot to bottom').movement = 'BOTTOM'
