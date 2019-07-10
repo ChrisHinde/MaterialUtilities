@@ -941,6 +941,167 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
     def execute(self, context):
         return mu_change_material_link(self, self.link_to, self.affect, self.override)
 
+class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
+    """Merges materials that has the same base names but ends with .xxx (.001, .002 etc)"""
+
+    bl_idname = "material.materialutilities_merge_base_names"
+    bl_label = "Merge Base Names"
+    bl_description = "Merge materials that has the same base names but ends with .xxx (.001, .002 etc)"
+
+    material_base_name: StringProperty(
+                            name = "Material Base Name",
+                            default = "",
+                            description = 'Base name for materials to merge ' +
+                                          '(e.g. "Material" is the base name of "Material.001", "Material.002" etc.)'
+                            )
+    is_auto: BoolProperty(
+                            name = "Auto Merge",
+                            description = "Find all available duplicate materials and Merge them"
+                            )
+
+    is_not_undo = False
+    material_error = []          # collect mat for warning messages
+
+
+    def replace_name(self):
+        """If the user chooses a material like 'Material.042', clean it up to get a base name ('Material')"""
+
+        # use the chosen material as a base one, check if there is a name
+        self.check_no_name = (False if self.material_base_name in {""} else True)
+
+        # No need to do this if it's already "clean"
+        #  (Also lessens the potential of error given about the material with the Base name)
+        if '.' not in self.material_base_name:
+            return
+
+        if self.check_no_name is True:
+            for mat in bpy.data.materials:
+                name = mat.name
+
+                if name == self.material_base_name:
+                    try:
+                        base, suffix = name.rsplit('.', 1)
+
+                        # trigger the exception
+                        num = int(suffix, 10)
+                        self.material_base_name = base
+                        mat.name = self.material_base_name
+                        return
+                    except ValueError:
+                        if name not in self.material_error:
+                            self.material_error.append(name)
+                        return
+
+        return
+
+    def split_name(self, material):
+        """Split the material name into a base and a suffix"""
+
+        name = material.name
+
+        # No need to do this if it's already "clean"/there is no suffix
+        if '.' not in name:
+            return name, None
+
+        base, suffix = name.rsplit('.', 1)
+
+        try:
+            # trigger the exception
+            num = int(suffix, 10)
+        except ValueError:
+            # Not a numeric suffix
+            # Don't report on materials not actually included in the merge!
+            if ((self.is_auto or base == self.material_base_name)
+                 and (name not in self.material_error)):
+                self.material_error.append(name)
+            return name, None
+
+        if self.is_auto is False:
+            if base == self.material_base_name:
+                return base, suffix
+            else:
+                return name, None
+
+        return base, suffix
+
+    def fixup_slot(self, slot):
+        """Fix material slots that was assigned to materials now removed"""
+
+        if not slot.material:
+            return
+
+        base, suffix = self.split_name(slot.material)
+        if suffix is None:
+            return
+
+        try:
+            base_mat = bpy.data.materials[base]
+        except KeyError:
+            print("\n[Materials Utilities Specials]\nLink to base names\nError:"
+                  "Base material %r not found\n" % base)
+            return
+
+        slot.material = base_mat
+
+    def main_loop(self, context):
+        """Loops through all objects and material slots to make sure they are assigned to the right material"""
+
+        for obj in context.scene.objects:
+            for slot in obj.material_slots:
+                self.fixup_slot(slot)
+
+    @classmethod
+    def poll(self, context):
+        return context.active_object is not None
+
+    def draw(self, context):
+        layout = self.layout
+
+        box_1 = layout.box()
+        box_1.prop_search(self, "material_base_name", bpy.data, "materials")
+        box_1.enabled = not self.is_auto
+        layout.separator()
+
+        box_2 = layout.box()
+        box_2.prop(self, "is_auto", text = "Auto Rename/Replace", icon = "SYNTAX_ON")
+
+    def invoke(self, context, event):
+        self.is_not_undo = True
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        # Reset Material errors, otherwise we risk reporting errors erroneously..
+        self.material_error = []
+
+        if not self.is_auto:
+            self.replace_name()
+
+            if self.check_no_name:
+                self.main_loop(context)
+            else:
+                self.report({'WARNING'}, "No Material Base Name given!")
+
+                self.is_not_undo = False
+                return {'CANCELLED'}
+
+        self.main_loop(context)
+
+        if self.material_error:
+            materials = ", ".join(self.material_error)
+
+            if len(self.material_error) == 1:
+                waswere = " was"
+                suff_s = ""
+            else:
+                waswere = " were"
+                suff_s = "s"
+
+            self.report({'WARNING'}, materials + waswere + " not removed or set as Base" + suff_s)
+
+        self.is_not_undo = False
+        return {'FINISHED'}
+
+
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
 
@@ -1055,6 +1216,23 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     text = material,
                     icon = 'MATERIAL_DATA').material_name = material
 
+class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
+    """Spcials menu for Material Utilities"""
+
+    bl_idname = "VIEW3D_MT_materialutilities_specials"
+    bl_label = "Specials"
+
+    def draw(self, context):
+        layout = self.layout
+
+        #layout.operator(VIEW3D_OT_materialutilities_set_new_material_name.bl_idname, icon = "SETTINGS")
+
+        layout.separator()
+
+        layout.operator(MATERIAL_OT_materialutilities_merge_base_names.bl_idname,
+                        text = "Merge Base Names",
+                        icon = "GREASEPENCIL")
+
 
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
     """Main menu for Material Utilities"""
@@ -1094,7 +1272,11 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
 
         layout.operator(VIEW3D_OT_materialutilities_change_material_link.bl_idname,
                        text = 'Change Material Link',
-                       icon = 'OUTLINER_OB_MESH')
+                       icon = 'LINKED')
+        layout.separator()
+
+        layout.menu(VIEW3D_MT_materialutilities_specials.bl_idname,
+                        icon = 'SOLO_ON')
 
 classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
@@ -1110,10 +1292,13 @@ classes = (
     VIEW3D_OT_materialutilities_fake_user_set,
     VIEW3D_OT_materialutilities_change_material_link,
 
+    MATERIAL_OT_materialutilities_merge_base_names,
+
     VIEW3D_MT_materialutilities_assign_material,
     VIEW3D_MT_materialutilities_select_by_material,
 
     VIEW3D_MT_materialutilities_clean_slots,
+    VIEW3D_MT_materialutilities_specials,
 
     VIEW3D_MT_materialutilities_main,
 )
