@@ -1,9 +1,12 @@
 # Ported from 2.6 (& 2.7) to 2.8 by
 #    Christopher Hindefjord (chrishinde) 2019
 #
-# ## Original:
-#   (c) 2010+ Michael Williamson (michaelw)
-#   ported from original by Michael Williamson
+# ## Port based on 2010 version by MichaelW with some code added from latest 2.7x version
+# ## Same code may be attributed to one of the follwing awesome people!
+#  (c) 2016 meta-androcto, parts based on work by Saidenka, lijenstina
+#  Materials Utils: by MichaleW, lijenstina,
+#       (some code thanks to: CoDEmanX, SynaGl0w, ideasman42)
+#  Link to base names: Sybren, Texture renamer: Yadoob
 # ###
 #
 #
