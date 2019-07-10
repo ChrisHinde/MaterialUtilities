@@ -5,6 +5,8 @@ o Fix problems with assigning materials when having multiple objects selected in
   It currently assigns to faces of the other objects that aren't selected. ("Polygon ID" conflicts?)
 o Fix problems with selecting by material not selecting faces for "not active" objects
   when you have multiple objects selected in Edit mode
+o Add "Rename Textures" - This will require some rework to fit in 2.8
+o Add Add-on properties
 
 o (?) Add "Copy material to others" to Edit mode,
   where the material of the active face is copied to the other selected faces
