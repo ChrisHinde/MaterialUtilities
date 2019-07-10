@@ -1104,6 +1104,65 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         self.is_not_undo = False
         return {'FINISHED'}
 
+class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
+    """Move the active material slot"""
+
+    bl_idname = "material.materialutilities_slot_move"
+    bl_label = "Move Slot"
+    bl_description = "Move the material slot"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    movement: EnumProperty(
+                name = "Move",
+                description = "How to move the material slot",
+                items = (('TOP', "Top", "Move slot to the top"),
+                         ('UP', "Up", "Move slot up"),
+                         ('DOWN', "Down", "Move slot down"),
+                         ('BOTTOM', "Bottom", "Move slot bottom"))
+                )
+
+    @classmethod
+    def poll(self, context):
+        # would prefer to access sely.movement here, but can'-'t..
+        obj = context.active_object
+        if not obj:
+            return False
+        if (obj.active_material_index < 0) or (len(obj.material_slots) <= 1):
+            return False
+        return True
+
+    def execute(self, context):
+        active_object = context.active_object
+        active_material = context.object.active_material
+
+        if self.movement in {'UP', 'DOWN'}:
+            result = bpy.ops.object.material_slot_move(direction = self.movement)
+
+            if 'FINISHED' in result:
+                self.report({'INFO'}, active_material.name + ' moved ' + self.movement.lower() + ' one step')
+            else:
+                self.report({'WARNING'}, active_material.name + " can't be moved " + self.movement.lower() + '!')
+        else:
+            if self.movement == 'TOP':
+                dir = 'UP'
+
+                steps = active_object.active_material_index
+            else:
+                dir = 'DOWN'
+
+                last_slot_index = len(active_object.material_slots) - 1
+                steps = last_slot_index - active_object.active_material_index
+
+            if steps == 0:
+                self.report({'WARNING'}, active_material.name + " already at " + self.movement.lower() + '!')
+            else:
+                for i in range(steps):
+                    bpy.ops.object.material_slot_move(direction = dir)
+
+                self.report({'INFO'}, active_material.name + ' moved to ' + self.movement.lower())
+
+        return {'FINISHED'}
+
 
 # -----------------------------------------------------------------------------
 # menu classes  (To be moved to separate file)
@@ -1297,6 +1356,8 @@ classes = (
 
     MATERIAL_OT_materialutilities_merge_base_names,
 
+    MATERIAL_OT_materialutilities_material_slot_move,
+
     VIEW3D_MT_materialutilities_assign_material,
     VIEW3D_MT_materialutilities_select_by_material,
 
@@ -1306,6 +1367,28 @@ classes = (
     VIEW3D_MT_materialutilities_main,
 )
 
+def materialutilities_specials_menu(self, contxt):
+    self.layout.separator()
+    self.layout.menu(VIEW3D_MT_materialutilities_main.bl_idname)
+
+
+def materialutilities_menu_move(self, context):
+    layout = self.layout
+    layout.operator_context = 'INVOKE_REGION_WIN'
+
+    layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
+                    icon = 'TRIA_UP_BAR',
+                    text = 'Move slot to top').movement = 'TOP'
+    layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
+                    icon = 'TRIA_UP',
+                    text = 'Move slot up').movement = 'UP'
+    layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
+                    icon = 'TRIA_DOWN',
+                    text = 'Move slot down').movement = 'DOWN'
+    layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
+                    icon = 'TRIA_DOWN_BAR',
+                    text = 'Move slot to bottom').movement = 'BOTTOM'
+    layout.separator()
 
 # This allows you to right click on a button and link to the manual
 def materialutilities_manual_map():
@@ -1332,6 +1415,10 @@ def mu_register():
     """Register the classes of Material Utilities together with the default shortcut (Shift+Q)"""
     register()
 
+    bpy.types.VIEW3D_MT_object_context_menu.append(materialutilities_specials_menu)
+
+    bpy.types.MATERIAL_MT_context_menu.prepend(materialutilities_menu_move)
+
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
         km = kc.keymaps.new(name = "3D View", space_type = "VIEW_3D")
@@ -1346,6 +1433,10 @@ def mu_unregister():
     unregister()
 
     bpy.utils.unregister_manual_map(materialutilities_manual_map)
+
+    bpy.types.VIEW3D_MT_object_context_menu.remove(materialutilities_specials_menu)
+
+    bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_move)
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
