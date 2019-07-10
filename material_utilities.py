@@ -1390,6 +1390,40 @@ def materialutilities_menu_move(self, context):
                     text = 'Move slot to bottom').movement = 'BOTTOM'
     layout.separator()
 
+def materialutilities_menu_functions(self, context):
+    layout = self.layout
+    layout.operator_context = 'INVOKE_REGION_WIN'
+
+    layout.separator()
+
+    layout.menu(VIEW3D_MT_materialutilities_assign_material.bl_idname,
+                 icon = 'ADD')
+    layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname,
+                 icon = 'VIEWZOOM')
+    layout.separator()
+
+    layout.separator()
+
+    layout.menu(VIEW3D_MT_materialutilities_clean_slots.bl_idname,
+                icon = 'NODE_MATERIAL')
+
+    layout.separator()
+    layout.operator(VIEW3D_OT_materialutilities_replace_material.bl_idname,
+                    text = 'Replace Material',
+                    icon = 'OVERLAY')
+
+    layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
+                   text = 'Set Fake User',
+                   icon = 'FAKE_USER_OFF')
+
+    layout.operator(VIEW3D_OT_materialutilities_change_material_link.bl_idname,
+                   text = 'Change Material Link',
+                   icon = 'LINKED')
+    layout.separator()
+
+    layout.menu(VIEW3D_MT_materialutilities_specials.bl_idname,
+                    icon = 'SOLO_ON')
+
 # This allows you to right click on a button and link to the manual
 def materialutilities_manual_map():
     print("ManMap")
@@ -1418,6 +1452,7 @@ def mu_register():
     bpy.types.VIEW3D_MT_object_context_menu.append(materialutilities_specials_menu)
 
     bpy.types.MATERIAL_MT_context_menu.prepend(materialutilities_menu_move)
+    bpy.types.MATERIAL_MT_context_menu.append(materialutilities_menu_functions)
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
@@ -1437,6 +1472,7 @@ def mu_unregister():
     bpy.types.VIEW3D_MT_object_context_menu.remove(materialutilities_specials_menu)
 
     bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_move)
+    bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_functions)
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
