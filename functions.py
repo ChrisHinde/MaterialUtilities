@@ -1,5 +1,8 @@
 import bpy
 
+# -----------------------------------------------------------------------------
+# utility functions
+
 def mu_assign_material_slots(object, material_list):
     """Given an object and a list of material names removes all material slots from the object
        adds new ones for each material in the material list, adds the materials to the slots as well."""

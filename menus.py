@@ -4,7 +4,7 @@ from .functions import *
 from .operators import *
 
 # -----------------------------------------------------------------------------
-# menu classes  (To be moved to separate file)
+# menu classes
 
 class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
     """Menu for choosing which material should be assigned to current selection"""
@@ -128,7 +128,7 @@ class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
 
         #layout.operator(VIEW3D_OT_materialutilities_set_new_material_name.bl_idname, icon = "SETTINGS")
 
-        layout.separator()
+        #layout.separator()
 
         layout.operator(MATERIAL_OT_materialutilities_merge_base_names.bl_idname,
                         text = "Merge Base Names",
