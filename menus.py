@@ -23,14 +23,14 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         if obj.mode == 'EDIT':
             bl_id = VIEW3D_OT_materialutilities_assign_material_edit.bl_idname
 
-        for material_name in bpy.data.materials.keys():
+        for material_name, material in bpy.data.materials.items():
             layout.operator(bl_id,
                 text = material_name,
-                icon = 'MATERIAL_DATA').material_name = material_name
+                icon_value = material.preview.icon_id).material_name = material_name
 
         layout.operator(bl_id,
                         text = "Add New Material",
-                        icon = 'ADD')
+                        icon = 'ADD').material_name = "Unnamed material"
 
 
 class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
@@ -53,7 +53,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                 if material.users > 0:
                     layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
                                     text = material_name,
-                                    icon = 'MATERIAL_DATA',
+                                    icon_value = material.preview.icon_id
                                     ).material_name = material_name
 
         elif obj.mode == 'EDIT':
@@ -62,7 +62,8 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
             for material in materials:
                 layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
                     text = material,
-                    icon = 'MATERIAL_DATA').material_name = material
+                    icon_value = material.preview.icon_id
+                    ).material_name = material
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
     """Menu for cleaning up the material slots"""
@@ -106,7 +107,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                 if material.users > 0:
                     layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
                                     text = material_name,
-                                    icon = 'MATERIAL_DATA',
+                                    icon_value = material.preview.icon_id
                                     ).material_name = material_name
 
         elif obj.mode == 'EDIT':
@@ -115,7 +116,8 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
             for material in materials:
                 layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
                     text = material,
-                    icon = 'MATERIAL_DATA').material_name = material
+                    icon_value = material.preview.icon_id
+                    ).material_name = material
 
 class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
     """Spcials menu for Material Utilities"""
