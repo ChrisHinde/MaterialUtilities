@@ -126,18 +126,12 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                 i += 1
 
             if not found:
-                # the material is not attached to the object
-                if (len(obj.data.materials) == 1) and not edit_mode:
-                    # in object mode, override the material if it's just one slot used
-                    obj.data.materials[0] = target
-                    index = 0
-                else:
-                    # In Edit mode, or if there's not a slot, append the assigned material
-                    #  If we're overriding, there's currently no materials at all, so after this there will be 1
-                    #  If not, this adds another slot with the assigned material
-                    index = len(obj.data.materials)
-                    obj.data.materials.append(target)
-                    obj.active_material_index = index
+                # In Edit mode, or if there's not a slot, append the assigned material
+                #  If we're overriding, there's currently no materials at all, so after this there will be 1
+                #  If not, this adds another slot with the assigned material
+                index = len(obj.data.materials)
+                obj.data.materials.append(target)
+                obj.active_material_index = index
 
                 mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
 
