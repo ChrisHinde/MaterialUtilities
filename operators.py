@@ -36,7 +36,7 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
 
 class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     """Assign a material to the current selection
-    (See the operator panel [F9] for more options)"""
+    (See the last operator panel for more options)"""
 
     bl_idname = "view3d.materialutilities_assign_material_object"
     bl_label = "Assign Material (Material Utilities)"
@@ -68,7 +68,7 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
 
 class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     """Select geometry that has the chosen material assigned to it
-    (See the operator panel [F9] for more options)"""
+    (See the last operator panel for more options)"""
 
     bl_idname = "view3d.materialutilities_select_by_material_name"
     bl_label = "Select By Material Name (Material Utilities)"
@@ -127,7 +127,7 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
 
 class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
     """Remove the active material slot from selected object(s)
-    (See the operator panel [F9] for more options)"""
+    (See the last operator panel for more options)"""
 
     bl_idname = "view3d.materialutilities_remove_material_slot"
     bl_label = "Remove Active Material Slot (Material Utilities)"
@@ -148,7 +148,7 @@ class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
 
 class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
     """Remove all material slots from selected object(s)
-    (See the operator panel [F9] for more options)"""
+    (See the last operator panel for more options)"""
 
     bl_idname = "view3d.materialutilities_remove_all_material_slots"
     bl_label = "Remove All Material Slots (Material Utilities)"
