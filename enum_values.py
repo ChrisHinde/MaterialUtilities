@@ -1,7 +1,5 @@
 import bpy
 
-print("eeeeeeeeeeeeee")
-print(__name__)
 
 mu_override_type_enums = [
     ('OVERRIDE_ALL', "Override all assigned slots",

@@ -7,8 +7,6 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty
 from .enum_values import *
 from .functions import *
 
-print("OOOOoooooooooo")
-print(__name__)
 # -----------------------------------------------------------------------------
 # operator classes (To be moved to separate file)
 
