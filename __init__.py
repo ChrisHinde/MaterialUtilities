@@ -876,17 +876,18 @@ def materialutilities_manual_map():
     #print(url_manual_mapping)
     return url_manual_prefix, url_manual_mapping
 
-register, unregister = bpy.utils.register_classes_factory(classes)
+mu_classes_register, mu_classes_unregister = bpy.utils.register_classes_factory(classes)
 
 
-def mu_register():
+def register():
     """Register the classes of Material Utilities together with the default shortcut (Shift+Q)"""
-    register()
+    mu_classes_register()
 
-    bpy.types.VIEW3D_MT_object_context_menu.append(materialutilities_specials_menu)
 
-    bpy.types.MATERIAL_MT_context_menu.prepend(materialutilities_menu_move)
-    bpy.types.MATERIAL_MT_context_menu.append(materialutilities_menu_functions)
+    bpy.types.MATERIAL_MT_specials.prepend(materialutilities_menu_move)
+    bpy.types.MATERIAL_MT_specials.append(materialutilities_menu_functions)
+
+    bpy.types.VIEW3D_MT_object_specials.append(materialutilities_specials_menu)
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
@@ -897,16 +898,16 @@ def mu_register():
         bpy.utils.register_manual_map(materialutilities_manual_map)
 
 
-def mu_unregister():
+def unregister():
     """Unregister the classes of Material Utilities together with the default shortcut for the menu"""
-    unregister()
+    mu_classes_unregister()
 
     bpy.utils.unregister_manual_map(materialutilities_manual_map)
 
-    bpy.types.VIEW3D_MT_object_context_menu.remove(materialutilities_specials_menu)
+    bpy.types.VIEW3D_MT_object_specials.remove(materialutilities_specials_menu)
 
-    bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_move)
-    bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_functions)
+    bpy.types.MATERIAL_MT_specials.remove(materialutilities_menu_move)
+    bpy.types.MATERIAL_MT_specials.remove(materialutilities_menu_functions)
 
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
@@ -918,7 +919,7 @@ def mu_unregister():
                     break
 
 if __name__ == "__main__":
-    mu_register()
+    register()
 
 #print("MU Start!")
 #mu_register()
