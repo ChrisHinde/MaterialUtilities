@@ -76,7 +76,7 @@ class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
         layout.label
         layout.operator(VIEW3D_OT_materialutilities_clean_material_slots.bl_idname,
                         text = "Clean Material Slots",
-                        icon = 'TRASH')
+                        icon = 'X')
         layout.separator()
         layout.operator(VIEW3D_OT_materialutilities_remove_material_slot.bl_idname,
                         text = "Remove Active Material Slot",
