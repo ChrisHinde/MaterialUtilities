@@ -121,8 +121,7 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        mu_cleanmatslots(self)
-        return {'FINISHED'}
+        return mu_cleanmatslots(self)
 
 
 class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):

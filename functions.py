@@ -398,6 +398,7 @@ def mu_cleanmatslots(self):
     if edit_mode:
         bpy.ops.object.mode_set(mode='EDIT')
 
+    return {'FINISHED'}
 
 def mu_remove_material(self, for_active_object = False):
     """Remove the active material slot from selected object(s)"""
