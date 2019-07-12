@@ -30,13 +30,13 @@
 
 bl_info = {
     "name": "Material Utilities",
-    "author": "chrishinde",
-    "version": (0, 1),
+    "author": "ChrisHinde",
+    "version": (0, 5),
     "blender": (2, 80, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
     "warning": "Under development!",
-    "wiki_url": "https://github.com/ChrisHinde/MaterialUtils",
+    "wiki_url": "https://github.com/ChrisHinde/MaterialUtilities",
     "category": "Materials"
 }
 
@@ -85,15 +85,13 @@ This script has several functions and operators, grouped for convenience:
 
 
 import bpy
-#import bmesh
-#from bpy.types import EnumPropertyItem
 
 from .enum_values import *
 from .functions import *
 from .operators import *
 from .menus import *
 
-
+# All classes used by Material Utilities, that need to be registred 
 classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
     VIEW3D_OT_materialutilities_assign_material_edit,
@@ -125,7 +123,7 @@ classes = (
 # This allows you to right click on a button and link to the manual
 def materialutilities_manual_map():
     print("ManMap")
-    url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtils/"
+    url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtilities"
     url_manual_map = []
     #url_manual_mapping = ()
         #("bpy.ops.view3d.materialutilities_*", ""),
@@ -146,7 +144,6 @@ mu_classes_register, mu_classes_unregister = bpy.utils.register_classes_factory(
 def register():
     """Register the classes of Material Utilities together with the default shortcut (Shift+Q)"""
     mu_classes_register()
-
 
     bpy.types.MATERIAL_MT_specials.prepend(materialutilities_menu_move)
     bpy.types.MATERIAL_MT_specials.append(materialutilities_menu_functions)
@@ -182,8 +179,6 @@ def unregister():
                     km.keymap_items.remove(kmi)
                     break
 
+
 if __name__ == "__main__":
     register()
-
-#print("MU Start!")
-#mu_register()
