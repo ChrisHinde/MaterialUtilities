@@ -83,7 +83,7 @@ class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
                         text = "Remove Active Material Slot",
                         icon = 'REMOVE')
         layout.operator(VIEW3D_OT_materialutilities_remove_all_material_slots.bl_idname,
-                        text = "Remove All Material Slot",
+                        text = "Remove All Material Slots",
                         icon = 'CANCEL')
 
 
@@ -156,7 +156,7 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
         layout.separator()
 
         layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
-                         text = 'Copy materials to others',
+                         text = 'Copy Materials to Selected',
                          icon = 'COPY_ID')
 
         layout.separator()
@@ -194,10 +194,10 @@ def materialutilities_menu_move(self, context):
 
     layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
                     icon = 'TRIA_UP_BAR',
-                    text = 'Move slot to top').movement = 'TOP'
+                    text = 'Move Slot to the Top').movement = 'TOP'
     layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
                     icon = 'TRIA_DOWN_BAR',
-                    text = 'Move slot to bottom').movement = 'BOTTOM'
+                    text = 'Move Slot to the Bottom').movement = 'BOTTOM'
     layout.separator()
 
 def materialutilities_menu_functions(self, context):
