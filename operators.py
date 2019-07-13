@@ -80,7 +80,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
             )
     material_name: StringProperty(
             name = 'Material Name',
-            description = 'Name of Material to Select',
+            description = 'Name of Material to find and Select',
             maxlen = 63,
             )
 
@@ -175,16 +175,16 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
 
     matorg: StringProperty(
             name = "Original",
-            description = "Material to replace",
+            description = "Material to find and replace",
             maxlen = 63,
             )
     matrep: StringProperty(name="Replacement",
-            description = "Replacement material",
+            description = "Material that will be used instead of the Original material",
             maxlen = 63,
             )
     all_objects: BoolProperty(
             name = "All objects",
-            description = "Replace for all objects in this blend file",
+            description = "Replace for all objects in this blend file (otherwise only selected objects)",
             default = True,
             )
     update_selection: BoolProperty(
