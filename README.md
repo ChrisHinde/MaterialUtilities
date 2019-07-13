@@ -50,48 +50,48 @@ But here are some examples:
 The default shortcut for Material Utilities is `Shift + Q`.\
 [![Material Utilities - popup menu](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_Menu-e1562975806841.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_Menu.png)
 
-- *Assign Material*\
+- **Assign Material**\
   Gives you a list of all available materials (including the option to create a new material).\
   Assigns the material you choose to the current selection.\
   In Object Mode you have the option to select how the existing material (slots) should be treated
   (In Edit mode it will append the material if it's not already in a material slot).\
   ![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat2-e1562979655329.png)
 
-  - *Override all assigned slots*\
+  - **Override all assigned slots**\
     Will remove any material previously assigned to the object(s) and add the one you've chosen
-  - *Assign material to each slot*\
+  - **Assign material to each slot**\
     Keeps all the material slots, and their assignment to respective parts of the object.
     But will replace each material in those slots with your chosen material.
-  - *Append material*\
+  - **Append material**\
     Keeps all materials slots, but appends your chosen material (if it's not already in a slot),
     and assigns the whole object to that material slot.
 
-- *Select by Material*\
+- **Select by Material**\
   Gives you a list of all available materials (in Edit mode it only shows the materials assigned to the object).\
   Selects all objects (in Object Mode) or faces (in Edit Mode) that have the material you choose.\
   In the operator panel `[F9]` you can choose to extend your current selection, otherwise what was selected before will be unselected first.
 
-- *Copy Materials to Seleted*\
+- **Copy Materials to Seleted**\
   Copies all the materials of the active object to the other selected objects. (Object Mode only)
 
-- *Clean Slots*
-  - *Clean Material Slots*\
+- **Clean Slots**
+  - **Clean Material Slots**\
     Removes any material slots that isn't assigned to any part of the object
-  - *Remove Active Slot*\
+  - **Remove Active Slot**\
     (Object Mode only)\
     You can limit it to only the active object in the operator panel `[F9]`
-  - *Remove All Material Slots*\
+  - **Remove All Material Slots**\
     Remove all material slots (and thus materials) assigned to the selected object(s). (Object Mode only)\
     You can limit it to only the active object in the operator panel `[F9]`
-- *Replace Material*\
-  Replace any occurence of one material, *Original*, with another material, *Replacement*.\
+- **Replace Material**\
+  Replace any occurence of one material, **Original**, with another material, **Replacement**.\
   In the operator panel you can also choose if you want it done "globally" (All objects in the file), or just selected objects,
   as well as to get those objects that was affected by the change selected
-- *Set Fake User*\
+- **Set Fake User**\
 
-- *Change Material Link*\
-- *Sepcials*
-  - *Merge Base Names*\
+- **Change Material Link**\
+- **Sepcials**
+  - **Merge Base Names**\
 
 
 ### Material Specials menu

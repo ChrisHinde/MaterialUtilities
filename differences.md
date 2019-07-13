@@ -1,4 +1,4 @@
-# What's the difference - Material Utilities vs Material Utils
+# What's the difference? - Material Utilities vs Material Utils
 
 ## Table of Contents
 
