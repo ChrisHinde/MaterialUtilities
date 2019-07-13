@@ -1,4 +1,4 @@
-# Material utilities v1.0b
+# Material utilities v1.0-beta
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
@@ -7,6 +7,12 @@ An add-on for Blender 2.8x that lets the user assign materials directly in the 3
 **This is Beta, and still under development, you're welcome to use it, but be aware that it might not work perfectely smoothly!**\
 Each part is tested thoroughly during development, but we can't guarantee that there might be a special case where a problem might occur!\
 Please read the list of [Known issues](#knownissues) below, if your problem isn't listed, please leave a bug report.
+
+## Version
+
+The current **Beta** version of Material Utilities is **v1.0.1**\
+(Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
+  Patch version [last number] indicates small changes and fixes)
 
 ## Table of Contents
 
@@ -21,11 +27,11 @@ Please read the list of [Known issues](#knownissues) below, if your problem isn'
 
 ## Background
 
-This is based on the Add-on *Material Utils*, originally written for Blender 2.4 (and then ported to 2.5, 2.6 etc).
+This is based on the Add-on *Material Utils*, originally written for Blender 2.4 (and then ported to 2.5, 2.6 etc).\
 I was really missing this Add-on when I started using Blender 2.80. But I couldn't find any ports of it (or even any in development),
 so I decided to port it myself, and this is the result!
 
-The goal is to include (almost?) every feature it had in 2.7x,
+The goal is to include (almost) every feature it had in 2.7x,
 but I'm also adding some features that I think (and hope others will as well) will be useful!\
 If you're missing something, please send in a request and we'll see what we can do!
 
@@ -41,21 +47,23 @@ But here are some examples:
 2. In Blender 2.8x go to *Edit* > *Preferences*, select *Add-ons* in the left panel, and then *Install* in the upper right.
 3. Browse to where you saved the ZIP-file, select it and click on *Install Add-on from File*.
 4. Click the checkbox to the left to enable the Add-on.
-5. (Click the menu icon in the lower left and select *Save Current State*, unless you have Auto-save Preferences on)
+5. Click the menu icon in the lower left and select *Save Current State*
 
 ## Usage
 
 ### Popup menu
 
-The default shortcut for Material Utilities is `Shift + Q`.\
+The default shortcut for Material Utilities is `[Shift + Q]`.\
 [![Material Utilities - popup menu](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_Menu-e1562975806841.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_Menu.png)
+
+*Tip:* All operators and options have descriptive tooltips
 
 - **Assign Material**\
   Gives you a list of all available materials (including the option to create a new material).\
   Assigns the material you choose to the current selection.\
   In Object Mode you have the option to select how the existing material (slots) should be treated
   (In Edit mode it will append the material if it's not already in a material slot).\
-  ![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat2-e1562979655329.png)
+  [![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat2-e1562979655329.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat2.png)
 
   - **Override all assigned slots**\
     Will remove any material previously assigned to the object(s) and add the one you've chosen
@@ -69,39 +77,65 @@ The default shortcut for Material Utilities is `Shift + Q`.\
 - **Select by Material**\
   Gives you a list of all available materials (in Edit mode it only shows the materials assigned to the object).\
   Selects all objects (in Object Mode) or faces (in Edit Mode) that have the material you choose.\
-  In the operator panel `[F9]` you can choose to extend your current selection, otherwise what was selected before will be unselected first.
+  In the operator panel `[F9]` you can choose to extend your current selection, otherwise what was selected before will be unselected first.\
+  [![Select By Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat-e1563020811830.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat.png)
 
-- **Copy Materials to Seleted**\
-  Copies all the materials of the active object to the other selected objects. (Object Mode only)
+- **Copy Materials to Seleted** (Object Mode only)\
+  Copies all the materials of the active object to the other selected objects.
 
 - **Clean Slots**
   - **Clean Material Slots**\
     Removes any material slots that isn't assigned to any part of the object
-  - **Remove Active Slot**\
-    (Object Mode only)\
+  - **Remove Active Slot** (Object Mode only)\
     You can limit it to only the active object in the operator panel `[F9]`
-  - **Remove All Material Slots**\
-    Remove all material slots (and thus materials) assigned to the selected object(s). (Object Mode only)\
+  - **Remove All Material Slots** (Object Mode only)\
+    Remove all material slots (and thus materials) assigned to the selected object(s).\
     You can limit it to only the active object in the operator panel `[F9]`
+
 - **Replace Material**\
   Replace any occurence of one material, **Original**, with another material, **Replacement**.\
-  In the operator panel you can also choose if you want it done "globally" (All objects in the file), or just selected objects,
-  as well as to get those objects that was affected by the change selected
+  In the operator panel you can also choose if you want it done "globally" (for all objects in the file),
+  or just for selected objects.\
+  You can also choose to have the objects that were affected by the change selected (objects not affected will be deselcted).\
+  [![Replace Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial-1-e1563021244834.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial.png)
+
 - **Set Fake User**\
+  Set the Fake User flag (to preserve unused materials) of the materials to either
+  **On** or **Off**, or **Toggle** (on a per material basis) their current states.\
+  You can limit the action to **Unused** materials (Default), **Used** materials, **All** materials,
+  materials of the **Selected** objects, of the **Active** object, or of all objects in the current **Scene**.\
+  [![Set Fake User](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SetFakeUser-e1563021336472.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SetFakeUser.png)
 
 - **Change Material Link**\
-- **Sepcials**
+  Change how the material slots are linked, to either the **Data** (i.e. Mesh Data) or to the **Object**,
+  or **Toggle** (on a per material basis) what they are currently are linked to.\
+  You can limit the action to material slots of the **Selected** objects (Default), of the **Active** object,
+  of all objects in the current **Scene**, or of **All** objects in the file.\
+  When switching to *Linked to Object* the materials assigned the materials assigned to the slots will be kept intact.\
+  When switching to *Linked to Data* there's a possibility that there's already an material assigned to the *Mesh Data*.\
+  If there is no material assigned to the data, the material of the object will be kept.\
+  If there is an material assigned to the data, that material will be used by default, or you can force the use of the material assigned to the object, by enabling **Override Data Material** (Do note that this will affect all objects that share the same *Data* and have materials linked to the *Data*).\
+  [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink-e1563021376228.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink.png)
+
+- **Specials**
   - **Merge Base Names**\
+    Finds materials such as `Material`, `Material.001`, `Material.002` and merges them into a single material (`Material`).\
+    You can select a specific **Material Base Name** (such as `MyMaterial`) to find duplicates of (`MyMaterial.001` etc).\
+    By enabling **Auto Rename/Replace** it will find all materials that are "duplicates" and merge them into a single material.\
+    **Do note** that this only keeps the base material (`MyMaterial`) and ignores the other versions (`MyMaterial.001` etc)\
+    [![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames-e1563021414948.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames.png)
 
 
 ### Material Specials menu
 
-Material Utilities adds some options to the *Material Specials* menu as well (accessible by the small downward pointing arrow to the right of the materials list).\
-At the bottom of this menu (below *Paste Material*), most of the options from the popup menu (detailed above) is added.
+Material Utilities adds some options to the **Material Specials** menu as well (accessible by the small downward pointing arrow to the right of the materials list).\
+At the bottom of this menu (below **Paste Material**), most of the options from the popup menu (detailed above) is added.
 And at the top two other options are added:
 
-- *Move slot to top* - Moves the currently selected material slot to the top of the list
-- *Move slot to bottom* - Moves the currently selected material slot to the bottom of the list
+- **Move slot to top**\
+  Moves the currently selected material slot to the top of the list
+- **Move slot to bottom**\
+  Moves the currently selected material slot to the bottom of the list
 
 [![Material Specials menu](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MaterialSpecials-e1562975670283.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MaterialSpecials.png)
 
@@ -119,7 +153,10 @@ And at the top two other options are added:
 
 ## Support
 
-
+Support is given when time is available, you can ask for support via https://chris.hindefjord.se/contact/. \
+If you think you've find a bug, please
+[report it by creating an issue](https://github.com/ChrisHinde/MaterialUtilities/issues)!\
+Bug reports takes precedence over other support requests!
 
 ## Contributing
 

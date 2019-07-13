@@ -1,5 +1,5 @@
-<a name=""></a>
-# v1.0.1 (2019-07-13)
+<a name="1.0.1"></a>
+# 1.0.1 (2019-07-13)
 
 
 * Add "Copy material to ohers" for Object mode 90808e6
