@@ -163,7 +163,7 @@ def register():
         bpy.utils.register_manual_map(materialutilities_manual_map)
 
 
-def mu_unregister():
+def unregister():
     """Unregister the classes of Material Utilities together with the default shortcut for the menu"""
     mu_classes_unregister()
 
