@@ -30,13 +30,3 @@ mu_link_affect_enums = (('ACTIVE', "Active object", "Materials of active object 
 
 mu_material_slot_move_enums = (('TOP', "Top", "Move slot to the top"),
                                ('BOTTOM', "Bottom", "Move slot to the bottom"))
-
-
-def register():
-    bpy.utils.register_module(__name__)
-    pass
-
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-    pass

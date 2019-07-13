@@ -496,13 +496,3 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
             self.report({'INFO'}, active_material.name + ' moved to ' + self.movement.lower())
 
         return {'FINISHED'}
-
-
-def register():
-    bpy.utils.register_module(__name__)
-    pass
-
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-    pass
