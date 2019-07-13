@@ -10,7 +10,7 @@
 - [Texture Renamer](#texture-renamer)
 - [Preview Active Material](#preview-active-material)
 - [Icons](#icons)
-- [Material Preview in menus](#material-previews)
+- [Material Preview in menus](#material-preview)
 - [Change Material Link](#change-material-link)
 - [Added options for operators](#added-options-for-operators)
 - [Possible additions](#possible-additions)
