@@ -10,7 +10,7 @@ Please read the list of [Known issues](#knownissues) below, if your problem isn'
 
 ## Version
 
-The current **Beta** version of Material Utilities is **v1.0.1**\
+The current **Beta** version of Material Utilities is **v1.0.2**\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -115,7 +115,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
   When switching to *Linked to Data* there's a possibility that there's already an material assigned to the *Mesh Data*.\
   If there is no material assigned to the data, the material of the object will be kept.\
   If there is an material assigned to the data, that material will be used by default, or you can force the use of the material assigned to the object, by enabling **Override Data Material** (Do note that this will affect all objects that share the same *Data* and have materials linked to the *Data*).\
-  [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink-e1563021376228.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink.png)
+  [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink_2-e1563060821217.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink_2.png)
 
 - **Specials**
   - **Merge Base Names**\

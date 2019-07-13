@@ -279,9 +279,14 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "override")
-        layout.prop(self, "link_to")
+
+        layout.prop(self, "link_to", expand = True)
+        layout.separator()
+
         layout.prop(self, "affect")
+        layout.separator()
+
+        layout.prop(self, "override", icon = "DECORATE_OVERRIDE")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
