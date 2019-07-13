@@ -4,17 +4,17 @@
 
 - [Introduction](#introduction)
   - [Author](#author)
-  - [Short Background](#shortbackground)
+  - [Short Background](#short-background)
 - [Naming](#naming)
-- [Blender Internal and material conversions](#blenderinternalandmaterialconversions)
-- [Texture Renamer](#texturerenamer)
-- [Preview Active Material](#previewactivematerial)
+- [Blender Internal and material conversions](#blender-internal)
+- [Texture Renamer](#texture-renamer)
+- [Preview Active Material](#preview-active-material)
 - [Icons](#icons)
-- [Material Preview in menus](#materialpreviews)
-- [Change Material Link](#changemateriallink)
-- [Added options for operators](#addedoptionsforoperators)
-- [Possible additions](#possibleadditions)
-- [More technical changes](#moretechnicalchanges)
+- [Material Preview in menus](#material-previews)
+- [Change Material Link](#change-material-link)
+- [Added options for operators](#added-options-for-operators)
+- [Possible additions](#possible-additions)
+- [More technical changes](#more-technical-changes)
 
 ## Introduction
 
@@ -42,7 +42,7 @@ or just will take a bit more effort (i.e. could be added later).
 A, slightly, different name was choosen to, primarily, indicate that this isn't *Material Utils* - it's done by another
 developer and whilst it mainly has the same functionality, it's not a 1:1 port.
 
-## Blender Internal and material conversions - Removed
+## <a name="blender-internal"></a>Blender Internal and material conversions - Removed
 
 Since 2.80 dropped the "Blender Internal"/"Blender Render" engine, none of the functionality that relates to Blener Render was included.
 
@@ -52,31 +52,31 @@ Since 2.80 dropped the "Blender Internal"/"Blender Render" engine, none of the f
 - Texface to Material and v.v.
 - Transparent Back (This might be interesting to add for Cycles/Eevee instead)
 
-## Texture Renamer - Not added
+## <a name="texture-renamer"></a>Texture Renamer - Not added
 
 This is a bit of a special case in the switch from 2.79 to 2.80.\
 Textures doesn't work in the same way in 2.8x as in 2.7x, mainly because of the exclusion of Blender Render.
 While textures exists in a similar way as before, they are used for brushes and modifiers, but not for materials.\
 The question is then if, helpful as it might be, be included in an Add-on as *Material Utilities*.
 
-## Preview Active Material - Not added
+## <a name="preview-active-material"></a>Preview Active Material - Not added
 
 The Material Preview hasn't yet been implemented in *Material Utilities*, and there's some questions about if it should be included.
 We now have "LookDev", as well as rendered view, in 2.8x, which gives a better preview of the material than the preview.
 But even so, it could exist some uses cases where a material preview, accessible via a shortcut, could be useful.
 The ability to see all available materials in a grid view is pretty nice as well.
 
-## Icons - Changed
+## <a name="icons"></a>Icons - Changed
 
 Some icons have been changed in an attempt to have them be more descriptive (like a Pen instead of a rhombus for Merge Base Names).
 
-## Material Preview in menus - Added
+## <a name="material-preview"></a>Material Preview in menus - Added
 
 Instead of using the "generic material icon" in the material lists (Assign material & Select by material)
 the material previews are used instead (which reflects the selected preview type).\
 This make it's a bit easier to find the right material at a glance.
 
-## Change Material Link - Added
+## <a name="change-material-link"></a>Change Material Link - Added
 
 This operator lets the user change the material link directly from the viewport and for several material slots and objects
 directly from the viewport. It has options to set the links to Object or Data, or Toggle what's currently used.

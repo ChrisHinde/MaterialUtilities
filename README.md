@@ -13,7 +13,7 @@ Please read the list of [Known issues](#knownissues) below, if your problem isn'
 - [Background](#background)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Known issues](#knownissues)
+- [Known issues](#known-issues)
 - [Support](#support)
 - [Contributing](#contributing)
 - [License](#license)
