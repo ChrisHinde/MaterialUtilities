@@ -529,7 +529,9 @@ def mu_change_material_link(self, link, affect, override_data_material = False):
     elif affect == "ALL":
         objects = bpy.data.objects
 
+
     for object in objects:
+        index = 0
         for slot in object.material_slots:
             present_material = slot.material
 
@@ -538,7 +540,18 @@ def mu_change_material_link(self, link, affect, override_data_material = False):
             else:
                 slot.link = link
 
-            if slot.link == 'OBJECT' or override_data_material:
+            if slot.link == 'OBJECT':
+                override_data_material = True
+            elif slot.material is None:
+                override_data_material = True
+            elif not override_data_material:
+                self.report({'INFO'},
+                            'The object Data for object ' + object.name_full + ' already had a material assigned ' +
+                            'to slot #' + str(index) + ' (' + slot.material.name + '), it was not overriden!')
+
+            if override_data_material:
                 slot.material = present_material
+
+            index = index + 1
 
     return {'FINISHED'}
