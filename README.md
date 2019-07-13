@@ -1,7 +1,12 @@
-# Material utilities v0.1
-An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport (via a keyboard shortcut and a pop up menu), as well as select by material and more!
+# Material utilities v1.0b
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-**This ALPHA, and still under development, you're welcome to use it, but be aware that it might not work smoothly!**
+An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
+(via a keyboard shortcut and a pop up menu), as well as select by material and more!
+
+**This is Beta, and still under development, you're welcome to use it, but be aware that it might not work perfectely smoothly!**\
+Each part is tested thoroughly during development, but we can't guarantee that there might be a special case where a problem might occur!\
+Please read the list of [Known issues](#knownissues) below, if your problem isn't listed, please leave a bug report.
 
 ## Table of Contents
 
@@ -11,17 +16,21 @@ An add-on for Blender 2.8x that lets the user assign materials directly in the 3
 - [Known issues](#knownissues)
 - [Support](#support)
 - [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ## Background
 
-This is based on the Add-on Material Utils by Michael Williamson (michaelw), originally written for Blender 2.4 (and then ported to 2.6, 2.7x).
+This is based on the Add-on *Material Utils*, originally written for Blender 2.4 (and then ported to 2.5, 2.6 etc).
 I was really missing this Add-on when I started using Blender 2.80. But I couldn't find any ports of it (or even any in development),
 so I decided to port it myself, and this is the result!
 
-The goal is to include (almost?) every feature it had in 2.7x, but I'm also adding some features that I think (and hope others will as well)
-will be useful!
+The goal is to include (almost?) every feature it had in 2.7x,
+but I'm also adding some features that I think (and hope others will as well) will be useful!\
+If you're missing something, please send in a request and we'll see what we can do!
 
-Some examples:
+If you want to know what's different (including code wise), take a look at the [Differences](differences.md) document.\
+But here are some examples:
 - Some functions (like "Clean Material Slots") now also work on Curve and Surface objects
 - The Select By Material have the option to extend the current selecction
 - Assign Material have options to override or append materials in Object Mode
@@ -36,19 +45,77 @@ Some examples:
 
 ## Usage
 
-The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`
+### Popup menu
+
+The default shortcut for Material Utilities is `Shift + Q`.\
+[![Material Utilities - popup menu](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_Menu-e1562975806841.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_Menu.png)
+
+- *Assign Material*\
+  Gives you a list of all available materials (including the option to create a new material).\
+  Assigns the material you choose to the current selection.\
+  In Object Mode you have the option to select how the existing material (slots) should be treated
+  (In Edit mode it will append the material if it's not already in a material slot).\
+  ![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat2-e1562979655329.png)
+
+  - *Override all assigned slots*\
+    Will remove any material previously assigned to the object(s) and add the one you've chosen
+  - *Assign material to each slot*\
+    Keeps all the material slots, and their assignment to respective parts of the object.
+    But will replace each material in those slots with your chosen material.
+  - *Append material*\
+    Keeps all materials slots, but appends your chosen material (if it's not already in a slot),
+    and assigns the whole object to that material slot.
+
+- *Select by Material*\
+  Gives you a list of all available materials (in Edit mode it only shows the materials assigned to the object).\
+  Selects all objects (in Object Mode) or faces (in Edit Mode) that have the material you choose.\
+  In the operator panel `[F9]` you can choose to extend your current selection, otherwise what was selected before will be unselected first.
+
+- *Copy Materials to Seleted*\
+  Copies all the materials of the active object to the other selected objects. (Object Mode only)
+
+- *Clean Slots*
+  - *Clean Material Slots*\
+    Removes any material slots that isn't assigned to any part of the object
+  - *Remove Active Slot*\
+    (Object Mode only)\
+    You can limit it to only the active object in the operator panel `[F9]`
+  - *Remove All Material Slots*\
+    Remove all material slots (and thus materials) assigned to the selected object(s). (Object Mode only)\
+    You can limit it to only the active object in the operator panel `[F9]`
+- *Replace Material*\
+  Replace any occurence of one material, *Original*, with another material, *Replacement*.\
+  In the operator panel you can also choose if you want it done "globally" (All objects in the file), or just selected objects,
+  as well as to get those objects that was affected by the change selected
+- *Set Fake User*\
+
+- *Change Material Link*\
+- *Sepcials*
+  - *Merge Base Names*\
+
+
+### Material Specials menu
+
+Material Utilities adds some options to the *Material Specials* menu as well (accessible by the small downward pointing arrow to the right of the materials list).\
+At the bottom of this menu (below *Paste Material*), most of the options from the popup menu (detailed above) is added.
+And at the top two other options are added:
+
+- *Move slot to top* - Moves the currently selected material slot to the top of the list
+- *Move slot to bottom* - Moves the currently selected material slot to the bottom of the list
+
+[![Material Specials menu](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MaterialSpecials-e1562975670283.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MaterialSpecials.png)
 
 
 ## Known issues
 
-- The selection by material only works for the active object in Edit mode.
+- The selection by material only works for the active object in Edit mode.\
   If you have multiple objects selected and "open" in Edit mode, it won't select any of the faces,
   with the selected material, of the other objects.
 - The assignment of material when you have multiple objects selected in Edit mode doesn't work correctly
-  and give Unexpected results.
-- **CRASHES:** Blender crashes (8 out of 10 times) when the user try to assign a material to a Curve object
-  that has more than one material (slot) in Object mode. This has only been experienced during those conditions.
-  (i.e A Curve object, with more than one material, and only in Object mode [it works fine in Edit mode])
+  and might give unexpected results&trade;.
+- Assignment to different splines in Curve objects doesn't work in 2.80 RC.\
+  (**Do note** that each spline/curve can only have one material,
+    so you can't assign different materials to different parts of the spline)
 
 ## Support
 
@@ -56,4 +123,24 @@ The default shortcut for Material Utilities (henceforth MU) is `Shift + Q`
 
 ## Contributing
 
-Please contribute!
+You're welcome to contribute to this Add-on.\
+If you want to know where to start, take a look at the [TODO](TODO) file.
+
+## License
+
+This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgements
+
+This Add-on is based on and uses (some) code by the following awesome people:\
+Michael Williamson (michaelw) (original author)\
+Sybren\
+meta-androcto\
+Saidenka\
+lijenstina\
+CoDEmanX\
+SynaGl0w\
+ideasman42
+
+(If you think your code is used in this add-on, but you're not listed here,
+please contact ChrisHinde so correct attribution can be given)
