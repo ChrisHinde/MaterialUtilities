@@ -59,7 +59,6 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
         elif obj.mode == 'EDIT':
             objects = context.selected_editable_objects
             for obj in objects:
-                print("Obj:" + obj.name)
                 #show only the materials on this object
                 materials = obj.material_slots.keys()
                 for material in materials:

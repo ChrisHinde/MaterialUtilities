@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current **Beta** version of Material Utilities is [**v1.0.3**](CHANGELOG.md#v1.0.3)\
+The current **Beta** version of Material Utilities is [**v1.0.4**](CHANGELOG.md#v1.0.4)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -142,8 +142,7 @@ And at the top two other options are added:
 
 ## Known issues
 
-- The assignment of material when you have multiple objects selected in Edit mode doesn't work correctly
-  and might give unexpected results&trade;.
+There is no known issues currently!
 
 (**Do note** that each spline/curve in Curvo Objects can only have one material,
   so you can't assign different materials to different parts of a spline)
