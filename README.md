@@ -142,7 +142,10 @@ And at the top two other options are added:
 
 ## Known issues
 
-There is no known issues currently!
+- When there is no object selected (at all, as after you've deleted an object), the Assign Material and Select By Material
+  menus will be empty (and an error occurs)
+- If you have Collections that are Excluded from the View Layer (the Checkbox is unchecked), you get an error when
+  using Select By Material
 
 (**Do note** that each spline/curve in Curvo Objects can only have one material,
   so you can't assign different materials to different parts of a spline)
