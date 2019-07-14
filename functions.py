@@ -178,6 +178,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
     if not edit_mode:
         objects = bpy.data.objects
+
         for obj in objects:
             if obj.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}:
                 mat_slots = obj.material_slots

@@ -1,15 +1,13 @@
 
 o Add Add-on properties
 
-o Fix problems with assigning materials when having multiple objects selected in Edit mode
-  It currently assigns to faces of the other objects that aren't selected. ("Polygon ID" conflicts?)
-
 o Add (current) Collection as an option for filtering materials to be affected.
-
-o (?) Add "Rename Textures" - This will require some rework to fit in 2.8
 
 o Add "Copy material to others" to Edit mode,
   where the material of the active face is copied to the other selected faces
+
+o (?) Add "Rename Textures" - This will require some rework to fit in 2.8
+
 
 
 - This seems to work since the buid of Blender 2.80 (2019-07-11, Pre RC [RC also works])!!
@@ -18,3 +16,6 @@ o Add "Copy material to others" to Edit mode,
 - FIXED Use material lists for material selection in operator panels
 - FIXED: problems with selecting by material not selecting faces for "not active" objects
   when you have multiple objects selected in Edit mode
+
+- FIXED: Fix problems with assigning materials when having multiple objects selected in Edit mode
+  It currently assigns to faces of the other objects that aren't selected. ("Polygon ID" conflicts?)
