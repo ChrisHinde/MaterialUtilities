@@ -1,19 +1,19 @@
 <a name="v1.0.3"></a>
-# v1.0.3 (2019-07-14)
+# v1.0.3-beta (2019-07-14)
 
 * Update UI for Replace Material Operator 0f5a4dc
 * Update UI for Assign Material Operator d5235fd
 * Update UI for Select By Material operator 51710ec
 
 <a name="v1.0.2"></a>
-# v1.0.2 (2019-07-14)
+# v1.0.2-beta (2019-07-14)
 
 * Update UI for Change Material Link operator c359798
 * Fix Change Material Link operator 0d462cb
 * Fix wrongly named unregister function 8be1de0
 
 <a name="1.0.1"></a>
-# v1.0.1 (2019-07-13)
+# v1.0.1-beta (2019-07-13)
 
 * Add "Copy material to ohers" for Object mode 90808e6
 * Add Assign material operators 26e083a
