@@ -123,6 +123,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                 if material.name == material_name:
                     found = True
                     index = i
+
                     # make slot active
                     obj.active_material_index = i
                     break
@@ -136,7 +137,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                 obj.data.materials.append(target)
                 obj.active_material_index = index
 
-                mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
+            mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
 
     #restore the active object
     bpy.context.view_layer.objects.active = active_object

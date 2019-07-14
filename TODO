@@ -1,6 +1,3 @@
-- Select By Material for Curves (Edit mode)
-- Assign Material for Curves in Edit mode
-
 - This seems to work since the buid of Blender 2.80 (2019-07-11, Pre RC [RC also works])!!
     CRASH: Assign material for Curves crashes when the curve object has more than one material slot not working!
 
