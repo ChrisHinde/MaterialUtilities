@@ -203,7 +203,7 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
             maxlen = 63,
             )
     all_objects: BoolProperty(
-            name = "All objects",
+            name = "All Objects",
             description = "Replace for all objects in this blend file (otherwise only selected objects)",
             default = True,
             )
@@ -215,10 +215,13 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
+
         layout.prop_search(self, "matorg", bpy.data, "materials")
         layout.prop_search(self, "matrep", bpy.data, "materials")
-        layout.prop(self, "all_objects")
-        layout.prop(self, "update_selection")
+        layout.separator()
+
+        layout.prop(self, "all_objects", icon = "BLANK1")
+        layout.prop(self, "update_selection", icon = "SELECT_INTERSECT")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
@@ -255,6 +258,8 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         layout.prop(self, "fake_user", expand = True)
+        layout.separator()
+
         layout.prop(self, "materials")
 
     def invoke(self, context, event):
@@ -270,7 +275,6 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
     bl_idname = "view3d.materialutilities_change_material_link"
     bl_label = "Change Material Linking (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
-
 
     override: BoolProperty(
             name = "Override Data material",
@@ -435,8 +439,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         box_1.enabled = not self.is_auto
         layout.separator()
 
-        box_2 = layout.box()
-        box_2.prop(self, "is_auto", text = "Auto Rename/Replace", icon = "SYNTAX_ON")
+        layout.prop(self, "is_auto", text = "Auto Rename/Replace", icon = "SYNTAX_ON")
 
     def invoke(self, context, event):
         self.is_not_undo = True

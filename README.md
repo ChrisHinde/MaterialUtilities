@@ -97,7 +97,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
   In the operator panel you can also choose if you want it done "globally" (for all objects in the file),
   or just for selected objects.\
   You can also choose to have the objects that were affected by the change selected (objects not affected will be deselcted).\
-  [![Replace Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial-1-e1563021244834.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial.png)
+  [![Replace Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial_2-e1563065836955.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial_2.png)
 
 - **Set Fake User**\
   Set the Fake User flag (to preserve unused materials) of the materials to either
