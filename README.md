@@ -78,7 +78,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
   Gives you a list of all available materials (in Edit mode it only shows the materials assigned to the object).\
   Selects all objects (in Object Mode) or faces (in Edit Mode) that have the material you choose.\
   In the operator panel `[F9]` you can choose to extend your current selection, otherwise what was selected before will be unselected first.\
-  [![Select By Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat-e1563020811830.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat.png)
+  [![Select By Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat_2-e1563064147331.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat_2.png)
 
 - **Copy Materials to Seleted** (Object Mode only)\
   Copies all the materials of the active object to the other selected objects.

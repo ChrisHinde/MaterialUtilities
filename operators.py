@@ -74,7 +74,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     bl_label = "Select By Material Name (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
-    extend: BoolProperty(
+    extend_selection: BoolProperty(
             name = 'Extend Selection',
             description = 'Keeps the current selection and adds faces with the material to the selection'
             )
@@ -88,9 +88,15 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     def poll(cls, context):
         return context.active_object is not None
 
+    def draw(self, context):
+        layout = self.layout
+        layout.prop_search(self, "material_name", bpy.data, "materials")
+
+        layout.prop(self, "extend_selection", icon = "SELECT_EXTEND")
+
     def execute(self, context):
         material_name = self.material_name
-        ext = self.extend
+        ext = self.extend_selection
         return mu_select_by_material_name(self, material_name, ext)
 
 
