@@ -63,7 +63,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
   Assigns the material you choose to the current selection.\
   In Object Mode you have the option to select how the existing material (slots) should be treated
   (In Edit mode it will append the material if it's not already in a material slot).\
-  [![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat2-e1562979655329.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat2.png)
+  [![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat3-e1563064512702.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat3.png)
 
   - **Override all assigned slots**\
     Will remove any material previously assigned to the object(s) and add the one you've chosen

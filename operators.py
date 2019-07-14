@@ -58,6 +58,12 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     def poll(cls, context):
         return context.active_object is not None
 
+    def draw(self, context):
+        layout = self.layout
+        layout.prop_search(self, "material_name", bpy.data, "materials")
+
+        layout.prop(self, "override_type")
+
     def execute(self, context):
         material_name = self.material_name
         override_type = self.override_type
@@ -148,6 +154,10 @@ class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
     def poll(cls, context):
         return (context.active_object is not None) and (context.active_object.mode != 'EDIT')
 
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "only_active", icon = "PIVOT_ACTIVE")
+
     def execute(self, context):
         return mu_remove_material(self, self.only_active)
 
@@ -168,6 +178,10 @@ class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return (context.active_object is not None) and (context.active_object.mode != 'EDIT')
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "only_active", icon = "PIVOT_ACTIVE")
 
     def execute(self, context):
         return mu_remove_all_materials(self, self.only_active)
