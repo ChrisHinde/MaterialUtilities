@@ -1,11 +1,12 @@
-- FIXED: Select By Material for Curves (Edit mode)
-- FIXED: Assign Material for Curves in Edit mode
+- Select By Material for Curves (Edit mode)
+- Assign Material for Curves in Edit mode
 
-- This seems to work in the latest buid of Blender 2.80 (2019-07-11, Pre RC)!!
-    CRASH: Assign material for Curves crashes when the curve object has more than one object slot not working!
+- This seems to work since the buid of Blender 2.80 (2019-07-11, Pre RC [RC also works])!!
+    CRASH: Assign material for Curves crashes when the curve object has more than one material slot not working!
+
+- FIXED Use material lists for material selection in operator panels
 
 o Add Add-on properties
-o Use material lists for material selection in operator panels
 
 o Fix problems with assigning materials when having multiple objects selected in Edit mode
   It currently assigns to faces of the other objects that aren't selected. ("Polygon ID" conflicts?)
