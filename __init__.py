@@ -1,4 +1,4 @@
-# Material Utilities v1.0b
+# Material Utilities v1.0.3-Beta
 #
 #  Usage: Shift + Q in the 3D viewport
 #
@@ -35,7 +35,7 @@
 bl_info = {
     "name": "Material Utilities",
     "author": "ChrisHinde",
-    "version": (1, 0, 2),
+    "version": (1, 0, 3),
     "blender": (2, 80, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
@@ -186,6 +186,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
-#print("MU Start!")
-#mu_register()

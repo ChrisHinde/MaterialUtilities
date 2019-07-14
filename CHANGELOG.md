@@ -1,5 +1,11 @@
+<a name="v1.0.3"></a>
+# v1.0.3 (2019-07-14)
 
-<a name=""></a>
+* Update UI for Replace Material Operator 0f5a4dc
+* Update UI for Assign Material Operator d5235fd
+* Update UI for Select By Material operator 51710ec
+
+<a name="v1.0.2"></a>
 # v1.0.2 (2019-07-14)
 
 * Update UI for Change Material Link operator c359798
