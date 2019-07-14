@@ -112,12 +112,13 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
         elif obj.mode == 'EDIT':
             #show only the materials on this object
-            materials = obj.material_slots.keys()
-            for material in materials:
+            material_slots = obj.material_slots
+            for material_slot in material_slots:
+                material = material_slot.material
                 layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
-                    text = material,
+                    text = material.name,
                     icon_value = material.preview.icon_id
-                    ).material_name = material
+                    ).material_name = material.name
 
 class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
     """Spcials menu for Material Utilities"""
