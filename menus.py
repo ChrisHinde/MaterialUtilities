@@ -43,9 +43,9 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 
-        obj = context.object
         layout.label
         if obj.mode == 'OBJECT':
+            obj = context.object
             #show all used materials in entire blend file
             for material_name, material in bpy.data.materials.items():
                 # There's no point in showing materials with 0 users
@@ -57,13 +57,16 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                                     ).material_name = material_name
 
         elif obj.mode == 'EDIT':
-            #show only the materials on this object
-            materials = obj.material_slots.keys()
-            for material in materials:
-                layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
-                    text = material,
-                    icon_value = material.preview.icon_id
-                    ).material_name = material
+            objects = context.selected_editable_objects
+            for obj in objects:
+                print("Obj:" + obj.name)
+                #show only the materials on this object
+                materials = obj.material_slots.keys()
+                for material in materials:
+                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
+                        text = material,
+                        icon_value = material.preview.icon_id
+                        ).material_name = material
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
     """Menu for cleaning up the material slots"""
@@ -99,6 +102,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
         obj = context.object
         layout.label
+
         if obj.mode == 'OBJECT':
             #show all used materials in entire blend file
             for material_name, material in bpy.data.materials.items():
@@ -111,14 +115,25 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                                     ).material_name = material_name
 
         elif obj.mode == 'EDIT':
-            #show only the materials on this object
-            material_slots = obj.material_slots
-            for material_slot in material_slots:
-                material = material_slot.material
-                layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
-                    text = material.name,
-                    icon_value = material.preview.icon_id
-                    ).material_name = material.name
+            objects = context.selected_editable_objects
+            materials_added = []
+
+            for obj in objects:
+                #show only the materials on this object
+                material_slots = obj.material_slots
+                for material_slot in material_slots:
+                    material = material_slot.material
+
+                    # Don't add a material that's already in the menu
+                    if material.name in materials_added:
+                        continue
+
+                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
+                        text = material.name,
+                        icon_value = material.preview.icon_id
+                        ).material_name = material.name
+
+                    materials_added.append(material.name)
 
 class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
     """Spcials menu for Material Utilities"""

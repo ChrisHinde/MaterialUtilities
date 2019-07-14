@@ -142,13 +142,10 @@ And at the top two other options are added:
 
 ## Known issues
 
-- The selection by material only works for the active object in Edit mode.\
-  If you have multiple objects selected and "open" in Edit mode, it won't select any of the faces,
-  with the selected material, of the other objects.
 - The assignment of material when you have multiple objects selected in Edit mode doesn't work correctly
   and might give unexpected results&trade;.
 
-(**Do note** that each spline/curve can only have one material,
+(**Do note** that each spline/curve in Curvo Objects can only have one material,
   so you can't assign different materials to different parts of a spline)
 
 ## Support

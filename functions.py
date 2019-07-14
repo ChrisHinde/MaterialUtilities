@@ -200,80 +200,88 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
                 obj.select_set(state=False)
 
         if not found_material:
-            self.report({'INFO'}, "No objects found with the material " + find_material_name + "!")
-            return {'CANCELLED'}
+            self.report({'INFO'}, "No objects found with the material " +
+                                    find_material_name + "!")
+            return {'FINISHED'}
 
     else:
         # it's edit_mode, so select the polygons
 
-        obj = active_object
-
-        if obj.type == 'MESH':
+        if active_object.type == 'MESH':
             # if not extending the selection, deselect all first
             #  (Without this, edges/faces were still selected
             #   while the faces were deselcted)
             if not extend_selection:
                 bpy.ops.mesh.select_all(action = 'DESELECT')
 
-            bpy.ops.object.mode_set()
+        objects = bpy.context.selected_editable_objects
 
-            mat_slots = obj.material_slots
+        for obj in objects:
+            print("Obj:" + obj.name)
+            bpy.context.view_layer.objects.active = obj
 
-            # same material can be on multiple slots
-            slot_indeces = []
-            i = 0
-            for material in mat_slots:
-                if material.material == find_material:
-                    slot_indeces.append(i)
-                i += 1
+            if obj.type == 'MESH':
+                bpy.ops.object.mode_set()
 
-            mesh = obj.data
+                mat_slots = obj.material_slots
 
-            for poly in mesh.polygons:
-                if poly.material_index in slot_indeces:
-                    poly.select = True
-                    found_material = True
-                elif not extend_selection:
-                    poly.select = False
+                # same material can be on multiple slots
+                slot_indeces = []
+                i = 0
+                for material in mat_slots:
+                    if material.material == find_material:
+                        slot_indeces.append(i)
+                    i += 1
 
-            mesh.update()
+                mesh = obj.data
 
-            bpy.ops.object.mode_set(mode = 'EDIT')
+                for poly in mesh.polygons:
+                    if poly.material_index in slot_indeces:
+                        poly.select = True
+                        found_material = True
+                    elif not extend_selection:
+                        poly.select = False
 
-            if not found_material:
-                self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to any faces!")
-                return {'CANCELLED'}
+                mesh.update()
 
-        elif obj.type in {'CURVE', 'SURFACE'}:
-            # For Curve objects, there can only be one material per spline
-            #  and thus each spline is linked to one material slot.
-            #  So to not have to care for different data structures for different curve types,
-            #  we use the material slots and the built in selection methods
-            #  (Technically, this should work for meshes as well)
+                bpy.ops.object.mode_set(mode = 'EDIT')
 
-            mat_slots = obj.material_slots
 
-            i = 0
-            for material in mat_slots:
-                bpy.context.active_object.active_material_index = i
+            elif obj.type in {'CURVE', 'SURFACE'}:
+                # For Curve objects, there can only be one material per spline
+                #  and thus each spline is linked to one material slot.
+                #  So to not have to care for different data structures
+                #  for different curve types, we use the material slots
+                #  and the built in selection methods
+                #  (Technically, this should work for meshes as well)
 
-                if material.material == find_material:
-                    bpy.ops.object.material_slot_select()
-                    found_material = True
-                elif not extend_selection:
-                    bpy.ops.object.material_slot_deselect()
+                mat_slots = obj.material_slots
 
-                i += 1
+                i = 0
+                for material in mat_slots:
+                    bpy.context.active_object.active_material_index = i
 
-            if not found_material:
-                self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to slots!")
+                    if material.material == find_material:
+                        bpy.ops.object.material_slot_select()
+                        found_material = True
+                    elif not extend_selection:
+                        bpy.ops.object.material_slot_deselect()
 
-        else:
-            # Some object types are not supported
-            #  mostly because don't really support selecting by material (like Font/Text objects)
-            #  ore that they don't support multiple materials/are just "weird" (i.e. Meta balls)
-            self.report({'WARNING'}, "The type '" + obj.type + "' isn't supported in Edit mode by Material Utilities!")
-            return {'CANCELLED'}
+                    i += 1
+
+            else:
+                # Some object types are not supported
+                #  mostly because don't really support selecting by material (like Font/Text objects)
+                #  ore that they don't support multiple materials/are just "weird" (i.e. Meta balls)
+                self.report({'WARNING'}, "The type '" +
+                                            obj.type +
+                                            "' isn't supported in Edit mode by Material Utilities!")
+                #return {'CANCELLED'}
+
+        bpy.context.view_layer.objects.active = active_object
+
+        if not found_material:
+            self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to anything!")
 
     return {'FINISHED'}
 
@@ -496,7 +504,10 @@ def mu_set_fake_user(self, fake_user, materials):
             objs = bpy.data.objects
             # Maybe check for users > 0 instead?
 
-        mats = (mat for ob in objs if hasattr(ob.data, "materials") for mat in ob.data.materials if mat.library is None)
+        mats = (mat for ob in objs
+                    if hasattr(ob.data, "materials")
+                        for mat in ob.data.materials
+                            if mat.library is None)
 
     if fake_user == 'TOGGLE':
         done_mats = []

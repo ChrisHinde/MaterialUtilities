@@ -7,7 +7,8 @@ o Add Add-on properties
 
 o Fix problems with assigning materials when having multiple objects selected in Edit mode
   It currently assigns to faces of the other objects that aren't selected. ("Polygon ID" conflicts?)
-o Fix problems with selecting by material not selecting faces for "not active" objects
+
+- FIXED: problems with selecting by material not selecting faces for "not active" objects
   when you have multiple objects selected in Edit mode
 
 o Add (current) Collection as an option for filtering materials to be affected.
