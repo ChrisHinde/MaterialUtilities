@@ -4,8 +4,8 @@
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
 (via a keyboard shortcut and a pop up menu), as well as select by material and more!
 
-**This is Beta, and still under development, you're welcome to use it, but be aware that it might not work perfectely smoothly!**\
-Each part is tested thoroughly during development, but we can't guarantee that there might be a special case where a problem might occur!\
+**This is Beta, and still under development! you're welcome to use it, but be aware that ther might be some unknown issue!**\
+Each part is tested thoroughly during development, but we can't guarantee that there in't a special case where a problem might occur!\
 Please read the list of [Known issues](#known-issues) below, if your problem isn't listed, please leave a bug report.
 
 ## Version
@@ -147,7 +147,7 @@ And at the top two other options are added:
 - If you have Collections that are Excluded from the View Layer (the Checkbox is unchecked), you get an error when
   using Select By Material
 
-(**Do note** that each spline/curve in Curvo Objects can only have one material,
+(**Do note** that each spline/curve in Curve Objects can only have one material,
   so you can't assign different materials to different parts of a spline)
 
 ## Support
