@@ -177,7 +177,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
         edit_mode = True
 
     if not edit_mode:
-        objects = bpy.data.objects
+        objects = bpy.context.visible_objects
 
         for obj in objects:
             if obj.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}:
