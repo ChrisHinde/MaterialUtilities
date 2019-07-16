@@ -173,7 +173,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
     active_object = bpy.context.active_object
 
-    if active_object.mode == 'EDIT':
+    if (not active_object is None) and (active_object.mode == 'EDIT'):
         edit_mode = True
 
     if not edit_mode:

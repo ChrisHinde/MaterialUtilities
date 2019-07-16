@@ -92,7 +92,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return len(bpy.data.objects) > 0
 
     def draw(self, context):
         layout = self.layout

@@ -20,7 +20,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         bl_id = VIEW3D_OT_materialutilities_assign_material_object.bl_idname
         obj = context.object
 
-        if obj.mode == 'EDIT':
+        if (not obj is None) and obj.mode == 'EDIT':
             bl_id = VIEW3D_OT_materialutilities_assign_material_edit.bl_idname
 
         for material_name, material in bpy.data.materials.items():
@@ -32,40 +32,6 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
                         text = "Add New Material",
                         icon = 'ADD').material_name = "Unnamed material"
 
-
-class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
-    """Menu for choosing which material should be used for selection"""
-    # The menu is filled programmatically with available materials
-
-    bl_idname = "VIEW3D_MT_materialutilities_select_by_material"
-    bl_label = "Select by Material"
-
-    def draw(self, context):
-        layout = self.layout
-
-        layout.label
-        if obj.mode == 'OBJECT':
-            obj = context.object
-            #show all used materials in entire blend file
-            for material_name, material in bpy.data.materials.items():
-                # There's no point in showing materials with 0 users
-                #  (It will still show materials with fake user though)
-                if material.users > 0:
-                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
-                                    text = material_name,
-                                    icon_value = material.preview.icon_id
-                                    ).material_name = material_name
-
-        elif obj.mode == 'EDIT':
-            objects = context.selected_editable_objects
-            for obj in objects:
-                #show only the materials on this object
-                materials = obj.material_slots.keys()
-                for material in materials:
-                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
-                        text = material,
-                        icon_value = material.preview.icon_id
-                        ).material_name = material
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
     """Menu for cleaning up the material slots"""
@@ -102,7 +68,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
         obj = context.object
         layout.label
 
-        if obj.mode == 'OBJECT':
+        if obj is None or obj.mode == 'OBJECT':
             #show all used materials in entire blend file
             for material_name, material in bpy.data.materials.items():
                 # There's no point in showing materials with 0 users
