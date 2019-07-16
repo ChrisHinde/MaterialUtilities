@@ -57,14 +57,12 @@ def mu_assign_to_data(object, material, index, edit_mode, all = True):
 def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_MATERIAL'):
     """Assign the defined material to selected polygons/objects"""
 
-    print("ASSMat: " + material_name + " : " + override_type)
-
     # get active object so we can restore it later
     active_object = bpy.context.active_object
 
     edit_mode = False
     all_polygons = True
-    if active_object.mode == 'EDIT':
+    if (not active_object is None) and active_object.mode == 'EDIT':
         edit_mode = True
         all_polygons = False
         bpy.ops.object.mode_set()
@@ -86,6 +84,10 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
     objects = bpy.context.selected_editable_objects
 
     for obj in objects:
+        # Apparently selected_editable_objects includes objects as cameras etc
+        if not obj.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}:
+            continue
+
         # set the active object to our object
         scene = bpy.context.scene
         bpy.context.view_layer.objects.active = obj
@@ -139,13 +141,14 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
 
             mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
 
-    #restore the active object
-    bpy.context.view_layer.objects.active = active_object
+    # We shouldn't risk unsetting the active object
+    if not active_object is None:
+        # restore the active object
+        bpy.context.view_layer.objects.active = active_object
 
     if edit_mode:
         bpy.ops.object.mode_set(mode='EDIT')
 
-    print("End of Assign material!")
     return {'FINISHED'}
 
 
@@ -541,7 +544,6 @@ def mu_change_material_link(self, link, affect, override_data_material = False):
         objects = bpy.context.scene.objects
     elif affect == "ALL":
         objects = bpy.data.objects
-
 
     for object in objects:
         index = 0

@@ -56,7 +56,7 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return len(context.selected_editable_objects) > 0
 
     def draw(self, context):
         layout = self.layout
@@ -68,7 +68,6 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
         material_name = self.material_name
         override_type = self.override_type
         result = mu_assign_material(self, material_name, override_type)
-        print("Material Assigned!")
         return result
 
 
@@ -87,12 +86,12 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     material_name: StringProperty(
             name = 'Material Name',
             description = 'Name of Material to find and Select',
-            maxlen = 63,
+            maxlen = 63
             )
 
     @classmethod
     def poll(cls, context):
-        return len(bpy.data.objects) > 0
+        return len(context.visible_objects) > 0
 
     def draw(self, context):
         layout = self.layout
@@ -130,7 +129,7 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return len(context.selected_editable_objects) > 0
 
     def execute(self, context):
         return mu_cleanmatslots(self)
@@ -429,7 +428,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        return context.active_object is not None
+        return len(context.selected_editable_objects) > 0
 
     def draw(self, context):
         layout = self.layout
