@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current **Beta** version of Material Utilities is [**v1.0.4**](CHANGELOG.md#v1.0.4)\
+The current **Beta** version of Material Utilities is [**v1.0.5**](CHANGELOG.md#v1.0.5)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -74,7 +74,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
   - **Append material**\
     Keeps all materials slots, but appends your chosen material (if it's not already in a slot),
     and assigns the whole object to that material slot.\
-    (This is not recommended when materials are linked to object, and there's linked duplicates of the object)
+    (This is **not recommended** when materials are linked to object, and there's linked duplicates of the object)
 
 - **Select by Material**\
   Gives you a list of all available materials (in Edit mode it only shows the materials assigned to the object).\

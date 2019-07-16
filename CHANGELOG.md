@@ -1,5 +1,13 @@
 # Changelog
 
+<a name="v1.0.5"></a>
+# v1.0.5-beta (2019-07-16)
+
+* Fix Issue #4 (Assigning materials when slot is linked to object) bba48ad
+* Fix issue #3 (Error if cameras etc are selcted) bba48ad
+* Fix issue #2 (Error if there's an Excluded collection) e0a443d
+* Fix issue #1 (Exception when no object is selected) 57afffd
+
 <a name="v1.0.4"></a>
 # v1.0.4-beta (2019-07-14)
 
