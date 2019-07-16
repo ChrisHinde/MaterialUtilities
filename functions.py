@@ -53,8 +53,18 @@ def mu_assign_to_data(object, material, index, edit_mode, all = True):
         if not edit_mode:
             bpy.ops.object.mode_set(mode = 'OBJECT')
 
+def mu_new_material_name(material):
+    return material
 
-def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_MATERIAL'):
+
+def mu_clear_materials(object):
+    #obj.data.materials.clear()
+
+    for mat in object.material_slots:
+        bpy.ops.object.material_slot_remove()
+
+
+def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_MATERIAL', link_override = 'KEEP'):
     """Assign the defined material to selected polygons/objects"""
 
     # get active object so we can restore it later
@@ -76,7 +86,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
             break
 
     if not found:
-        target = bpy.data.materials.new(material_name)
+        target = bpy.data.materials.new(mu_new_material_name(material_name))
         target.use_nodes = True         # When do we not want nodes today?
 
 
@@ -92,15 +102,28 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
         scene = bpy.context.scene
         bpy.context.view_layer.objects.active = obj
 
+        if link_override == 'KEEP':
+            if len(obj.material_slots) > 0:
+                link = obj.material_slots[0].link
+            else:
+                link = 'DATA'
+        else:
+            link = link_override
+
         # If we should override all current material slots
         if override_type == 'OVERRIDE_ALL' or obj.type == 'META':
-            # Clear out the material slots
-            obj.data.materials.clear()
-            # and then append the target material
-            obj.data.materials.append(target)
 
-            # Assign the material to the data/palys, to avoid weird problems
-            mu_assign_to_data(obj, target, 0, edit_mode, True)
+            # If there's more than one slot, Clear out all the material slots
+            if len(obj.material_slots) > 1:
+                mu_clear_materials(obj)
+
+            # If there's no slots left/never was one, add a slot
+            if len(obj.material_slots) == 0:
+                bpy.ops.object.material_slot_add()
+
+            # Assign the material to that slot
+            obj.material_slots[0].link = link
+            obj.material_slots[0].material = target
 
             if obj.type == 'META':
                 self.report({'INFO'}, "Meta balls only support one material, all other materials overriden!")
@@ -111,7 +134,9 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
             # go through each slot
             for material in obj.material_slots:
                 # assign the target material to current slot
-                obj.data.materials[i] = target
+                if not link_override == 'KEEP':
+                    obj.material_slots[i].link = link
+                obj.material_slots[i].material = target
                 i += 1
 
         # if we should keep the material slots and just append the selected material (if not already assigned)
@@ -119,6 +144,10 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
             found = False
             i = 0
             material_slots = obj.material_slots
+
+            if (obj.data.users > 1) and (len(material_slots) >= 1 and material_slots[0].link == 'OBJECT'):
+                self.report({'WARNING'}, 'Append material is not recommended for linked duplicates! ' +
+                                            'Unwanted results might happen!')
 
             # check material slots for material_name materia
             for material in material_slots:
@@ -135,8 +164,11 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                 # In Edit mode, or if there's not a slot, append the assigned material
                 #  If we're overriding, there's currently no materials at all, so after this there will be 1
                 #  If not, this adds another slot with the assigned material
-                index = len(obj.data.materials)
-                obj.data.materials.append(target)
+
+                index = len(obj.material_slots)
+                bpy.ops.object.material_slot_add()
+                obj.material_slots[index].link = link
+                obj.material_slots[index].material = target
                 obj.active_material_index = index
 
             mu_assign_to_data(obj, target, index, edit_mode, all_polygons)

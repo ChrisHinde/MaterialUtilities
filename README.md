@@ -69,10 +69,12 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
     Will remove any material previously assigned to the object(s) and add the one you've chosen
   - **Assign material to each slot**\
     Keeps all the material slots, and their assignment to respective parts of the object.
-    But will replace each material in those slots with your chosen material.
+    But will replace each material in those slots with your chosen material.\
+    (This is recommended when materials are linked to the object)
   - **Append material**\
     Keeps all materials slots, but appends your chosen material (if it's not already in a slot),
-    and assigns the whole object to that material slot.
+    and assigns the whole object to that material slot.\
+    (This is not recommended when materials are linked to object, and there's linked duplicates of the object)
 
 - **Select by Material**\
   Gives you a list of all available materials (in Edit mode it only shows the materials assigned to the object).\
@@ -141,11 +143,6 @@ And at the top two other options are added:
 
 
 ## Known issues
-
-- When there is no object selected (at all, as after you've deleted an object), the Assign Material and Select By Material
-  menus will be empty (and an error occurs)
-- If you have Collections that are Excluded from the View Layer (the Checkbox is unchecked), you get an error when
-  using Select By Material
 
 (**Do note** that each spline/curve in Curve Objects can only have one material,
   so you can't assign different materials to different parts of a spline)
