@@ -41,7 +41,7 @@ bl_info = {
     "description": "Menu of material tools (assign, select..) in the 3D View",
     "warning": "Beta",
     "wiki_url": "https://github.com/ChrisHinde/MaterialUtilities",
-    "category": "Materials"
+    "category": "Material"
 }
 
 """
