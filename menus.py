@@ -30,7 +30,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
         layout.operator(bl_id,
                         text = "Add New Material",
-                        icon = 'ADD').material_name = "Unnamed material"
+                        icon = 'ADD').material_name = mu_new_material_name("Unnamed material")
 
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
