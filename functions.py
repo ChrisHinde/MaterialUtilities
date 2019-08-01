@@ -54,6 +54,19 @@ def mu_assign_to_data(object, material, index, edit_mode, all = True):
             bpy.ops.object.mode_set(mode = 'OBJECT')
 
 def mu_new_material_name(material):
+    for mat in bpy.data.materials:
+        name = mat.name
+
+        if (name == material):
+            try:
+                base, suffix = name.rsplit('.', 1)
+
+                # trigger the exception
+                num = int(suffix, 10)
+                material = base + "." + '%03d' % (num + 1)
+            except ValueError:
+                material = material + ".001"
+
     return material
 
 

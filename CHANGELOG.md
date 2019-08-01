@@ -1,5 +1,10 @@
 # Changelog
 
+<a name="v1.0.6"></a>
+# v1.0.6-beta (2019-08-01)
+
+* Fix (naming of) new/add material (default "Unnamed material"), so it adds numeric suffix if it already exists
+
 <a name="v1.0.5"></a>
 # v1.0.5-beta (2019-07-16)
 
