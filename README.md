@@ -127,7 +127,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
     **Do note** that this only keeps the base material (`MyMaterial`) and ignores the other versions (`MyMaterial.001` etc)\
     [![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames-e1563021414948.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames.png)
 
-  - **Join by material**\
+  - **Join By Material**\
     This is the opposite of "Seperate By Material" in Edit mode.
     It finds objects that have the same material and join them together.\
     You can set a specific **Material**, where all objects that have that material will be joined.\
