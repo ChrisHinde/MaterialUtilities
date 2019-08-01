@@ -428,7 +428,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        return len(context.selected_editable_objects) > 0
+        return (context.mode == 'OBJECT') and (len(context.visible_objects) > 0)
 
     def draw(self, context):
         layout = self.layout
@@ -492,7 +492,7 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        # would prefer to access sely.movement here, but can'-'t..
+        # would prefer to access self.movement here, but can't..
         obj = context.active_object
         if not obj:
             return False
@@ -523,3 +523,66 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
             self.report({'INFO'}, active_material.name + ' moved to ' + self.movement.lower())
 
         return {'FINISHED'}
+
+
+
+class MATERIAL_OT_materialutilities_join_objects(bpy.types.Operator):
+    """Join objects that have the same (selected) material(s)"""
+
+    bl_idname = "material.materialutilities_join_objects"
+    bl_label = "Join by material (Material Utilities)"
+    bl_description = "Join objects that share the same material"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    material_name: StringProperty(
+                            name = "Material",
+                            default = "",
+                            description = 'Material to use to join objects'
+                            )
+    is_auto: BoolProperty(
+                            name = "Auto Join",
+                            description = "Join objects for all materials"
+                            )
+
+    is_not_undo = True
+    material_error = []          # collect mat for warning messages
+
+
+    @classmethod
+    def poll(self, context):
+        # This operator only works in Object mode
+        return (context.mode == 'OBJECT') and (len(context.visible_objects) > 0)
+
+    def draw(self, context):
+        layout = self.layout
+
+        box_1 = layout.box()
+        box_1.prop_search(self, "material_name", bpy.data, "materials")
+        box_1.enabled = not self.is_auto
+        layout.separator()
+
+        layout.prop(self, "is_auto", text = "Auto Join", icon = "SYNTAX_ON")
+
+    def invoke(self, context, event):
+        self.is_not_undo = True
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        # Reset Material errors, otherwise we risk reporting errors erroneously..
+        self.material_error = []
+        materials = []
+
+        if not self.is_auto:
+            if self.material_name == "":
+                self.report({'WARNING'}, "No Material Name given!")
+
+                self.is_not_undo = False
+                return {'CANCELLED'}
+            materials = [self.material_name]
+        else:
+            materials = bpy.data.materials.keys()
+
+        result = mu_join_objects(self, materials)
+        self.is_not_undo = False
+
+        return result

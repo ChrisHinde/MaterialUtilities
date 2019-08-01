@@ -117,6 +117,10 @@ class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
                         text = "Merge Base Names",
                         icon = "GREASEPENCIL")
 
+        layout.operator(MATERIAL_OT_materialutilities_join_objects.bl_idname,
+                        text = "Join by material",
+                        icon = "OBJECT_DATAMODE")
+
 
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
     """Main menu for Material Utilities"""

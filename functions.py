@@ -197,7 +197,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
     return {'FINISHED'}
 
 
-def mu_select_by_material_name(self, find_material_name, extend_selection = False):
+def mu_select_by_material_name(self, find_material_name, extend_selection = False, internal = False):
     """Searches through all objects, or the polygons/curves of the current object
     to find and select objects/data with the desired material"""
 
@@ -208,7 +208,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
     if find_material is None:
         self.report({'INFO'}, "The material " + find_material_name + " doesn't exists!")
-        return {'CANCELLED'}
+        return {'CANCELLED'} if not internal else -1
 
     # check for edit_mode
     edit_mode = False
@@ -249,9 +249,10 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
                 obj.select_set(state=False)
 
         if not found_material:
-            self.report({'INFO'}, "No objects found with the material " +
-                                    find_material_name + "!")
-            return {'FINISHED'}
+            if not internal:
+                self.report({'INFO'}, "No objects found with the material " +
+                                        find_material_name + "!")
+            return {'FINISHED'} if not internal else 0
 
     else:
         # it's edit_mode, so select the polygons
@@ -266,7 +267,6 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
         objects = bpy.context.selected_editable_objects
 
         for obj in objects:
-            print("Obj:" + obj.name)
             bpy.context.view_layer.objects.active = obj
 
             if obj.type == 'MESH':
@@ -318,7 +318,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
                     i += 1
 
-            else:
+            elif not internal:
                 # Some object types are not supported
                 #  mostly because don't really support selecting by material (like Font/Text objects)
                 #  ore that they don't support multiple materials/are just "weird" (i.e. Meta balls)
@@ -329,10 +329,10 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
         bpy.context.view_layer.objects.active = active_object
 
-        if not found_material:
+        if (not found_material) and (not internal):
             self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to anything!")
 
-    return {'FINISHED'}
+    return {'FINISHED'} if not internal else 1
 
 
 def mu_copy_material_to_others(self):
@@ -613,5 +613,15 @@ def mu_change_material_link(self, link, affect, override_data_material = False):
                 slot.material = present_material
 
             index = index + 1
+
+    return {'FINISHED'}
+
+def mu_join_objects(self, materials):
+    """Join objects together based on their material"""
+
+    for material in materials:
+        mu_select_by_material_name(self, material, False, True)
+
+        bpy.ops.object.join()
 
     return {'FINISHED'}

@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current **Beta** version of Material Utilities is [**v1.0.6**](CHANGELOG.md#v1.0.6)\
+The current **Beta** version of Material Utilities is [**v1.1.0**](CHANGELOG.md#v1.1.0)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -127,6 +127,17 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
     **Do note** that this only keeps the base material (`MyMaterial`) and ignores the other versions (`MyMaterial.001` etc)\
     [![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames-e1563021414948.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames.png)
 
+  - **Join by material**\
+    This is the opposite of "Seperate By Material" in Edit mode.
+    It finds objects that have the same material and join them together.\
+    You can set a specific **Material**, where all objects that have that material will be joined.\
+    Or you can choose to **Automatically Join**, where objects that share the same material will be joined (no matter what the material is).\
+    If there's different types of objects (Mesh, Curves etc) that shares the same material,
+    those will be joined according to their type.\
+    **Do note** that if the objects have multiple materials, the resulting joins might not be as you predicted.\
+    **Tip:** If you have objects that you don't want to be affected, you can hide them from the viewport first.\
+    [![Join By Material](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial-e1564691922884.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial.png)
+
 
 ### Material Specials menu
 
@@ -143,6 +154,8 @@ And at the top two other options are added:
 
 
 ## Known issues
+
+There's currently no known issues.\
 
 (**Do note** that each spline/curve in Curve Objects can only have one material,
   so you can't assign different materials to different parts of a spline)
