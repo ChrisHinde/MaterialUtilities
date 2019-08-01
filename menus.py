@@ -20,6 +20,17 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         bl_id = VIEW3D_OT_materialutilities_assign_material_object.bl_idname
         obj = context.object
 
+        layout.operator(bl_id,
+                        text = 'Search',
+                        icon = 'VIEWZOOM'
+                        ).dialog = True
+
+        layout.operator(bl_id,
+                text = "Add New Material",
+                icon = 'ADD').material_name = mu_new_material_name("Unnamed material")
+
+        layout.separator()
+
         if (not obj is None) and obj.mode == 'EDIT':
             bl_id = VIEW3D_OT_materialutilities_assign_material_edit.bl_idname
 
@@ -27,10 +38,6 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
             layout.operator(bl_id,
                 text = material_name,
                 icon_value = material.preview.icon_id).material_name = material_name
-
-        layout.operator(bl_id,
-                        text = "Add New Material",
-                        icon = 'ADD').material_name = mu_new_material_name("Unnamed material")
 
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
@@ -65,8 +72,16 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 
+        bl_id = VIEW3D_OT_materialutilities_select_by_material_name.bl_idname
         obj = context.object
         layout.label
+
+        layout.operator(bl_id,
+                        text = 'Search',
+                        icon = 'VIEWZOOM'
+                        ).dialog = True
+
+        layout.separator()
 
         if obj is None or obj.mode == 'OBJECT':
             #show all used materials in entire blend file
@@ -74,7 +89,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                 # There's no point in showing materials with 0 users
                 #  (It will still show materials with fake user though)
                 if material.users > 0:
-                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
+                    layout.operator(bl_id,
                                     text = material_name,
                                     icon_value = material.preview.icon_id
                                     ).material_name = material_name
@@ -93,7 +108,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     if material.name in materials_added:
                         continue
 
-                    layout.operator(VIEW3D_OT_materialutilities_select_by_material_name.bl_idname,
+                    layout.operator(bl_id,
                         text = material.name,
                         icon_value = material.preview.icon_id
                         ).material_name = material.name

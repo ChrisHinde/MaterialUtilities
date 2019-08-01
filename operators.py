@@ -33,7 +33,6 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
         return mu_assign_material(self, material_name, 'APPEND_MATERIAL')
 
 
-
 class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     """Assign a material to the current selection
     (See the operator panel [F9] for more options)"""
@@ -53,10 +52,20 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
             description = '',
             items = mu_override_type_enums
             )
+    dialog: BoolProperty(
+            name = 'Show Dialog',
+            default = False
+    )
 
     @classmethod
     def poll(cls, context):
         return len(context.selected_editable_objects) > 0
+
+    def invoke(self, context, event):
+        if self.dialog:
+            return context.window_manager.invoke_props_dialog(self)
+        else:
+            return self.execute(context)
 
     def draw(self, context):
         layout = self.layout
@@ -69,7 +78,6 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
         override_type = self.override_type
         result = mu_assign_material(self, material_name, override_type)
         return result
-
 
 class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     """Select geometry that has the chosen material assigned to it
@@ -88,10 +96,20 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
             description = 'Name of Material to find and Select',
             maxlen = 63
             )
+    dialog: BoolProperty(
+            name = 'Show Dialog',
+            default = False
+    )
 
     @classmethod
     def poll(cls, context):
         return len(context.visible_objects) > 0
+
+    def invoke(self, context, event):
+        if self.dialog:
+            return context.window_manager.invoke_props_dialog(self)
+        else:
+            return self.execute(context)
 
     def draw(self, context):
         layout = self.layout
