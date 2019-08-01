@@ -23,13 +23,48 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
             default = "",
             maxlen = 63
             )
+    new_material: BoolProperty(
+            name = '',
+            description = 'Add a new material, enter the name in the box',
+            default = False
+            )
+    show_dialog: BoolProperty(
+            name = 'Show Dialog',
+            default = False
+            )
 
     @classmethod
     def poll(cls, context):
         return context.active_object is not None
 
+    def invoke(self, context, event):
+        if self.show_dialog:
+            return context.window_manager.invoke_props_dialog(self)
+        else:
+            return self.execute(context)
+
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column()
+        row = col.split(factor=0.9, align = True)
+
+        if self.new_material:
+            row.prop(self, "material_name")
+        else:
+            row.prop_search(self, "material_name", bpy.data, "materials")
+
+        row.prop(self, "new_material", expand = True, icon = 'ADD')
+
     def execute(self, context):
         material_name = self.material_name
+
+        if self.new_material:
+            material_name = mu_new_material_name(material_name)
+        elif material_name == "":
+            self.report({'WARNING'}, "No Material Name given!")
+            return {'CANCELLED'}
+
         return mu_assign_material(self, material_name, 'APPEND_MATERIAL')
 
 
