@@ -44,7 +44,7 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     material_name: StringProperty(
             name = 'Material Name',
             description = 'Name of Material to assign to current selection',
-            default = "Unnamed Material",
+            default = "Unnamed material",
             maxlen = 63
             )
     override_type: EnumProperty(
@@ -52,30 +52,52 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
             description = '',
             items = mu_override_type_enums
             )
-    dialog: BoolProperty(
+    new_material: BoolProperty(
+            name = '',
+            description = 'Add a new material, enter the name in the box',
+            default = False
+            )
+    show_dialog: BoolProperty(
             name = 'Show Dialog',
             default = False
-    )
+            )
 
     @classmethod
     def poll(cls, context):
         return len(context.selected_editable_objects) > 0
 
     def invoke(self, context, event):
-        if self.dialog:
+        if self.show_dialog:
             return context.window_manager.invoke_props_dialog(self)
         else:
             return self.execute(context)
 
     def draw(self, context):
         layout = self.layout
-        layout.prop_search(self, "material_name", bpy.data, "materials")
+
+        col = layout.column()
+        row = col.split(factor=0.9, align = True)
+
+        if self.new_material:
+            row.prop(self, "material_name")
+        else:
+            row.prop_search(self, "material_name", bpy.data, "materials")
+
+        row.prop(self, "new_material", expand = True, icon = 'ADD')
 
         layout.prop(self, "override_type")
+
 
     def execute(self, context):
         material_name = self.material_name
         override_type = self.override_type
+
+        if self.new_material:
+            material_name = mu_new_material_name(material_name)
+        elif material_name == "":
+            self.report({'WARNING'}, "No Material Name given!")
+            return {'CANCELLED'}
+
         result = mu_assign_material(self, material_name, override_type)
         return result
 
@@ -96,7 +118,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
             description = 'Name of Material to find and Select',
             maxlen = 63
             )
-    dialog: BoolProperty(
+    show_dialog: BoolProperty(
             name = 'Show Dialog',
             default = False
     )
@@ -106,7 +128,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
         return len(context.visible_objects) > 0
 
     def invoke(self, context, event):
-        if self.dialog:
+        if self.show_dialog:
             return context.window_manager.invoke_props_dialog(self)
         else:
             return self.execute(context)

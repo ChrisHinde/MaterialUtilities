@@ -20,14 +20,19 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         bl_id = VIEW3D_OT_materialutilities_assign_material_object.bl_idname
         obj = context.object
 
-        layout.operator(bl_id,
+        op = layout.operator(bl_id,
                         text = 'Search',
-                        icon = 'VIEWZOOM'
-                        ).dialog = True
+                        icon = 'VIEWZOOM')
+        op.material_name = ""
+        op.new_material = False
+        op.show_dialog = True
 
-        layout.operator(bl_id,
+        op = layout.operator(bl_id,
                 text = "Add New Material",
-                icon = 'ADD').material_name = mu_new_material_name("Unnamed material")
+                icon = 'ADD')
+        op.material_name = mu_new_material_name("Unnamed material")
+        op.new_material = True
+        op.show_dialog = True
 
         layout.separator()
 
@@ -35,9 +40,11 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
             bl_id = VIEW3D_OT_materialutilities_assign_material_edit.bl_idname
 
         for material_name, material in bpy.data.materials.items():
-            layout.operator(bl_id,
-                text = material_name,
-                icon_value = material.preview.icon_id).material_name = material_name
+            op = layout.operator(bl_id,
+                    text = material_name,
+                    icon_value = material.preview.icon_id)
+            op.material_name = material_name
+            op.show_dialog = False
 
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
@@ -79,7 +86,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
         layout.operator(bl_id,
                         text = 'Search',
                         icon = 'VIEWZOOM'
-                        ).dialog = True
+                        ).show_dialog = True
 
         layout.separator()
 
@@ -89,10 +96,12 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                 # There's no point in showing materials with 0 users
                 #  (It will still show materials with fake user though)
                 if material.users > 0:
-                    layout.operator(bl_id,
+                    op = layout.operator(bl_id,
                                     text = material_name,
                                     icon_value = material.preview.icon_id
-                                    ).material_name = material_name
+                                    )
+                    op.material_name = material_name
+                    op.show_dialog = False
 
         elif obj.mode == 'EDIT':
             objects = context.selected_editable_objects
@@ -108,10 +117,12 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     if material.name in materials_added:
                         continue
 
-                    layout.operator(bl_id,
-                        text = material.name,
-                        icon_value = material.preview.icon_id
-                        ).material_name = material.name
+                    op = layout.operator(bl_id,
+                                    text = material.name,
+                                    icon_value = material.preview.icon_id
+                                    )
+                    op.material_name = material_name
+                    op.show_dialog = False
 
                     materials_added.append(material.name)
 
