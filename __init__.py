@@ -1,4 +1,4 @@
-# Material Utilities v1.1.0-Beta
+# Material Utilities v2.0.0-Beta
 #
 #  Usage: Shift + Q in the 3D viewport
 #
@@ -35,7 +35,7 @@
 bl_info = {
     "name": "Material Utilities",
     "author": "ChrisHinde",
-    "version": (1, 1, 0),
+    "version": (2, 0, 0),
     "blender": (2, 80, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",

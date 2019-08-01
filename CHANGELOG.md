@@ -1,5 +1,11 @@
 # Changelog
 
+<a name="v2.0.0"></a>
+# v2.0.0-beta (2019-08-01)
+(New feature -> Bump of version)
+
+* Add new operator: Specials > Join By Material
+
 <a name="v1.0.6"></a>
 # v1.0.6-beta (2019-08-01)
 
