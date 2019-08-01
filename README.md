@@ -4,7 +4,7 @@
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
 (via a keyboard shortcut and a pop up menu), as well as select by material and more!
 
-**This is Beta, and still under development! you're welcome to use it, but be aware that ther might be some unknown issue!**\
+**This is Beta, it's stable, but it's not guaranteed bug free**\
 Each part is tested thoroughly during development, but we can't guarantee that there in't a special case where a problem might occur!\
 Please read the list of [Known issues](#known-issues) below, if your problem isn't listed, please leave a bug report.
 
