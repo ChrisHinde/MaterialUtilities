@@ -155,7 +155,7 @@ And at the top two other options are added:
 
 ## Known issues
 
-There's currently no known issues.\
+There's currently no known issues.
 
 (**Do note** that each spline/curve in Curve Objects can only have one material,
   so you can't assign different materials to different parts of a spline)

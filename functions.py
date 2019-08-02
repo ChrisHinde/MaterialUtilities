@@ -152,6 +152,15 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                 obj.material_slots[i].material = target
                 i += 1
 
+        elif override_type == 'OVERRIDE_CURRENT':
+            active_slot = obj.active_material_index
+
+            if len(obj.material_slots) == 0:
+                self.report({'INFO'}, 'No material slots found! A material slot was added!')
+                bpy.ops.object.material_slot_add()
+
+            obj.material_slots[active_slot].material = target
+
         # if we should keep the material slots and just append the selected material (if not already assigned)
         elif override_type == 'APPEND_MATERIAL':
             found = False

@@ -4,6 +4,8 @@ import bpy
 mu_override_type_enums = [
     ('OVERRIDE_ALL', "Override all assigned slots",
         "Remove any current material slots, and assign the current material"),
+    ('OVERRIDE_CURRENT', 'Assign material to currently selected slot',
+        'Only assign the material to the material slot that\'s currently selected'),
     ('OVERRIDE_SLOTS', 'Assign material to each slot',
         'Keep the material slots, but assign the selected material in each slot'),
     ('APPEND_MATERIAL', 'Append Material',
