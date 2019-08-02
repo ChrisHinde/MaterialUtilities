@@ -1,7 +1,12 @@
 import bpy
 
 from bpy.types import Operator
-from bpy.props import StringProperty, BoolProperty, EnumProperty
+from bpy.props import (
+    StringProperty,
+    BoolProperty,
+    EnumProperty,
+    IntProperty
+    )
 
 
 from .enum_values import *
@@ -79,7 +84,7 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     material_name: StringProperty(
             name = 'Material Name',
             description = 'Name of Material to assign to current selection',
-            default = "Unnamed material",
+            default = "",
             maxlen = 63
             )
     override_type: EnumProperty(

@@ -2,6 +2,7 @@ import bpy
 
 from .functions import *
 from .operators import *
+from .preferences import *
 
 # -----------------------------------------------------------------------------
 # menu classes
@@ -21,12 +22,12 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
         bl_id = VIEW3D_OT_materialutilities_assign_material_object.bl_idname
         obj = context.object
-
+        mu_prefs = materialutilities_get_preferences(context)
 
         if (not obj is None) and obj.mode == 'EDIT':
             bl_id = VIEW3D_OT_materialutilities_assign_material_edit.bl_idname
 
-        if len(materials) > 5:
+        if len(materials) > mu_prefs.search_show_limit:
             op = layout.operator(bl_id,
                             text = 'Search',
                             icon = 'VIEWZOOM')
@@ -37,7 +38,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         op = layout.operator(bl_id,
                 text = "Add New Material",
                 icon = 'ADD')
-        op.material_name = mu_new_material_name("Unnamed material")
+        op.material_name = mu_new_material_name(mu_prefs.new_material_name)
         op.new_material = True
         op.show_dialog = True
 
@@ -86,12 +87,14 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
         bl_id = VIEW3D_OT_materialutilities_select_by_material_name.bl_idname
         obj = context.object
+        mu_prefs = materialutilities_get_preferences(context)
+
         layout.label
 
         if obj is None or obj.mode == 'OBJECT':
             materials = bpy.data.materials.items()
 
-            if len(materials) > 5:
+            if len(materials) > mu_prefs.search_show_limit:
                 layout.operator(bl_id,
                                 text = 'Search',
                                 icon = 'VIEWZOOM'

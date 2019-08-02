@@ -87,13 +87,34 @@ This script has several functions and operators, grouped for convenience:
 
 """
 
+if "bpy" in locals():
+    import importlib
+    if "enum_values" in locals():
+        importlib.reload(enum_values)
+    if "functions" in locals():
+        importlib.reload(functions)
+    if "operators" in locals():
+        importlib.reload(operators)
+    if "menues" in locals():
+        importlib.reload(menus)
+    if "preferences" in locals():
+        importlib.reload(preferences)
+else:
+    from .enum_values import *
+    from .functions import *
+    from .operators import *
+    from .menus import *
+    from .preferences import *
 
 import bpy
+from bpy.props import (
+    PointerProperty,
+    )
+from bpy.types import (
+    AddonPreferences,
+    PropertyGroup,
+    )
 
-from .enum_values import *
-from .functions import *
-from .operators import *
-from .menus import *
 
 # All classes used by Material Utilities, that need to be registred
 classes = (
@@ -122,12 +143,13 @@ classes = (
     VIEW3D_MT_materialutilities_specials,
 
     VIEW3D_MT_materialutilities_main,
+
+    VIEW3D_MT_materialutilities_preferences
 )
 
 
 # This allows you to right click on a button and link to the manual
 def materialutilities_manual_map():
-    print("ManMap")
     url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtilities"
     url_manual_map = []
     #url_manual_mapping = ()
@@ -184,6 +206,9 @@ def unregister():
                     km.keymap_items.remove(kmi)
                     break
 
+    del bpy.types.Scene.material_utilities
+
+    #bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
     register()
