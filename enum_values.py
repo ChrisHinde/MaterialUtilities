@@ -15,12 +15,12 @@ mu_override_type_enums = [
 mu_fake_user_set_enums = (('ON', "On", "Enable fake user"),
                           ('OFF', "Off", "Disable fake user"),
                           ('TOGGLE', "Toggle", "Toggle fake user"))
-mu_fake_user_materials_enums = (('ACTIVE', "Active object", "Materials of active object only"),
-                                ('SELECTED', "Selected objects", "Materials of selected objects"),
-                                ('SCENE', "Scene objects", "Materials of objects in current scene"),
-                                ('USED', "Used", "All materials used by objects"),
-                                ('UNUSED', "Unused", "Currently unused materials"),
-                                ('ALL', "All", "All materials in this blend file"))
+mu_fake_user_affect_enums = (('ACTIVE', "Active object", "Materials of active object only"),
+                             ('SELECTED', "Selected objects", "Materials of selected objects"),
+                             ('SCENE', "Scene objects", "Materials of objects in current scene"),
+                             ('USED', "Used", "All materials used by objects"),
+                             ('UNUSED', "Unused", "Currently unused materials"),
+                             ('ALL', "All", "All materials in this blend file"))
 
 mu_link_to_enums = (('DATA', "Data", "Link the materials to the data"),
                     ('OBJECT', "Object", "Link the materials to the object"),

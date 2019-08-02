@@ -52,7 +52,7 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
         layout = self.layout
 
         col = layout.column()
-        row = col.split(factor=0.9, align = True)
+        row = col.split(factor = 0.9, align = True)
 
         if self.new_material:
             row.prop(self, "material_name")
@@ -323,10 +323,10 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
             default = 'TOGGLE'
             )
 
-    materials: EnumProperty(
-            name = "Materials",
+    affect: EnumProperty(
+            name = "Affect",
             description = "Which materials of objects to affect",
-            items = mu_fake_user_materials_enums,
+            items = mu_fake_user_affect_enums,
             default = 'UNUSED'
             )
 
@@ -339,13 +339,13 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
         layout.prop(self, "fake_user", expand = True)
         layout.separator()
 
-        layout.prop(self, "materials")
+        layout.prop(self, "affect")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_set_fake_user(self, self.fake_user, self.materials)
+        return mu_set_fake_user(self, self.fake_user, self.affect)
 
 
 class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
@@ -370,7 +370,7 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
             )
 
     affect: EnumProperty(
-            name = "Materials",
+            name = "Affect",
             description = "Which materials of objects to affect",
             items = mu_link_affect_enums,
             default = 'SELECTED'

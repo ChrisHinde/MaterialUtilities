@@ -32,6 +32,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
                             text = 'Search',
                             icon = 'VIEWZOOM')
             op.material_name = ""
+            op.override_type = mu_prefs.override_type
             op.new_material = False
             op.show_dialog = True
 
@@ -39,6 +40,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
                 text = "Add New Material",
                 icon = 'ADD')
         op.material_name = mu_new_material_name(mu_prefs.new_material_name)
+        op.override_type = mu_prefs.override_type
         op.new_material = True
         op.show_dialog = True
 
@@ -49,6 +51,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
                     text = material_name,
                     icon_value = material.preview.icon_id)
             op.material_name = material_name
+            op.override_type = mu_prefs.override_type
             op.new_material = False
             op.show_dialog = False
 
@@ -167,6 +170,7 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
 
     def draw(self, context):
         obj = context.object
+        mu_prefs = materialutilities_get_preferences(context)
 
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
@@ -191,13 +195,17 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
                         text = 'Replace Material',
                         icon = 'OVERLAY')
 
-        layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
+        op = layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
                        text = 'Set Fake User',
                        icon = 'FAKE_USER_OFF')
+        op.fake_user = mu_prefs.fake_user
+        op.affect = mu_prefs.fake_user_affect
 
-        layout.operator(VIEW3D_OT_materialutilities_change_material_link.bl_idname,
+        op = layout.operator(VIEW3D_OT_materialutilities_change_material_link.bl_idname,
                        text = 'Change Material Link',
                        icon = 'LINKED')
+        op.link_to = mu_prefs.link_to
+        op.affect = mu_prefs.link_to_affect
         layout.separator()
 
         layout.menu(VIEW3D_MT_materialutilities_specials.bl_idname,
