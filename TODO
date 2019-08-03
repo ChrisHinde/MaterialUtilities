@@ -1,5 +1,3 @@
-o Add Add-on properties
-
 o Add (current) Collection as an option for filtering materials to be affected.
 
 o Add "Copy material to others" to Edit mode,
@@ -10,6 +8,8 @@ o OSL library
 o (?) Add "Rename Textures" - This will require some rework to fit in 2.8
 
 ----------------------------- FIXED ----------------------------------
+
+- Add Add-on properties
 
 - This seems to work since the buid of Blender 2.80 (2019-07-11, Pre RC [RC also works])!!
     CRASH: Assign material for Curves crashes when the curve object has more than one material slot not working!

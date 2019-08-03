@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current **Beta** version of Material Utilities is [**v2.0.0**](CHANGELOG.md#v2.0.0)\
+The current **Beta** version of Material Utilities is [**v2.1.0**](CHANGELOG.md#v2.1.0)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 

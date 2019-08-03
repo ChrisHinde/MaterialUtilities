@@ -1,5 +1,14 @@
 # Changelog
 
+<a name="v2.1.0"></a>
+# v2.1.0-beta (2019-08-03)
+
+* Add Add-on Preferences (for defaults like new/add material etc)
+* Add *Override Current material slot* as an option for *Assign Material*
+* Add *Search* as an option at the top of the *Assign Material* and *Select By Material* menus
+* Add option/button for adding a new material in the operator panel for *Assign Material*
+* *Add New Material* is now at the top of the menu (instead of at the bottom)
+
 <a name="v2.0.0"></a>
 # v2.0.0-beta (2019-08-01)
 (New feature -> Bump of version)
