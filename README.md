@@ -1,4 +1,4 @@
-# Material utilities v2.0-beta
+# Material utilities v2.1-beta
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
