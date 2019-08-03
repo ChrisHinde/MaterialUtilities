@@ -165,9 +165,11 @@ And at the top two other options are added:
 
 ### Preferences
 
-In the Add-on Preferences (Go to the Prefences in Blender [Edit menu] and the `Add-ons` section, find the Material Utilities Add-on, either by searching or selecting the `Material` category) you have the options to change some default settings.\
-
-[![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences2-e1564789693961.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences2.png)
+In the Add-on Preferences (Go to the Prefences in Blender [Edit menu] and the `Add-ons` section, find the Material Utilities Add-on, either by searching or selecting the `Material` category) you have the options to change some settings for this Add-on.\
+The defaults section lets you set the default options (like the default material name when adding a new material)
+for several of the operators that is described above.\
+The `Show 'Search' Limit` lets you choose how many materials there should be before the `Search` option in the *Assing Material* and *Select By Material* menus. Set it to `0` (default) to always show `Search` in the menus.\
+[![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences3-e1564790495840.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences3.png)
 
 ## Known issues
 

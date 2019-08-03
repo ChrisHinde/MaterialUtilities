@@ -30,7 +30,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             items = mu_override_type_enums
             )
     fake_user: EnumProperty(
-            name = "Fake User",
+            name = "Set Fake User",
             description = "Default option for the Set Fake User (Turn fake user on or off)",
             items = mu_fake_user_set_enums,
             default = 'TOGGLE'
@@ -42,19 +42,19 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             default = 'UNUSED'
             )
     link_to: EnumProperty(
-            name = "Link To",
-            description = "Default option for the Link to operator",
+            name = "Change Material Link To",
+            description = "Default option for the Change Material Link operator",
             items = mu_link_to_enums,
             default = 'OBJECT'
             )
     link_to_affect: EnumProperty(
             name = "Affect",
-            description = "Which materials of objects to affect",
+            description = "Which materials of objects to affect by default with Change Material Link",
             items = mu_link_affect_enums,
             default = 'SELECTED'
             )
     search_show_limit: IntProperty(
-            name = "'Show Search' Limit",
+            name = "Show 'Search' Limit",
             description = "How many materials should there be before the 'Search' option is shown "
                           "in the Assign Material and Select By Material menus\n"
                           "Set it to 0 to always show 'Search'",
