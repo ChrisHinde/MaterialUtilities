@@ -17,6 +17,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
+        edit_mode = False
 
         materials = bpy.data.materials.items()
 
@@ -26,23 +27,26 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
         if (not obj is None) and obj.mode == 'EDIT':
             bl_id = VIEW3D_OT_materialutilities_assign_material_edit.bl_idname
+            edit_mode = True
 
         if len(materials) > mu_prefs.search_show_limit:
             op = layout.operator(bl_id,
                             text = 'Search',
                             icon = 'VIEWZOOM')
             op.material_name = ""
-            op.override_type = mu_prefs.override_type
             op.new_material = False
             op.show_dialog = True
+            if not edit_mode:
+                op.override_type = mu_prefs.override_type
 
         op = layout.operator(bl_id,
                 text = "Add New Material",
                 icon = 'ADD')
         op.material_name = mu_new_material_name(mu_prefs.new_material_name)
-        op.override_type = mu_prefs.override_type
         op.new_material = True
         op.show_dialog = True
+        if not edit_mode:
+            op.override_type = mu_prefs.override_type
 
         layout.separator()
 
@@ -51,9 +55,10 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
                     text = material_name,
                     icon_value = material.preview.icon_id)
             op.material_name = material_name
-            op.override_type = mu_prefs.override_type
             op.new_material = False
             op.show_dialog = False
+            if not edit_mode:
+                op.override_type = mu_prefs.override_type
 
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
