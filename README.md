@@ -58,15 +58,26 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
 
 *Tip:* All operators and options have descriptive tooltips
 
+You can set the defaults of several options, such as the default name for new materials, in the Preferences
+(Open Blender Preferences, go to Add-ons, find *Material Utilities*)
+
 - **Assign Material**\
   Gives you a list of all available materials (including the option to create a new material).\
   Assigns the material you choose to the current selection.\
+  Add the top of the menu you have options to Add a new material and "Search" for a material
+  (you can change when this appears in the preferences),
+  which can be useful if you have a lot of materials in your project.
+  Both of these will open the operator panel as a "dialog" in your viewport.\
+  In the operator the `+` (plus) button to the right will let you add a new material.
   In Object Mode you have the option to select how the existing material (slots) should be treated
   (In Edit mode it will append the material if it's not already in a material slot).\
-  [![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat3-e1563064512702.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat3.png)
+  [![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_AssignMat5-e1564786914277.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat5.png)
 
   - **Override all assigned slots**\
     Will remove any material previously assigned to the object(s) and add the one you've chosen
+  - **Assign material to currently selected slot**\
+    Sets the material you choose to only the currently active material slot (in the Material Properties panel).
+    It will leave the rest of the materials untouched.
   - **Assign material to each slot**\
     Keeps all the material slots, and their assignment to respective parts of the object.
     But will replace each material in those slots with your chosen material.\
@@ -106,7 +117,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
   **On** or **Off**, or **Toggle** (on a per material basis) their current states.\
   You can limit the action to **Unused** materials (Default), **Used** materials, **All** materials,
   materials of the **Selected** objects, of the **Active** object, or of all objects in the current **Scene**.\
-  [![Set Fake User](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SetFakeUser-e1563021336472.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SetFakeUser.png)
+  [![Set Fake User](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetFakeUser_2-e1564786813579.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetFakeUser_2.png)
 
 - **Change Material Link**\
   Change how the material slots are linked, to either the **Data** (i.e. Mesh Data) or to the **Object**,
@@ -117,7 +128,7 @@ The default shortcut for Material Utilities is `[Shift + Q]`.\
   When switching to *Linked to Data* there's a possibility that there's already an material assigned to the *Mesh Data*.\
   If there is no material assigned to the data, the material of the object will be kept.\
   If there is an material assigned to the data, that material will be used by default, or you can force the use of the material assigned to the object, by enabling **Override Data Material** (Do note that this will affect all objects that share the same *Data* and have materials linked to the *Data*).\
-  [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink_2-e1563060821217.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ChangeMaterialLink_2.png)
+  [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_ChangeMaterialLink_3-e1564786727327.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_ChangeMaterialLink_3.png)
 
 - **Specials**
   - **Merge Base Names**\
@@ -152,10 +163,17 @@ And at the top two other options are added:
 
 [![Material Specials menu](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MaterialSpecials-e1562975670283.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MaterialSpecials.png)
 
+### Preferences
+
+In the Add-on Preferences (Go to the Prefences in Blender [Edit menu] and the `Add-ons` section, find the Material Utilities Add-on, either by searching or selecting the `Material` category) you have the options to change some settings for this Add-on.\
+The defaults section lets you set the default options (like the default material name when adding a new material)
+for several of the operators that is described above.\
+The `Show 'Search' Limit` lets you choose how many materials there should be before the `Search` option in the *Assing Material* and *Select By Material* menus. Set it to `0` (default) to always show `Search` in the menus.\
+[![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences3-e1564790495840.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences3.png)
 
 ## Known issues
 
-There's currently no known issues.\
+There's currently no known issues.  
 
 (**Do note** that each spline/curve in Curve Objects can only have one material,
   so you can't assign different materials to different parts of a spline)

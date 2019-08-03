@@ -1,7 +1,12 @@
 import bpy
 
 from bpy.types import Operator
-from bpy.props import StringProperty, BoolProperty, EnumProperty
+from bpy.props import (
+    StringProperty,
+    BoolProperty,
+    EnumProperty,
+    IntProperty
+    )
 
 
 from .enum_values import *
@@ -23,15 +28,49 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
             default = "",
             maxlen = 63
             )
+    new_material: BoolProperty(
+            name = '',
+            description = 'Add a new material, enter the name in the box',
+            default = False
+            )
+    show_dialog: BoolProperty(
+            name = 'Show Dialog',
+            default = False
+            )
 
     @classmethod
     def poll(cls, context):
         return context.active_object is not None
 
+    def invoke(self, context, event):
+        if self.show_dialog:
+            return context.window_manager.invoke_props_dialog(self)
+        else:
+            return self.execute(context)
+
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column()
+        row = col.split(factor = 0.9, align = True)
+
+        if self.new_material:
+            row.prop(self, "material_name")
+        else:
+            row.prop_search(self, "material_name", bpy.data, "materials")
+
+        row.prop(self, "new_material", expand = True, icon = 'ADD')
+
     def execute(self, context):
         material_name = self.material_name
-        return mu_assign_material(self, material_name, 'APPEND_MATERIAL')
 
+        if self.new_material:
+            material_name = mu_new_material_name(material_name)
+        elif material_name == "":
+            self.report({'WARNING'}, "No Material Name given!")
+            return {'CANCELLED'}
+
+        return mu_assign_material(self, material_name, 'APPEND_MATERIAL')
 
 
 class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
@@ -45,7 +84,7 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     material_name: StringProperty(
             name = 'Material Name',
             description = 'Name of Material to assign to current selection',
-            default = "Unnamed Material",
+            default = "",
             maxlen = 63
             )
     override_type: EnumProperty(
@@ -53,23 +92,54 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
             description = '',
             items = mu_override_type_enums
             )
+    new_material: BoolProperty(
+            name = '',
+            description = 'Add a new material, enter the name in the box',
+            default = False
+            )
+    show_dialog: BoolProperty(
+            name = 'Show Dialog',
+            default = False
+            )
 
     @classmethod
     def poll(cls, context):
         return len(context.selected_editable_objects) > 0
 
+    def invoke(self, context, event):
+        if self.show_dialog:
+            return context.window_manager.invoke_props_dialog(self)
+        else:
+            return self.execute(context)
+
     def draw(self, context):
         layout = self.layout
-        layout.prop_search(self, "material_name", bpy.data, "materials")
+
+        col = layout.column()
+        row = col.split(factor=0.9, align = True)
+
+        if self.new_material:
+            row.prop(self, "material_name")
+        else:
+            row.prop_search(self, "material_name", bpy.data, "materials")
+
+        row.prop(self, "new_material", expand = True, icon = 'ADD')
 
         layout.prop(self, "override_type")
+
 
     def execute(self, context):
         material_name = self.material_name
         override_type = self.override_type
+
+        if self.new_material:
+            material_name = mu_new_material_name(material_name)
+        elif material_name == "":
+            self.report({'WARNING'}, "No Material Name given!")
+            return {'CANCELLED'}
+
         result = mu_assign_material(self, material_name, override_type)
         return result
-
 
 class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     """Select geometry that has the chosen material assigned to it
@@ -88,10 +158,20 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
             description = 'Name of Material to find and Select',
             maxlen = 63
             )
+    show_dialog: BoolProperty(
+            name = 'Show Dialog',
+            default = False
+    )
 
     @classmethod
     def poll(cls, context):
         return len(context.visible_objects) > 0
+
+    def invoke(self, context, event):
+        if self.show_dialog:
+            return context.window_manager.invoke_props_dialog(self)
+        else:
+            return self.execute(context)
 
     def draw(self, context):
         layout = self.layout
@@ -243,10 +323,10 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
             default = 'TOGGLE'
             )
 
-    materials: EnumProperty(
-            name = "Materials",
+    affect: EnumProperty(
+            name = "Affect",
             description = "Which materials of objects to affect",
-            items = mu_fake_user_materials_enums,
+            items = mu_fake_user_affect_enums,
             default = 'UNUSED'
             )
 
@@ -259,13 +339,13 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
         layout.prop(self, "fake_user", expand = True)
         layout.separator()
 
-        layout.prop(self, "materials")
+        layout.prop(self, "affect")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_set_fake_user(self, self.fake_user, self.materials)
+        return mu_set_fake_user(self, self.fake_user, self.affect)
 
 
 class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
@@ -290,7 +370,7 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
             )
 
     affect: EnumProperty(
-            name = "Materials",
+            name = "Affect",
             description = "Which materials of objects to affect",
             items = mu_link_affect_enums,
             default = 'SELECTED'
