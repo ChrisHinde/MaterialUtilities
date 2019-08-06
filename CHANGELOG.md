@@ -1,5 +1,11 @@
 # Changelog
 
+<a name="v2.1.1"></a>
+# v2.1.1-beta (2019-08-06)
+
+* Add option for affecting selected/active objects to Clean Material slots
+* Fix bug with Assign Material menu in Edit mode
+
 <a name="v2.1.0"></a>
 # v2.1.0-beta (2019-08-03)
 
