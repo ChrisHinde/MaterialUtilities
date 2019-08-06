@@ -207,12 +207,32 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
     bl_label = "Clean Material Slots (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
+    # affect: EnumProperty(
+    #         name = "Affect",
+    #         description = "Which objects material slots should be cleaned",
+    #         items = mu_clean_slots_enums,
+    #         default = 'ACTIVE'
+    #         )
+
+    only_active: BoolProperty(
+            name = 'Only active object',
+            description = 'Only remove the material slots for the active object ' +
+                            '(otherwise do it for every selected object)',
+            default = True
+            )
+
     @classmethod
     def poll(cls, context):
         return len(context.selected_editable_objects) > 0
 
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "only_active", icon = "PIVOT_ACTIVE")
+
     def execute(self, context):
-        return mu_cleanmatslots(self)
+        affect = "ACTIVE" if self.only_active else "SELECTED"
+
+        return mu_cleanmatslots(self, affect)
 
 
 class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
@@ -226,7 +246,8 @@ class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
     only_active: BoolProperty(
             name = 'Only active object',
             description = 'Only remove the active material slot for the active object ' +
-                            '(otherwise do it for every selected object)'
+                            '(otherwise do it for every selected object)',
+            default = True
             )
 
     @classmethod
@@ -251,7 +272,8 @@ class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
     only_active: BoolProperty(
             name = 'Only active object',
             description = 'Only remove the material slots for the active object ' +
-                            '(otherwise do it for every selected object)'
+                            '(otherwise do it for every selected object)',
+            default = True
             )
 
     @classmethod

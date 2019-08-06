@@ -356,7 +356,7 @@ def mu_copy_material_to_others(self):
     return {'FINISHED'}
 
 
-def mu_cleanmatslots(self):
+def mu_cleanmatslots(self, affect):
     """Clean the material slots of the seleceted objects"""
 
     # check for edit mode
@@ -366,7 +366,16 @@ def mu_cleanmatslots(self):
         edit_mode = True
         bpy.ops.object.mode_set()
 
-    objects = bpy.context.selected_editable_objects
+    objects = []
+
+    if affect == 'ACTIVE':
+        objects = [active_object]
+    elif affect == 'SELECTED':
+        objects = bpy.context.selected_editable_objects
+    elif affect == 'SCENE':
+        objects = bpy.context.scene.objects
+    else: # affect == 'ALL'
+        objects = bpy.data.objects
 
     for obj in objects:
         used_mat_index = []  # we'll store used materials indices here

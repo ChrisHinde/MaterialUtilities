@@ -12,6 +12,11 @@ mu_override_type_enums = [
         'Add the material in a new slot, and assign it to the whole object')
 ]
 
+mu_clean_slots_enums = (('ACTIVE', "Active object", "Materials of active object only"),
+                        ('SELECTED', "Selected objects", "Materials of selected objects"),
+                        ('SCENE', "Scene objects", "Materials of objects in current scene"),
+                        ('ALL', "All", "All materials in this blend file"))
+
 mu_fake_user_set_enums = (('ON', "On", "Enable fake user"),
                           ('OFF', "Off", "Disable fake user"),
                           ('TOGGLE', "Toggle", "Toggle fake user"))
