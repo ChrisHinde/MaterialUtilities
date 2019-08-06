@@ -34,7 +34,7 @@
 
 bl_info = {
     "name": "Material Utilities",
-    "author": "ChrisHinde",
+    "author": "MichaleW, ChrisHinde",
     "version": (2, 1, 1),
     "blender": (2, 80, 0),
     "location": "View3D > Shift + Q key",
