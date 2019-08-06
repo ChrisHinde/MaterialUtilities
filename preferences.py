@@ -64,31 +64,32 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
 
     def draw(self, context):
         layout = self.layout
+        layout.use_property_split = True
 
         box = layout.box()
         box.label(text = "Defaults")
 
         a = box.box()
-        #a.label(text = "Assign Material")
+        a.label(text = "Assign Material")
         a.prop(self, "new_material_name", icon = "MATERIAL")
         a.prop(self, "override_type", expand = False)
 
         b = box.box()
-        #a.label(text = "Set Fake User")
+        b.label(text = "Set Fake User")
         b.row().prop(self, "fake_user", expand = False)
         b.row().prop(self, "fake_user_affect", expand = False)
 
         c = box.box()
-        # a.label(text = "Set Link To")
+        c.label(text = "Set Link To")
         c.row().prop(self, "link_to", expand = False)
         c.row().prop(self, "link_to_affect", expand = False)
 
         box = layout.box()
-        box.label(text="Miscellaneous")
+        box.label(text = "Miscellaneous")
 
-        col = box.column()
-        row = col.split(factor = 0.5)
-        row.prop(self, "search_show_limit", expand = False)
+        #col = box.column()
+        #row = col.split(factor = 0.5)
+        box.prop(self, "search_show_limit", expand = False)
 
 
 def materialutilities_get_preferences(context):
