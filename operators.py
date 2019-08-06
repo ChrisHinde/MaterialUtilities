@@ -5,12 +5,15 @@ from bpy.props import (
     StringProperty,
     BoolProperty,
     EnumProperty,
-    IntProperty
+    IntProperty,
+    FloatProperty
     )
 
 
 from .enum_values import *
 from .functions import *
+
+from math import radians
 
 # -----------------------------------------------------------------------------
 # operator classes
@@ -688,3 +691,52 @@ class MATERIAL_OT_materialutilities_join_objects(bpy.types.Operator):
         self.is_not_undo = False
 
         return result
+
+
+class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
+    """Set Auto smooth values for selected objects"""
+    # Inspired by colkai
+
+    bl_idname = "view3d.materialutilities_auto_smooth_angle"
+    bl_label = "Set Auto Smooth Angle (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    affect: EnumProperty(
+            name = "Affect",
+            description = "Which objects of to affect",
+            items = mu_affect_enums,
+            default = 'SELECTED'
+            )
+    angle: FloatProperty(
+            name = "Angle",
+            description = "Maximum angle between face normals that will be considered as smooth",
+            subtype = 'ANGLE',
+            min = 0,
+            max = radians(180),
+            default = radians(35)
+            )
+    set_smooth_shading: BoolProperty(
+            name = "Set Smooth",
+            description = "Set Smooth shading for the affected objects\n"
+                   "This overrides the currenth smooth/flat shading that might be set to different parts of the object",
+            default = True
+            )
+
+    @classmethod
+    def poll(cls, context):
+        return (len(bpy.data.objects) > 0) and (context.mode == 'OBJECT')
+
+    def invoke(self, context, event):
+        self.is_not_undo = True
+        return context.window_manager.invoke_props_dialog(self)
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.prop(self, "angle")
+        layout.prop(self, "affect")
+
+        layout.prop(self, "set_smooth_shading", icon = "BLANK1")
+
+    def execute(self, context):
+        return mu_set_auto_smooth(self, self.angle, self.affect, self.set_smooth_shading)

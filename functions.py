@@ -1,4 +1,5 @@
 import bpy
+from math import radians, degrees
 
 # -----------------------------------------------------------------------------
 # utility functions
@@ -641,5 +642,43 @@ def mu_join_objects(self, materials):
         mu_select_by_material_name(self, material, False, True)
 
         bpy.ops.object.join()
+
+    return {'FINISHED'}
+
+def mu_set_auto_smooth(self, angle, affect, set_smooth_shading):
+    """Set Auto smooth values for selected objects"""
+    # Inspired by colkai
+
+    objects = []
+    objects_affected = 0
+
+    if affect == "ACTIVE":
+        objects = [bpy.context.active_object]
+    elif affect == "SELECTED":
+        objects = bpy.context.selected_editable_objects
+    elif affect == "SCENE":
+        objects = bpy.context.scene.objects
+    elif affect == "ALL":
+        objects = bpy.data.objects
+
+    if len(objects) == 0:
+        self.report({'WARNING'}, 'No objects available to set Auto Smooth on')
+        return {'CANCELLED'}
+
+    for object in objects:
+        if object.type == "MESH":
+            if set_smooth_shading:
+                for poly in object.data.polygons:
+                    poly.use_smooth = True
+
+                #bpy.ops.object.shade_smooth()
+
+            object.data.use_auto_smooth = 1
+            object.data.auto_smooth_angle = angle  # 35 degrees as radians
+
+            objects_affected += 1
+
+    self.report({'INFO'}, 'Auto smooth angle set to %.0f° on %d of %d objects' %
+                            (degrees(angle), objects_affected, len(objects)))
 
     return {'FINISHED'}

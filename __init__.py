@@ -133,6 +133,7 @@ classes = (
 
     MATERIAL_OT_materialutilities_merge_base_names,
     MATERIAL_OT_materialutilities_join_objects,
+    MATERIAL_OT_materialutilities_auto_smooth_angle,
 
     MATERIAL_OT_materialutilities_material_slot_move,
 
