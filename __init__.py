@@ -189,7 +189,6 @@ def register():
 
 def unregister():
     """Unregister the classes of Material Utilities together with the default shortcut for the menu"""
-    mu_classes_unregister()
 
     bpy.utils.unregister_manual_map(materialutilities_manual_map)
 
@@ -207,9 +206,7 @@ def unregister():
                     km.keymap_items.remove(kmi)
                     break
 
-    del bpy.types.Scene.material_utilities
-
-    #bpy.utils.unregister_module(__name__)
+    mu_classes_unregister()
 
 if __name__ == "__main__":
     register()
