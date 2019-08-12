@@ -17,6 +17,11 @@ mu_clean_slots_enums = (('ACTIVE', "Active object", "Materials of active object 
                         ('SCENE', "Scene objects", "Materials of objects in current scene"),
                         ('ALL', "All", "All materials in this blend file"))
 
+mu_affect_enums = (('ACTIVE', "Active object", "Affect the active object only"),
+                   ('SELECTED', "Selected objects", "Affect all selected objects"),
+                   ('SCENE', "Scene objects", "Affect all objects in the current scene"),
+                   ('ALL', "All", "All objects in this blend file"))
+
 mu_fake_user_set_enums = (('ON', "On", "Enable fake user"),
                           ('OFF', "Off", "Disable fake user"),
                           ('TOGGLE', "Toggle", "Toggle fake user"))
