@@ -1,5 +1,11 @@
 # Changelog
 
+<a name="v2.2.0"></a>
+# v2.2.0-beta (2019-08-12)
+
+* Add "Set Auto Smooth" to Specials
+* Fix error when disabling Add-on
+
 <a name="v2.1.1"></a>
 # v2.1.1-beta (2019-08-06)
 

@@ -1,4 +1,4 @@
-# Material utilities v2.1-beta
+# Material utilities v2.2-beta
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current **Beta** version of Material Utilities is [**v2.1.1**](CHANGELOG.md#v2.1.1)\
+The current **Beta** version of Material Utilities is [**v2.2.0**](CHANGELOG.md#v2.2.0)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -149,6 +149,14 @@ You can set the defaults of several options, such as the default name for new ma
     **Tip:** If you have objects that you don't want to be affected, you can hide them from the viewport first.\
     [![Join By Material](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial-e1564691922884.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial.png)
 
+  - **Set Auto Smooth**\
+    Enables the *Auto Smooth* option (otherwise found under *Normals* in the *Object Data* panel) and sets the *Auto Smooth Angle*
+    to the chosen value for the selected objects (or the objects you choose to affect).\
+    This is useful when you want to set enable *Auto Smooth* or set the *Auto Smooth Angle* for multiple objects.\
+    You can choose to *Set Smooth* shading for the affect objects as well. Auto smooth only works on surfaces that has
+    smooth shading, but **do note** that the *Set Smooth* will override any parts that might have been set to flat shading.\
+    In the preferences for the Add-on you can set your desired default angle, as well as the default options for *Affect*.\
+    [![Set Auto Smooth](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetAutoSmooth-e1565642419495.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetAutoSmooth.png)
 
 ### Material Specials menu
 
