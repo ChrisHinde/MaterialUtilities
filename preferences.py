@@ -65,7 +65,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             )
 
     set_smooth_affect: EnumProperty(
-            name = "Set Smooth Affect",
+            name = "Set Auto Smooth Affect",
             description = "Which objects to affect",
             items = mu_affect_enums,
             default = 'SELECTED'
