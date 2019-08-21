@@ -126,6 +126,11 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
             objects = context.selected_editable_objects
             materials_added = []
 
+            # There can be an active object (that is in Edit mode), but not actually "selected"
+            #  (so it isn't listed in selected_objects)
+            if len(objects) == 0:
+                objects = [obj]
+
             for obj in objects:
                 #show only the materials on this object
                 material_slots = obj.material_slots
