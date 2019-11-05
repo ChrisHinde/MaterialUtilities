@@ -435,13 +435,22 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             description = 'Base name for materials to merge ' +
                                           '(e.g. "Material" is the base name of "Material.001", "Material.002" etc.)'
                             )
+    use_new_name: BoolProperty(
+                            name = "New name",
+                            description = "Give the material a new name instead of the original base name"
+                            )
+    material_new_name: StringProperty(
+                            name = "New Material Name",
+                            default = "",
+                            description = 'Set a new name to use instead of the original Material Base Name'
+                            )
     is_auto: BoolProperty(
                             name = "Auto Merge",
                             description = "Find all available duplicate materials and Merge them"
                             )
     pattern_to_use: EnumProperty(
-                            name = "Pattern to use",
-                            description = "Lets you use another pattern than Material.xxx for merging materials.",
+                            name = "Pattern",
+                            description = "Use another pattern than Material.xxx for merging materials.",
                             items = mu_merge_basse_names_pattern_enums,
                             default = 'DEFAULT',
                             )
@@ -455,7 +464,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             description = "The pattern to use for search and replace.\
                                             Use (Python Style) RegEx.\
                                             Make sure you have to groups (one for the name and one for the suffix)",
-                            default = "^(.*)\.(\d{1,3})$"
+                            default = "^%BASE_NAME\.(\d{1,3})$"
                             )
 
     is_not_undo = False
@@ -472,8 +481,9 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
         if ( (self.pattern_to_use == 'REGEX') and (self.check_no_name is False) ):
             base, suffix = self.split_name_regex(self.material_base_name)
+            self.material_base_name = base
 
-            return base
+            return
 
         if (self.pattern_to_use == 'SIMPLE'):
             delimiter = self.user_defined_pattern_simple
@@ -505,12 +515,14 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                         return
 
         return
+
     def split_name_regex(self, name):
         """Split the material name using Regular Expressions"""
 
         import re
 
         pattern = self.user_defined_pattern_regex
+        pattern = pattern.replace("%BASE_NAME", "(.*)")
 
         matches = re.search(pattern, name)
 
@@ -524,13 +536,11 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         return base, suffix
 
 
-    def split_name(self, material):
+    def split_name(self, name):
         """Split the material name into a base and a suffix"""
 
-        name = material.name
+        #name = material.name
         delimiter = '.'
-
-        print("SplitName: " + name)
 
         if (self.pattern_to_use == 'REGEX'):
             return self.split_name_regex(name)
@@ -569,7 +579,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         if not slot.material:
             return
 
-        base, suffix = self.split_name(slot.material)
+        base, suffix = self.split_name(slot.material.name)
         if suffix is None:
             return
 
@@ -584,6 +594,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
     def main_loop(self, context):
         """Loops through all objects and material slots to make sure they are assigned to the right material"""
+        print("Main loop!")
 
         for obj in context.scene.objects:
             for slot in obj.material_slots:
@@ -597,8 +608,16 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         layout = self.layout
 
         box_1 = layout.box()
-        box_1.prop_search(self, "material_base_name", bpy.data, "materials")
+        col = box_1.column()
+        row = col.split(factor = 0.93, align = True)
+        row.prop_search(self, "material_base_name", bpy.data, "materials")
+        row.prop(self, "use_new_name", text = "", icon = "STYLUS_PRESSURE")
+
+        if (self.use_new_name):
+            box_1.prop(self, "material_new_name")
+
         box_1.enabled = not self.is_auto
+
         layout.separator()
 
         box_2 = layout.box()
@@ -624,13 +643,17 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
             if self.check_no_name:
                 self.main_loop(context)
+
+                # IF the user wants to change the name, do it now
+                if self.use_new_name:
+                    bpy.data.materials[self.material_base_name].name = self.material_new_name
             else:
                 self.report({'WARNING'}, "No Material Base Name given!")
 
                 self.is_not_undo = False
                 return {'CANCELLED'}
-
-        self.main_loop(context)
+        else:
+            self.main_loop(context)
 
         if self.material_error:
             materials = ", ".join(self.material_error)
