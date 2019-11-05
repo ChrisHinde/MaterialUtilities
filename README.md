@@ -144,6 +144,7 @@ You can set the defaults of several options, such as the default name for new ma
       (Python style) Regular Expressions, you can use `%BASE_NAME` to indicate the base part of the name
       (or just make sure it's a group, the operator expects one group matching the base name, eg `MyMaterial`, and a second group matching the suffix, eg. `042`)\
       The default regular expression is `^%BASE_NAME\.(\d{1,3})$` which matches materials like `MyMaterial.003` as well as `MyMaterial.2` (The `%BASE_NAME` token just translates to `(.*)`).\
+
     [![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2019/11/MU_MergeBaseNames_3-e1572996566823.png)](https://chris.hindefjord.se/wp-content/uploads/2019/11/MU_MergeBaseNames_3.png)
 
   - **Join By Material**\
