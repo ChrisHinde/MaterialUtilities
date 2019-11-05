@@ -439,6 +439,24 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             name = "Auto Merge",
                             description = "Find all available duplicate materials and Merge them"
                             )
+    pattern_to_use: EnumProperty(
+                            name = "Pattern to use",
+                            description = "Lets you use another pattern than Material.xxx for merging materials.",
+                            items = mu_merge_basse_names_pattern_enums,
+                            default = 'DEFAULT',
+                            )
+    user_defined_pattern_simple: StringProperty(
+                            name = "Delimiter",
+                            description = "Delimiter to use instead of . (dot)",
+                            default = "."
+                            )
+    user_defined_pattern_regex: StringProperty(
+                            name = "RegEx pattern",
+                            description = "The pattern to use for search and replace.\
+                                            Use (Python Style) RegEx.\
+                                            Make sure you have to groups (one for the name and one for the suffix)",
+                            default = "^(.*)\.(\d{1,3})$"
+                            )
 
     is_not_undo = False
     material_error = []          # collect mat for warning messages
@@ -450,9 +468,19 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         # use the chosen material as a base one, check if there is a name
         self.check_no_name = (False if self.material_base_name in {""} else True)
 
+        delimiter = '.'
+
+        if ( (self.pattern_to_use == 'REGEX') and (self.check_no_name is False) ):
+            base, suffix = self.split_name_regex(self.material_base_name)
+
+            return base
+
+        if (self.pattern_to_use == 'SIMPLE'):
+            delimiter = self.user_defined_pattern_simple
+
         # No need to do this if it's already "clean"
         #  (Also lessens the potential of error given about the material with the Base name)
-        if '.' not in self.material_base_name:
+        if delimiter not in self.material_base_name:
             return
 
         if self.check_no_name is True:
@@ -461,10 +489,13 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
                 if name == self.material_base_name:
                     try:
-                        base, suffix = name.rsplit('.', 1)
+                        if (self.pattern_to_use == 'REGEX'):
+                            base, suffix = self.split_name_regex(name)
+                        else:
+                            base, suffix = name.rsplit(delimiter, 1)
+                            # trigger the exception
+                            num = int(suffix, 10)
 
-                        # trigger the exception
-                        num = int(suffix, 10)
                         self.material_base_name = base
                         mat.name = self.material_base_name
                         return
@@ -474,17 +505,44 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                         return
 
         return
+    def split_name_regex(self, name):
+        """Split the material name using Regular Expressions"""
+
+        import re
+
+        pattern = self.user_defined_pattern_regex
+
+        matches = re.search(pattern, name)
+
+        if not matches:
+            print("Not matching regex:" + name)
+            return name, None
+
+        base = matches.group(1)
+        suffix = matches.group(2)
+
+        return base, suffix
+
 
     def split_name(self, material):
         """Split the material name into a base and a suffix"""
 
         name = material.name
+        delimiter = '.'
+
+        print("SplitName: " + name)
+
+        if (self.pattern_to_use == 'REGEX'):
+            return self.split_name_regex(name)
+
+        if (self.pattern_to_use == 'SIMPLE'):
+            delimiter = self.user_defined_pattern_simple
 
         # No need to do this if it's already "clean"/there is no suffix
-        if '.' not in name:
+        if delimiter not in name:
             return name, None
 
-        base, suffix = name.rsplit('.', 1)
+        base, suffix = name.rsplit(delimiter, 1)
 
         try:
             # trigger the exception
@@ -542,6 +600,14 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         box_1.prop_search(self, "material_base_name", bpy.data, "materials")
         box_1.enabled = not self.is_auto
         layout.separator()
+
+        box_2 = layout.box()
+        box_2.prop(self, "pattern_to_use")
+
+        if self.pattern_to_use == 'SIMPLE':
+            box_2.prop(self, "user_defined_pattern_simple")
+        elif self.pattern_to_use == 'REGEX':
+            box_2.prop(self, "user_defined_pattern_regex")
 
         layout.prop(self, "is_auto", text = "Auto Rename/Replace", icon = "SYNTAX_ON")
 

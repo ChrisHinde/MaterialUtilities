@@ -42,3 +42,9 @@ mu_link_affect_enums = (('ACTIVE', "Active object", "Materials of active object 
 
 mu_material_slot_move_enums = (('TOP', "Top", "Move slot to the top"),
                                ('BOTTOM', "Bottom", "Move slot to the bottom"))
+
+mu_merge_basse_names_pattern_enums = (
+                        ('DEFAULT', "Default", "Use the default pattern: Material.xxx (eg. Metal.001, Metal.002)"),
+                        ('SIMPLE', "Define delimiter", "Use another delimiter (as _ or -) instead of the default . (dot)"),
+                        ("REGEX", "Regex pattern", "Define a custom pattern using (Python style) Regular Expressions")
+                        )
