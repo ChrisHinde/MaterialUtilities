@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current **Beta** version of Material Utilities is [**v2.2.0**](CHANGELOG.md#v2.2.0)\
+The current **Beta** version of Material Utilities is [**v2.2.1**](CHANGELOG.md#v2.2.1)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -136,7 +136,15 @@ You can set the defaults of several options, such as the default name for new ma
     You can select a specific **Material Base Name** (such as `MyMaterial`) to find duplicates of (`MyMaterial.001` etc).\
     By enabling **Auto Rename/Replace** it will find all materials that are "duplicates" and merge them into a single material.\
     **Do note** that this only keeps the base material (`MyMaterial`) and ignores the other versions (`MyMaterial.001` etc)\
-    [![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames-e1563021414948.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_MergeBaseNames.png)
+    You can choose to give the material a new name after all the duplicates have been merged by "checking" the icon
+    to the right of the material name (a box where you can enter the new name will appear).\
+    - **Patterns**\
+      If you want to merge materials based on another pattern than the the default Blender way (such as `Material_001` instead of `Material.001`)
+      you can change the Pattern option to set a custom delimiter (eg. `.` `_` `,`) or define your own pattern with
+      (Python style) Regular Expressions, you can use `%BASE_NAME` to indicate the base part of the name
+      (or just make sure it's a group, the operator expects one group matching the base name, eg `MyMaterial`, and a second group matching the suffix, eg. `042`)\
+      The default regular expression is `^%BASE_NAME\.(\d{1,3})$` which matches materials like `MyMaterial.003` as well as `MyMaterial.2` (The `%BASE_NAME` token just translates to `(.*)`).\
+    [![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2019/11/MU_MergeBaseNames_3-e1572996566823.png)](https://chris.hindefjord.se/wp-content/uploads/2019/11/MU_MergeBaseNames_3.png)
 
   - **Join By Material**\
     This is the opposite of "Seperate By Material" in Edit mode.

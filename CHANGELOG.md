@@ -1,5 +1,11 @@
 # Changelog
 
+<a name="v2.2.1"></a>
+# v2.2.1-beta (2019-11-05)
+
+* Added Pattern options (Simple/Delimiter choice and Regular Expressions) to Merge Base Names (Works for "Auto Merge" as well)
+* Added option to rename the merged material
+
 <a name="v2.2.0"></a>
 # v2.2.0-beta (2019-08-12)
 
