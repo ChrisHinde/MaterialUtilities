@@ -153,10 +153,6 @@ classes = (
 def materialutilities_manual_map():
     url_manual_prefix = "https://github.com/ChrisHinde/MaterialUtilities"
     url_manual_map = []
-    #url_manual_mapping = ()
-        #("bpy.ops.view3d.materialutilities_*", ""),
-        #("bpy.ops.view3d.materialutilities_assign_material_edit", ""),
-        #("bpy.ops.view3d.materialutilities_select_by_material_name", ""),)
 
     for cls in classes:
         if issubclass(cls, bpy.types.Operator):
@@ -195,9 +191,29 @@ def unregister():
     bpy.types.VIEW3D_MT_object_context_menu.remove(materialutilities_specials_menu)
 
     bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_move)
+    #kc = bpy.context.window_manager.keyconfigs.addon
     bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_functions)
 
-    kc = bpy.context.window_manager.keyconfigs.addon
+
+    keyconfigs = bpy.context.window_manager.keyconfigs
+    defaultmap = keyconfigs.get("blender").keymaps
+    addonmap   = keyconfigs.get("blender addon").keymaps
+
+    km = addonmap["3D View"]
+    for kmi in km.keymap_items:
+        if kmi.idname == "wm.call_menu":
+            if kmi.properties.name == VIEW3D_MT_materialutilities_main.bl_idname:
+                km.keymap_items.remove(kmi)
+
+
+    km = defaultmap["3D View"]
+    for kmi in km.keymap_items:
+        if kmi.idname == "wm.call_menu":
+            if kmi.properties.name == VIEW3D_MT_materialutilities_main.bl_idname:
+                km.keymap_items.remove(kmi)
+
+
+"""
     if kc:
         km = kc.keymaps["3D View"]
         for kmi in km.keymap_items:
@@ -205,6 +221,7 @@ def unregister():
                 if kmi.properties.name == VIEW3D_MT_materialutilities_main.bl_idname:
                     km.keymap_items.remove(kmi)
                     break
+"""
 
     mu_classes_unregister()
 
