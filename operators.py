@@ -471,8 +471,11 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
     material_error = []          # collect mat for warning messages
 
 
-    def replace_name(self):
+    def replace_name(self, name = ""):
         """If the user chooses a material like 'Material.042', clean it up to get a base name ('Material')"""
+
+        if (name != ""):
+            self.material_base_name = name
 
         # use the chosen material as a base one, check if there is a name
         self.check_no_name = (False if self.material_base_name in {""} else True)
@@ -586,8 +589,13 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         try:
             base_mat = bpy.data.materials[base]
         except KeyError:
-            print("\n[Materials Utilities Specials]\nLink to base names\nError:"
-                  "Base material %r not found\n" % base)
+            self.replace_name(slot.material.name)
+
+            try:
+                base_mat = bpy.data.materials[base]
+            except KeyError:
+                print("\n[Materials Utilities Specials]\nLink to base names\nError:"
+                      "Base material %r not found\n" % base)
             return
 
         slot.material = base_mat
@@ -654,6 +662,8 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                 return {'CANCELLED'}
         else:
             self.main_loop(context)
+
+            self.material_base_name = ""
 
         if self.material_error:
             materials = ", ".join(self.material_error)
