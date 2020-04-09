@@ -197,7 +197,15 @@ class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return (context.active_object is not None) and (context.active_object.mode != 'EDIT')
+        if context.active_object is None:
+            return False
+
+        # Only enable in Edit mode if Face selection is enabled
+        if context.active_object.mode == 'EDIT':
+            return bpy.context.scene.tool_settings.mesh_select_mode[2]
+        else:
+            return True
+        # and (context.active_object.mode != 'EDIT')
 
     def execute(self, context):
         return mu_copy_material_to_others(self)

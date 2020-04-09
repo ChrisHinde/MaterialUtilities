@@ -199,8 +199,10 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
                      icon = 'VIEWZOOM')
         layout.separator()
 
+        active_object = bpy.context.active_object
+        copy_lbl = 'Copy Material to Selected' if active_object.mode == 'EDIT' else 'Copy Materials to Selected'
         layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
-                         text = 'Copy Materials to Selected',
+                         text = copy_lbl,
                          icon = 'COPY_ID')
 
         layout.separator()
@@ -259,6 +261,10 @@ def materialutilities_menu_functions(self, context):
     layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname,
                  icon = 'VIEWZOOM')
     layout.separator()
+
+    layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
+                     text = 'Copy Materials to Selected',
+                     icon = 'COPY_ID')
 
     layout.separator()
 

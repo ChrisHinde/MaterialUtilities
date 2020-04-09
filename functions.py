@@ -348,11 +348,33 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 def mu_copy_material_to_others(self):
     """Copy the material to of the current object to the other seleceted all_objects"""
     # Currently uses the built-in method
-    #  This could be extended to work in edit mode as well
 
-    #active_object = context.active_object
+    active_object = bpy.context.active_object
+    if active_object.mode == 'EDIT':
+        bpy.ops.object.mode_set()
 
-    bpy.ops.object.material_slot_copy()
+        mesh = active_object.data
+        materials = active_object.material_slots.keys()
+        material_index = mesh.polygons[mesh.polygons.active].material_index
+        material = materials[material_index]
+
+        objects = bpy.context.selected_editable_objects
+
+        for obj in objects:
+            try:
+                mi = obj.material_slots.keys().index(material)
+            except ValueError:
+                mi = len(obj.material_slots)
+                obj.data.materials.append(bpy.data.materials[material])
+                obj.active_material_index = mi
+
+            for p in obj.data.polygons:
+                if p.select:
+                    p.material_index = mi
+
+        bpy.ops.object.mode_set(mode = 'EDIT')
+    else:
+        bpy.ops.object.material_slot_copy()
 
     return {'FINISHED'}
 
