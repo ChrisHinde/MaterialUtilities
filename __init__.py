@@ -1,4 +1,4 @@
-# Material Utilities v2.2.0-Beta
+# Material Utilities v2.3.1
 #
 #  Usage: Shift + Q in the 3D viewport
 #
@@ -35,11 +35,10 @@
 bl_info = {
     "name": "Material Utilities",
     "author": "MichaleW, ChrisHinde",
-    "version": (2, 3, 0),
+    "version": (2, 3, 1),
     "blender": (2, 80, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
-    "warning": "Beta",
     "wiki_url": "https://github.com/ChrisHinde/MaterialUtilities",
     "category": "Material"
 }
@@ -213,7 +212,7 @@ def unregister():
                 km.keymap_items.remove(kmi)
 
 
-"""
+    """
     if kc:
         km = kc.keymaps["3D View"]
         for kmi in km.keymap_items:
@@ -221,7 +220,7 @@ def unregister():
                 if kmi.properties.name == VIEW3D_MT_materialutilities_main.bl_idname:
                     km.keymap_items.remove(kmi)
                     break
-"""
+    """
 
     mu_classes_unregister()
 
