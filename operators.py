@@ -350,10 +350,15 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
 
     affect: EnumProperty(
             name = "Affect",
-            description = "Which materials of objects to affect",
+            description = "Which object's materials to affect",
             items = mu_fake_user_affect_enums,
             default = 'UNUSED'
             )
+    selected_collection: StringProperty(
+            name = "Collection",
+            description = "Affect materials of the objects in this selected collection",
+            default = ""
+    )
 
     @classmethod
     def poll(cls, context):
@@ -366,11 +371,14 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
 
         layout.prop(self, "affect")
 
+        if self.affect == 'SELECTED_COLLECTION':
+            layout.prop_search(self, "selected_collection", bpy.data, "collections")
+
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_set_fake_user(self, self.fake_user, self.affect)
+        return mu_set_fake_user(self, self.fake_user, self.affect, self.selected_collection)
 
 
 class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
@@ -400,6 +408,11 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
             items = mu_link_affect_enums,
             default = 'SELECTED'
             )
+    selected_collection: StringProperty(
+            name = "Collection",
+            description = "Affect materials of the objects in this selected collection",
+            default = ""
+    )
 
     @classmethod
     def poll(cls, context):
@@ -412,6 +425,10 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
         layout.separator()
 
         layout.prop(self, "affect")
+
+        if self.affect == 'SELECTED_COLLECTION':
+            layout.prop_search(self, "selected_collection", bpy.data, "collections")
+
         layout.separator()
 
         layout.prop(self, "override", icon = "DECORATE_OVERRIDE")
@@ -420,7 +437,7 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_change_material_link(self, self.link_to, self.affect, self.override)
+        return mu_change_material_link(self, self.link_to, self.affect, self.override, self.selected_collection)
 
 class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
     """Merges materials that has the same base names but ends with .xxx (.001, .002 etc)"""
@@ -806,6 +823,11 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
             items = mu_affect_enums,
             default = 'SELECTED'
             )
+    selected_collection: StringProperty(
+            name = "Collection",
+            description = "Affect materials of the objects in this selected collection",
+            default = ""
+    )
     angle: FloatProperty(
             name = "Angle",
             description = "Maximum angle between face normals that will be considered as smooth",
@@ -835,7 +857,10 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
         layout.prop(self, "angle")
         layout.prop(self, "affect")
 
+        if self.affect == 'SELECTED_COLLECTION':
+            layout.prop_search(self, "selected_collection", bpy.data, "collections")
+
         layout.prop(self, "set_smooth_shading", icon = "BLANK1")
 
     def execute(self, context):
-        return mu_set_auto_smooth(self, self.angle, self.affect, self.set_smooth_shading)
+        return mu_set_auto_smooth(self, self.angle, self.affect, self.set_smooth_shading, self.selected_collection)
