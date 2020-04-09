@@ -3,9 +3,9 @@ o Add (current) Collection as an option for filtering materials to be affected.
 o Add "Copy material to others" to Edit mode,
   where the material of the active face is copied to the other selected faces
 
-o OSL library
+o Maybe: OSL library
 
-o (?) Add "Rename Textures" - This will require some rework to fit in 2.8
+o Maybe: Add "Rename Textures" - This will require some rework to fit in 2.8
 
 ----------------------------- FIXED ----------------------------------
 
