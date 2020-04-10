@@ -45,7 +45,8 @@ But here are some examples:
 
 This Add-on is now included with the official Blender Builds (since 2.81), just go the *Preferences* > *Add-ons* > Select the *Material* category, or search for "Material", and then enable it.\
 **NB:** The version included with Blender might be, slightly, older than the latest version found in this repository.
-Plesae visit the [Changelog](CHANGELOG.md) to compare the difference in the versions.
+Plesae visit the [Changelog](CHANGELOG.md) to compare the difference in the versions.\
+Thanks to Meta-Androcto for handling the inclusion into the Blender repository.
 
 ## Installation
 
@@ -177,6 +178,10 @@ You can set the defaults of several options, such as the default name for new ma
     In the preferences for the Add-on you can set your desired default angle, as well as the default options for *Affect*.\
     [![Set Auto Smooth](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetAutoSmooth-e1565642419495.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetAutoSmooth.png)
 
+#### Note about Active collection limiting.
+The *Active collection* isn't necessarily the same as the collection of the active object.
+Please check the outliner to verify which collection is active, or choose a specific collection to limit which objects and materials gets affected.
+
 ### Material Specials menu
 
 Material Utilities adds some options to the **Material Specials** menu as well (accessible by the small downward pointing arrow to the right of the materials list).\
@@ -225,7 +230,7 @@ This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.
 
 This Add-on is based on and uses (some) code by the following awesome people:\
 Michael Williamson (michaelw) (original author)\
-meta-androcto\
+Meta-Androcto\
 Sybren\
 Saidenka\
 lijenstina\

@@ -4,7 +4,7 @@
 # v2.4.0 (2020-04-10)
 
 * Fix Merge By Base Name to handle missing base names, This adresses issue #6
-* Added Collection as a "filter" for which obbject's materials to affect (similar to "Selected Objects" etc)
+* Added Collection as a "filter" for which object's materials to affect (similar to "Selected Objects" etc)
   You can either choose a specific Collection or use the Active Collection
   (NB: Active collection isn't necessarily the same as the collection of the active object)
 * Add "Copy material to others" in Edit mode. This lets you set the material of the active face to the other selected faces
