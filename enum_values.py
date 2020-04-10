@@ -12,13 +12,15 @@ mu_override_type_enums = [
         'Add the material in a new slot, and assign it to the whole object')
 ]
 
-mu_clean_slots_enums = (('ACTIVE', "Active object", "Materials of active object only"),
-                        ('SELECTED', "Selected objects", "Materials of selected objects"),
-                        ('SCENE', "Scene objects", "Materials of objects in current scene"),
-                        ('ALL', "All", "All materials in this blend file"))
+#mu_clean_slots_enums = (('ACTIVE', "Active object", "Materials of active object only"),
+#                        ('SELECTED', "Selected objects", "Materials of selected objects"),
+#                        ('SCENE', "Scene objects", "Materials of objects in current scene"),
+#                        ('ALL', "All", "All materials in this blend file"))
 
 mu_affect_enums = (('ACTIVE', "Active object", "Affect the active object only"),
                    ('SELECTED', "Selected objects", "Affect all selected objects"),
+                   ('ACTIVE_COLLECTION', "Active collection", "Materials of objects in active collection"),
+                   ('SELECTED_COLLECTION', "Select collection ", "Materials of objects in the selected collection"),
                    ('SCENE', "Scene objects", "Affect all objects in the current scene"),
                    ('ALL', "All", "All objects in this blend file"))
 
@@ -27,6 +29,8 @@ mu_fake_user_set_enums = (('ON', "On", "Enable fake user"),
                           ('TOGGLE', "Toggle", "Toggle fake user"))
 mu_fake_user_affect_enums = (('ACTIVE', "Active object", "Materials of active object only"),
                              ('SELECTED', "Selected objects", "Materials of selected objects"),
+                             ('ACTIVE_COLLECTION', "Active collection", "Materials of objects in active collection"),
+                             ('SELECTED_COLLECTION', "Select collection ", "Materials of objects in the selected collection"),
                              ('SCENE', "Scene objects", "Materials of objects in current scene"),
                              ('USED', "Used", "All materials used by objects"),
                              ('UNUSED', "Unused", "Currently unused materials"),
@@ -37,6 +41,8 @@ mu_link_to_enums = (('DATA', "Data", "Link the materials to the data"),
                     ('TOGGLE', "Toggle", "Toggle what the materials are currently linked to"))
 mu_link_affect_enums = (('ACTIVE', "Active object", "Materials of active object only"),
                         ('SELECTED', "Selected objects", "Materials of selected objects"),
+                        ('ACTIVE_COLLECTION', "Active collection", "Materials of objects in active collection"),
+                        ('SELECTED_COLLECTION', "Select collection ", "Materials of objects in the selected collection"),
                         ('SCENE', "Scene objects", "Materials of objects in current scene"),
                         ('ALL', "All", "All materials in this blend file"))
 

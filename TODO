@@ -1,7 +1,3 @@
-o Add (current) Collection as an option for filtering materials to be affected.
-
-o Add "Copy material to others" to Edit mode,
-  where the material of the active face is copied to the other selected faces
 
 o Maybe: OSL library
 
@@ -23,3 +19,9 @@ o Maybe: Add "Rename Textures" - This will require some rework to fit in 2.8
 
 - FIXED: Fix Error with listing materials when there is no selected object
 - FIXED: Fix problem with Collections Excluded from the View layer
+
+- DONE: Add (current) Collection as an option for filtering materials to be affected.
+        (Also select specific collection)
+
+- DONE: "Copy material to others" to Edit mode,
+  where the material of the active face is copied to the other selected faces

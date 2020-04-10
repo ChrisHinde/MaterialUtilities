@@ -348,16 +348,38 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 def mu_copy_material_to_others(self):
     """Copy the material to of the current object to the other seleceted all_objects"""
     # Currently uses the built-in method
-    #  This could be extended to work in edit mode as well
 
-    #active_object = context.active_object
+    active_object = bpy.context.active_object
+    if active_object.mode == 'EDIT':
+        bpy.ops.object.mode_set()
 
-    bpy.ops.object.material_slot_copy()
+        mesh = active_object.data
+        materials = active_object.material_slots.keys()
+        material_index = mesh.polygons[mesh.polygons.active].material_index
+        material = materials[material_index]
+
+        objects = bpy.context.selected_editable_objects
+
+        for obj in objects:
+            try:
+                mi = obj.material_slots.keys().index(material)
+            except ValueError:
+                mi = len(obj.material_slots)
+                obj.data.materials.append(bpy.data.materials[material])
+                obj.active_material_index = mi
+
+            for p in obj.data.polygons:
+                if p.select:
+                    p.material_index = mi
+
+        bpy.ops.object.mode_set(mode = 'EDIT')
+    else:
+        bpy.ops.object.material_slot_copy()
 
     return {'FINISHED'}
 
 
-def mu_cleanmatslots(self, affect):
+def mu_cleanmatslots(self, affect, selected_collection = ""):
     """Clean the material slots of the seleceted objects"""
 
     # check for edit mode
@@ -373,6 +395,10 @@ def mu_cleanmatslots(self, affect):
         objects = [active_object]
     elif affect == 'SELECTED':
         objects = bpy.context.selected_editable_objects
+    elif affect == "ACTIVE_COLLECTION":
+        objects = bpy.context.collection.objects
+    elif affect == "SELECTED_COLLECTION":
+        objects = bpy.data.collections[selected_collection].objects
     elif affect == 'SCENE':
         objects = bpy.context.scene.objects
     else: # affect == 'ALL'
@@ -553,7 +579,7 @@ def mu_replace_material(material_a, material_b, all_objects=False, update_select
     return {'FINISHED'}
 
 
-def mu_set_fake_user(self, fake_user, materials):
+def mu_set_fake_user(self, fake_user, materials, selected_collection = ""):
     """Set the fake user flag for the objects material"""
 
     if materials == 'ALL':
@@ -566,6 +592,10 @@ def mu_set_fake_user(self, fake_user, materials):
             objs = [bpy.context.active_object]
         elif materials == 'SELECTED':
             objs = bpy.context.selected_objects
+        elif materials == "ACTIVE_COLLECTION":
+            objs = bpy.context.collection.objects
+        elif materials == "SELECTED_COLLECTION":
+            objs = bpy.data.collections[selected_collection].objects
         elif materials == 'SCENE':
             objs = bpy.context.scene.objects
         else: # materials == 'USED'
@@ -595,7 +625,7 @@ def mu_set_fake_user(self, fake_user, materials):
     return {'FINISHED'}
 
 
-def mu_change_material_link(self, link, affect, override_data_material = False):
+def mu_change_material_link(self, link, affect, override_data_material = False, selected_collection = ""):
     """Change what the materials are linked to (Object or Data), while keeping materials assigned"""
 
     objects = []
@@ -604,6 +634,10 @@ def mu_change_material_link(self, link, affect, override_data_material = False):
         objects = [bpy.context.active_object]
     elif affect == "SELECTED":
         objects = bpy.context.selected_objects
+    elif affect == "ACTIVE_COLLECTION":
+        objects = bpy.context.collection.objects
+    elif affect == "SELECTED_COLLECTION":
+        objects = bpy.data.collections[selected_collection].objects
     elif affect == "SCENE":
         objects = bpy.context.scene.objects
     elif affect == "ALL":
@@ -645,7 +679,7 @@ def mu_join_objects(self, materials):
 
     return {'FINISHED'}
 
-def mu_set_auto_smooth(self, angle, affect, set_smooth_shading):
+def mu_set_auto_smooth(self, angle, affect, set_smooth_shading, selected_collection = ""):
     """Set Auto smooth values for selected objects"""
     # Inspired by colkai
 
@@ -656,6 +690,10 @@ def mu_set_auto_smooth(self, angle, affect, set_smooth_shading):
         objects = [bpy.context.active_object]
     elif affect == "SELECTED":
         objects = bpy.context.selected_editable_objects
+    elif affect == "ACTIVE_COLLECTION":
+        objects = bpy.context.collection.objects
+    elif affect == "SELECTED_COLLECTION":
+        objects = bpy.data.collections[selected_collection].objects
     elif affect == "SCENE":
         objects = bpy.context.scene.objects
     elif affect == "ALL":
