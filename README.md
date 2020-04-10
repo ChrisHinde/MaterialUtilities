@@ -1,4 +1,4 @@
-# Material utilities v2.3.1 (Stable)
+# Material utilities v2.4.0 (Stable)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
@@ -9,13 +9,14 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current stable version of Material Utilities is [**v2.3.1**](CHANGELOG.md#v2.3.1)\
+The current stable version of Material Utilities is [**v2.4.0**](CHANGELOG.md#v2.4.0)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
 ## Table of Contents
 
 - [Background](#background)
+- [Information](#information)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Known issues](#known-issues)
@@ -39,6 +40,12 @@ But here are some examples:
 - Some functions (like "Clean Material Slots") now also work on Curve and Surface objects
 - The Select By Material have the option to extend the current selecction
 - Assign Material have options to override or append materials in Object Mode
+
+## Information
+
+This Add-on is now included with the official Blender Builds (since 2.81), just go the *Preferences* > *Add-ons* > Select the *Material* category, or search for "Material", and then enable it.\
+**NB:** The version included with Blender might be, slightly, older than the latest version found in this repository.
+Plesae visit the [Changelog](CHANGELOG.md) to compare the difference in the versions.
 
 ## Installation
 
@@ -92,8 +99,12 @@ You can set the defaults of several options, such as the default name for new ma
   In the operator panel `[F9]` you can choose to extend your current selection, otherwise what was selected before will be unselected first.\
   [![Select By Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat_2-e1563064147331.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat_2.png)
 
-- **Copy Materials to Seleted** (Object Mode only)\
-  Copies all the materials of the active object to the other selected objects.
+- **Copy Materials to Seleted**
+   - **In Object Mode:** Copies all the materials of the active object to the other selected objects.
+   - **In Edit Mode:** Copies the material of the active face to the other selected faces
+        (works if you have multiple objects in Edit Mode as well).\
+        (**NB:** You need to have Face Select enabled to use this)
+
 
 - **Clean Slots**
   - **Clean Material Slots**\
@@ -115,14 +126,14 @@ You can set the defaults of several options, such as the default name for new ma
   Set the Fake User flag (to preserve unused materials) of the materials to either
   **On** or **Off**, or **Toggle** (on a per material basis) their current states.\
   You can limit the action to **Unused** materials (Default), **Used** materials, **All** materials,
-  materials of the **Selected** objects, of the **Active** object, or of all objects in the current **Scene**.\
+  materials of the **Selected** objects, of the **Active** object, of the **Active Collection**, of a **Selected Collection**, or of all objects in the current **Scene**.\
   [![Set Fake User](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetFakeUser_2-e1564786813579.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetFakeUser_2.png)
 
 - **Change Material Link**\
   Change how the material slots are linked, to either the **Data** (i.e. Mesh Data) or to the **Object**,
   or **Toggle** (on a per material basis) what they are currently are linked to.\
   You can limit the action to material slots of the **Selected** objects (Default), of the **Active** object,
-  of all objects in the current **Scene**, or of **All** objects in the file.\
+  of the **Active Collection**, of a **Selected Collection**, of all objects in the current **Scene**, or of **All** objects in the file.\
   When switching to *Linked to Object* the materials assigned the materials assigned to the slots will be kept intact.\
   When switching to *Linked to Data* there's a possibility that there's already an material assigned to the *Mesh Data*.\
   If there is no material assigned to the data, the material of the object will be kept.\
@@ -214,8 +225,8 @@ This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.
 
 This Add-on is based on and uses (some) code by the following awesome people:\
 Michael Williamson (michaelw) (original author)\
-Sybren\
 meta-androcto\
+Sybren\
 Saidenka\
 lijenstina\
 CoDEmanX\
