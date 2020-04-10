@@ -13,7 +13,7 @@
 <a name="v2.3.1"></a>
 # v2.3.1 (2020-04-09)
 
-* Changed the "unregister" mothed to try to fix #7
+* Changed the "unregister" method to try to fix #7
 * Mark this as a **Stable** version
 
 <a name="v2.3.0"></a>
