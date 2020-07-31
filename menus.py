@@ -51,6 +51,11 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         layout.separator()
 
         for material_name, material in materials:
+            # Should we show Grease Pencil mateerials?
+            if not mu_prefs.include_gp_materials:
+                if material.is_grease_pencil:
+                    continue
+
             op = layout.operator(bl_id,
                     text = material_name,
                     icon_value = material.preview.icon_id)
@@ -112,6 +117,11 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
             #show all used materials in entire blend file
             for material_name, material in materials:
+                # Should we show Grease Pencil mateerials?
+                if not mu_prefs.include_gp_materials:
+                    if material.is_grease_pencil:
+                        continue
+
                 # There's no point in showing materials with 0 users
                 #  (It will still show materials with fake user though)
                 if material.users > 0:
@@ -151,7 +161,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     materials_added.append(material.name)
 
 class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
-    """Spcials menu for Material Utilities"""
+    """Specials menu for Material Utilities"""
 
     bl_idname = "VIEW3D_MT_materialutilities_specials"
     bl_label = "Specials"

@@ -64,6 +64,12 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             default = 0
             )
 
+    include_gp_materials: BoolProperty(
+            name = "Show Grease Pencil materials",
+            description = "Include Grease Pencil materials in the materials list",
+            default = False
+    )
+
     set_smooth_affect: EnumProperty(
             name = "Set Auto Smooth Affect",
             description = "Which objects to affect",
@@ -111,6 +117,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
 
         #col = box.column()
         #row = col.split(factor = 0.5)
+        box.prop(self, "include_gp_materials", expand = False)
         box.prop(self, "search_show_limit", expand = False)
 
 

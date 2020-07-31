@@ -193,7 +193,6 @@ def unregister():
     #kc = bpy.context.window_manager.keyconfigs.addon
     bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_functions)
 
-
     keyconfigs = bpy.context.window_manager.keyconfigs
     defaultmap = keyconfigs.get("blender").keymaps
     addonmap   = keyconfigs.get("blender addon").keymaps

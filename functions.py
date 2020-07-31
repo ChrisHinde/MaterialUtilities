@@ -54,6 +54,8 @@ def mu_assign_to_data(object, material, index, edit_mode, all = True):
         if not edit_mode:
             bpy.ops.object.mode_set(mode = 'OBJECT')
 
+
+
 def mu_new_material_name(material):
     for mat in bpy.data.materials:
         name = mat.name
@@ -109,7 +111,13 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
 
     for obj in objects:
         # Apparently selected_editable_objects includes objects as cameras etc
-        if not obj.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}:
+        if not obj.type in {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META', 'GPENCIL'}:
+            continue
+
+        if obj.type == 'GPENCIL':
+            if not target.is_grease_pencil:
+                continue
+        elif target.is_grease_pencil:
             continue
 
         # set the active object to our object
@@ -194,7 +202,10 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                 obj.material_slots[index].material = target
                 obj.active_material_index = index
 
-            mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
+            if obj.type == 'GPENCIL':
+                self.report({'WARNING'}, "Material not assigned to Grease Pencil Stroke! Only appended to object!")
+            else:
+                mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
 
     # We shouldn't risk unsetting the active object
     if not active_object is None:
@@ -720,3 +731,7 @@ def mu_set_auto_smooth(self, angle, affect, set_smooth_shading, selected_collect
                             (degrees(angle), objects_affected, len(objects)))
 
     return {'FINISHED'}
+
+
+def mu_materials_filter_poll(self, material):
+    return not material.is_grease_pencil
