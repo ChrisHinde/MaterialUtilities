@@ -73,6 +73,23 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
             mat_count += 1
 
+        # IF there's enough number of materials, add a Search option at the end of the list
+        if mat_count > mu_prefs.search_show_btm_limit:
+            layout.separator()
+            layout.operator(bl_id,
+                            text = 'Search',
+                            icon = 'VIEWZOOM'
+                            ).show_dialog = True
+
+            op = layout.operator(bl_id,
+                    text = "Add New Material",
+                    icon = 'ADD')
+            op.material_name = mu_new_material_name(mu_prefs.new_material_name)
+            op.new_material = True
+            op.show_dialog = True
+            if not edit_mode:
+                op.override_type = mu_prefs.override_type
+
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
     """Menu for cleaning up the material slots"""
@@ -175,6 +192,15 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     op.show_dialog = False
 
                     materials_added.append(material.name)
+
+                    mat_count += 1
+
+        if mat_count > mu_prefs.search_show_btm_limit:
+            layout.separator()
+            layout.operator(bl_id,
+                            text = 'Search',
+                            icon = 'VIEWZOOM'
+                            ).show_dialog = True
 
 class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
     """Specials menu for Material Utilities"""

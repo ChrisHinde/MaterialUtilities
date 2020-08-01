@@ -63,6 +63,14 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             min = 0,
             default = 0
             )
+    search_show_btm_limit: IntProperty(
+            name = "Show 'Search' at Bottom Limit",
+            description = "How many materials should there be before the 'Search' option is shown at the bottom"
+                          "in the Assign Material and Select By Material menus\n"
+                          "Set it to 0 to always show 'Search' at the bottom",
+            min = 0,
+            default = 50
+            )
     material_show_limit: IntProperty(
             name = "Material List Menu Limit ",
             description = "The maximum number of materials to show in the Assign Material & Select By Material menus"
@@ -128,6 +136,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         #row = col.split(factor = 0.5)
         box.prop(self, "include_gp_materials", expand = False)
         box.prop(self, "search_show_limit", expand = False)
+        box.prop(self, "search_show_btm_limit", expand = False)
         box.prop(self, "material_show_limit", expand = False)
 
 
