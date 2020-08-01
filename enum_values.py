@@ -1,6 +1,5 @@
 import bpy
 
-
 mu_override_type_enums = [
     ('OVERRIDE_ALL', "Override all assigned slots",
         "Remove any current material slots, and assign the current material"),
@@ -11,11 +10,6 @@ mu_override_type_enums = [
     ('APPEND_MATERIAL', 'Append Material',
         'Add the material in a new slot, and assign it to the whole object')
 ]
-
-#mu_clean_slots_enums = (('ACTIVE', "Active object", "Materials of active object only"),
-#                        ('SELECTED', "Selected objects", "Materials of selected objects"),
-#                        ('SCENE', "Scene objects", "Materials of objects in current scene"),
-#                        ('ALL', "All", "All materials in this blend file"))
 
 mu_affect_enums = (('ACTIVE', "Active object", "Affect the active object only"),
                    ('SELECTED', "Selected objects", "Affect all selected objects"),

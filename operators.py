@@ -206,7 +206,6 @@ class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
             return bpy.context.scene.tool_settings.mesh_select_mode[2]
         else:
             return True
-        # and (context.active_object.mode != 'EDIT')
 
     def execute(self, context):
         return mu_copy_material_to_others(self)
@@ -218,13 +217,6 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
     bl_idname = "view3d.materialutilities_clean_material_slots"
     bl_label = "Clean Material Slots (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
-
-    # affect: EnumProperty(
-    #         name = "Affect",
-    #         description = "Which objects material slots should be cleaned",
-    #         items = mu_clean_slots_enums,
-    #         default = 'ACTIVE'
-    #         )
 
     only_active: BoolProperty(
             name = 'Only active object',
@@ -574,7 +566,6 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
     def split_name(self, name):
         """Split the material name into a base and a suffix"""
 
-        #name = material.name
         delimiter = '.'
 
         if (self.pattern_to_use == 'REGEX'):
@@ -781,7 +772,7 @@ class MATERIAL_OT_materialutilities_join_objects(bpy.types.Operator):
                             )
 
     is_not_undo = True
-    material_error = []          # collect mat for warning messages
+    material_error = []          # collect material names for warning messages
 
 
     @classmethod

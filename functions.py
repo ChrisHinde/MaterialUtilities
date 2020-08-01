@@ -57,6 +57,8 @@ def mu_assign_to_data(object, material, index, edit_mode, all = True):
 
 
 def mu_new_material_name(material):
+    """Generate a new material name, if it exists: append a suitable suffix to it"""
+
     for mat in bpy.data.materials:
         name = mat.name
 
@@ -74,7 +76,7 @@ def mu_new_material_name(material):
 
 
 def mu_clear_materials(object):
-    #obj.data.materials.clear()
+    """Clear out all the material slots for the current object"""
 
     for mat in object.material_slots:
         bpy.ops.object.material_slot_remove()

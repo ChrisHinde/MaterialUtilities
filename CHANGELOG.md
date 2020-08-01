@@ -4,8 +4,8 @@
 # v2.4.1 (2020-08-01)
 
 * Add options for whether or not to include Grease Pencil materials in the menus
-* Add option to unlink from Object/Data for Change Material Link. This addresses issue #8.
-* Add a limit to how many materials to show in the Assign & Select By menus (Default: 1000), to avoid Blender hanging when there's a big amount of materials in the file. This addresses issue #9.
+* Add option to unlink from Object/Data for Change Material Link. This addresses issue #8
+* Add a limit to how many materials to show in the Assign & Select By menus (Default: 1000), to avoid Blender hanging when there's a big amount of materials in the file. This addresses issue #9
 * Add Search & Add New Material options to the bottom of the material menus, when there's more than a certain amount of materials (Default: 50).
 This is so it's easier to get to those options when there's more materials than can be shown in one "page" (screen height).
 

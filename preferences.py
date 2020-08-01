@@ -132,8 +132,6 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         box = layout.box()
         box.label(text = "Miscellaneous")
 
-        #col = box.column()
-        #row = col.split(factor = 0.5)
         box.prop(self, "include_gp_materials", expand = False)
         box.prop(self, "search_show_limit", expand = False)
         box.prop(self, "search_show_btm_limit", expand = False)

@@ -73,7 +73,7 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
             mat_count += 1
 
-        # IF there's enough number of materials, add a Search option at the end of the list
+        # If there's enough number of materials, add a Search option at the end of the list
         if mat_count > mu_prefs.search_show_btm_limit:
             layout.separator()
             layout.operator(bl_id,
