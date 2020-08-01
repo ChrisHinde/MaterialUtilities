@@ -404,6 +404,11 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
                              "which have the materials linked to Data)",
             default = False,
             )
+    unlink_old: BoolProperty(
+            name = "Unlink Material From Object/Data",
+            description = "Unlink the material from what it is currently linked to, before it gets linked to the new option",
+            default = False,
+            )
     link_to: EnumProperty(
             name = "Link",
             description = "What should the material be linked to",
@@ -441,12 +446,13 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
         layout.separator()
 
         layout.prop(self, "override", icon = "DECORATE_OVERRIDE")
+        layout.prop(self, "unlink_old", icon = "UNLINKED")
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_change_material_link(self, self.link_to, self.affect, self.override, self.selected_collection)
+        return mu_change_material_link(self, self.link_to, self.affect, self.override, self.selected_collection, self.unlink_old)
 
 class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
     """Merges materials that has the same base names but ends with .xxx (.001, .002 etc)"""

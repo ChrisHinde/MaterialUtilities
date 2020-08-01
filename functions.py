@@ -636,7 +636,7 @@ def mu_set_fake_user(self, fake_user, materials, selected_collection = ""):
     return {'FINISHED'}
 
 
-def mu_change_material_link(self, link, affect, override_data_material = False, selected_collection = ""):
+def mu_change_material_link(self, link, affect, override_data_material = False, selected_collection = "", unlink_old = False):
     """Change what the materials are linked to (Object or Data), while keeping materials assigned"""
 
     objects = []
@@ -658,6 +658,9 @@ def mu_change_material_link(self, link, affect, override_data_material = False, 
         index = 0
         for slot in object.material_slots:
             present_material = slot.material
+
+            if unlink_old:
+                slot.material = None
 
             if link == 'TOGGLE':
                 slot.link = ('DATA' if slot.link == 'OBJECT' else 'OBJECT')
