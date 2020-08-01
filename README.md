@@ -9,7 +9,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current stable version of Material Utilities is [**v2.4.0**](CHANGELOG.md#v2.4.0)\
+The current stable version of Material Utilities is [**v2.4.1**](CHANGELOG.md#v2.4.1)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -139,7 +139,9 @@ You can set the defaults of several options, such as the default name for new ma
   When switching to *Linked to Data* there's a possibility that there's already an material assigned to the *Mesh Data*.\
   If there is no material assigned to the data, the material of the object will be kept.\
   If there is an material assigned to the data, that material will be used by default, or you can force the use of the material assigned to the object, by enabling **Override Data Material** (Do note that this will affect all objects that share the same *Data* and have materials linked to the *Data*).\
-  [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_ChangeMaterialLink_3-e1564786727327.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_ChangeMaterialLink_3.png)
+  If you enable **Unlink Material From Old Link** the material will be "unlinked" from what it was linked to before when the linking is changed.
+  If it was linked to before the Link change.\
+  [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2020/08/MU_MaterialLink_20200801-e1596319891375.png)](https://chris.hindefjord.se/wp-content/uploads/2020/08/MU_MaterialLink_20200801.png)
 
 - **Specials**
   - **Merge Base Names**\
@@ -200,8 +202,11 @@ And at the top two other options are added:
 In the Add-on Preferences (Go to the Prefences in Blender [Edit menu] and the `Add-ons` section, find the Material Utilities Add-on, either by searching or selecting the `Material` category) you have the options to change some settings for this Add-on.\
 The defaults section lets you set the default options (like the default material name when adding a new material)
 for several of the operators that is described above.\
-The `Show 'Search' Limit` lets you choose how many materials there should be before the `Search` option in the *Assing Material* and *Select By Material* menus. Set it to `0` (default) to always show `Search` in the menus.\
-[![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences3-e1564790495840.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_Preferences3.png)
+The `Show 'Search' Limit` lets you choose how many materials there should be before the `Search` option in the *Assign Material* and *Select By Material* menus. Set it to `0` (default) to always show `Search` in the menus. There is also an option to have the `Search` (and `Add new material`) appear at the bottom of the menus, given a certain numbers of materials.\
+For those cases where your file have a lot of materials, and using the *Assign Material* and *Select By Material* is slow
+(or even hangs Blender), there is now an limit to the number of materials shown (Defaults to 1000 materials).
+(You can still access all the materials via the `Search` option)\
+[![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2020/08/MU_ChangeMaterialLink_20200801-e1596320619139.png)](https://chris.hindefjord.se/wp-content/uploads/2020/08/MU_ChangeMaterialLink_20200801.png)
 
 ## Known issues
 

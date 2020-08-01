@@ -405,7 +405,7 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
             default = False,
             )
     unlink_old: BoolProperty(
-            name = "Unlink Material From Object/Data",
+            name = "Unlink Material From Old Link",
             description = "Unlink the material from what it is currently linked to, before it gets linked to the new option",
             default = False,
             )
