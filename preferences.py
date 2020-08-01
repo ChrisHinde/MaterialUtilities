@@ -63,6 +63,15 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             min = 0,
             default = 0
             )
+    material_show_limit: IntProperty(
+            name = "Material List Menu Limit ",
+            description = "The maximum number of materials to show in the Assign Material & Select By Material menus"
+                          "(default: 1000). The limit is so not to slow down the opening of the menus,"
+                          "when there's a lot of materials in the project.\n"
+                          "Set it to 0 to always show all materials",
+            min = 0,
+            default = 1000
+            )
 
     include_gp_materials: BoolProperty(
             name = "Show Grease Pencil materials",
@@ -119,6 +128,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         #row = col.split(factor = 0.5)
         box.prop(self, "include_gp_materials", expand = False)
         box.prop(self, "search_show_limit", expand = False)
+        box.prop(self, "material_show_limit", expand = False)
 
 
 def materialutilities_get_preferences(context):

@@ -50,8 +50,14 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
         layout.separator()
 
+        mat_count = 0
+
         for material_name, material in materials:
-            # Should we show Grease Pencil mateerials?
+            # If Theres a limit, and we reached it, stop!
+            if (mu_prefs.material_show_limit > 0) and (mat_count >= mu_prefs.material_show_limit):
+                break
+
+            # Should we show Grease Pencil materials?
             if not mu_prefs.include_gp_materials:
                 if material.is_grease_pencil:
                     continue
@@ -64,6 +70,8 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
             op.show_dialog = False
             if not edit_mode:
                 op.override_type = mu_prefs.override_type
+
+            mat_count += 1
 
 
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
@@ -104,6 +112,8 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
         layout.label
 
+        mat_count = 0
+
         if obj is None or obj.mode == 'OBJECT':
             materials = bpy.data.materials.items()
 
@@ -115,9 +125,13 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
                 layout.separator()
 
-            #show all used materials in entire blend file
+            # Show all used materials in entire blend file
             for material_name, material in materials:
-                # Should we show Grease Pencil mateerials?
+                # If Theres a limit, and we reached it, stop!
+                if (mu_prefs.material_show_limit > 0) and (mat_count >= mu_prefs.material_show_limit):
+                    break
+
+                # Should we show Grease Pencil materials?
                 if not mu_prefs.include_gp_materials:
                     if material.is_grease_pencil:
                         continue
@@ -131,6 +145,8 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                                     )
                     op.material_name = material_name
                     op.show_dialog = False
+
+                mat_count += 1
 
         elif obj.mode == 'EDIT':
             objects = context.selected_editable_objects
@@ -169,10 +185,6 @@ class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
     def draw(self, context):
         mu_prefs = materialutilities_get_preferences(context)
         layout = self.layout
-
-        #layout.operator(VIEW3D_OT_materialutilities_set_new_material_name.bl_idname, icon = "SETTINGS")
-
-        #layout.separator()
 
         layout.operator(MATERIAL_OT_materialutilities_merge_base_names.bl_idname,
                         text = "Merge Base Names",
