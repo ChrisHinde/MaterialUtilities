@@ -1,5 +1,11 @@
 # Changelog
 
+<a name="v2.4.2"></a>
+# v2.4.2 (2022-04-04)
+* Fix issue #10 where a material slot wasn't removed properly when using "Clean material slots" 887ed7012deed6219c7136e29edf6d93b8b0dafd
+* Fix problem with Material Icons(/Previews) in Assign Material & Select By Material in Blender 3.x (Mentioned in comment to issue #10) db9522feafa9689162ea6f3453dbea25781d2336
+
+
 <a name="v2.4.1"></a>
 # v2.4.1 (2020-08-01)
 
@@ -12,7 +18,7 @@ This is so it's easier to get to those options when there's more materials than 
 <a name="v2.4.0"></a>
 # v2.4.0 (2020-04-10)
 
-* Fix Merge By Base Name to handle missing base names, This adresses issue #6
+* Fix Merge By Base Name to handle missing base names, This addresses issue #6
 * Added Collection as a "filter" for which object's materials to affect (similar to "Selected Objects" etc)
   You can either choose a specific Collection or use the Active Collection
   (NB: Active collection isn't necessarily the same as the collection of the active object)

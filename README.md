@@ -1,7 +1,7 @@
 # Material utilities v2.4.0 (Stable)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-An add-on for Blender 2.8x that lets the user assign materials directly in the 3D viewport
+An add-on for Blender 2.8x and 3.x that lets the user assign materials directly in the 3D viewport
 (via a keyboard shortcut and a pop up menu), as well as select by material and more!
 
 Each part is tested thoroughly during development, but we can't guarantee that there in't a special case where a problem might occur!\
@@ -9,9 +9,18 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current stable version of Material Utilities is [**v2.4.1**](CHANGELOG.md#v2.4.1)\
+The current stable version of Material Utilities is [**v2.4.2**](CHANGELOG.md#v2.4.2)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
+
+## Disclaimer (want to help out?)
+
+I (Chris Hindefjord) am not really in a position where I can actively develop and maintain this add-on. I will do my best\
+to respond to new issues, but I (sadly) can't guarantee a quick response.
+I don't want this project to die, and neither do I think that creating forks (just to keep it maintained in another repository) is the best idea!
+So I welcome anyone that is willing to help, either by:
+ - Patching and making pull request
+ - Be added to this repository as a collaborators (and so having a more direct access to the project)
 
 ## Table of Contents
 
@@ -221,6 +230,7 @@ Support is given when time is available, you can ask for support via https://chr
 If you think you've find a bug, please
 [report it by creating an issue](https://github.com/ChrisHinde/MaterialUtilities/issues)!\
 Bug reports takes precedence over other support requests!
+(Also see [Disclaimer](#Disclaimer) above)
 
 ## Contributing
 
