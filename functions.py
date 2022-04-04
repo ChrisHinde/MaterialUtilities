@@ -12,7 +12,9 @@ def mu_assign_material_slots(object, material_list):
     active_object = bpy.context.active_object
     bpy.context.view_layer.objects.active = object
 
-    for s in object.material_slots:
+    # Remove all current material slots
+    #  By looping until the material slots list is empty
+    while len(object.material_slots) != 0:
         bpy.ops.object.material_slot_remove()
 
     # re-add them and assign material
@@ -393,7 +395,7 @@ def mu_copy_material_to_others(self):
 
 
 def mu_cleanmatslots(self, affect, selected_collection = ""):
-    """Clean the material slots of the seleceted objects"""
+    """Clean the material slots of the selected objects"""
 
     # check for edit mode
     edit_mode = False
