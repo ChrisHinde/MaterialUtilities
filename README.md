@@ -1,4 +1,4 @@
-# Material utilities v2.4.2 (Stable)
+# Material utilities v2.4.3 (Stable)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 An add-on for Blender 2.8x and 3.x that lets the user assign materials directly in the 3D viewport
@@ -9,7 +9,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current stable version of Material Utilities is [**v2.4.2**](CHANGELOG.md#v2.4.2)\
+The current stable version of Material Utilities is [**v2.4.3**](CHANGELOG.md#v2.4.3)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -132,6 +132,23 @@ You can set the defaults of several options, such as the default name for new ma
   You can also choose to have the objects that were affected by the change selected (objects not affected will be deselcted).\
   [![Replace Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial_2-e1563065836955.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial_2.png)
 
+- **Replace Multiple Materials**\
+  **NB:** This needs to be enabled in the add-on settings before use!
+  Use this to replace a list of materials with the matching material in a second list.
+  This feature is functional, but needs more polish to be more user friendly!
+  Currently this uses text block(s) (one line per material name/substitute) for the lists:
+    1. Setup the list(s) in the text editor (or load it in from a text file).
+      You have the option to use two text blocks (one for the materials that should be replaced, and one for the materials to replace with).
+      Or you can use one text block, where each line contains both the material name and the material that it should be \
+      replaced with, separated by, at least, a tab or two spaces (to allow material names with [single] spcaes in them)
+    2. Go to **Replace Multiple Materials** in the Material Utilities menu
+    3. Select the text blocks that have the materials list for **Original** and **Replacement**.
+      If you only have one list that contains both the original material names and replacements, select that for \
+      **Original** and leave **Replacement** empty.
+    4. Select whether only selected objects or all objects should be checked, and whether or not to update the selection \
+      (works the same as for **Replace Material**)
+    5. Run the replacement by clicking **OK**
+
 - **Set Fake User**\
   Set the Fake User flag (to preserve unused materials) of the materials to either
   **On** or **Off**, or **Toggle** (on a per material basis) their current states.\
@@ -179,6 +196,10 @@ You can set the defaults of several options, such as the default name for new ma
     **Do note** that if the objects have multiple materials, the resulting joins might not be as you predicted.\
     **Tip:** If you have objects that you don't want to be affected, you can hide them from the viewport first.\
     [![Join By Material](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial-e1564691922884.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial.png)
+
+  - **Remove unused materials**\
+    Removes any and all materials that isn't used (i.e. materials that has zero users).
+    This is similar to *File* > *Clean Up* > *Unused Data-Blocks*, but only looks for unused materials.
 
   - **Set Auto Smooth**\
     Enables the *Auto Smooth* option (otherwise found under *Normals* in the *Object Data* panel) and sets the *Auto Smooth Angle*

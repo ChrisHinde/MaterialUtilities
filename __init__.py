@@ -1,9 +1,9 @@
-# Material Utilities v2.4.2
+# Material Utilities v2.4.3
 #
 #  Usage: Shift + Q in the 3D viewport
 #
-# Ported from 2.6/2.7 to 2.8x by
-#    Christopher Hindefjord (chrishinde) 2019
+# Ported from 2.6/2.7 to 2.8x+ by
+#    Christopher Hindefjord (chrishinde) 2019-2022
 #
 # ## Port based on 2010 version by MichaelW with some code added from latest 2.7x version
 # ## Same code may be attributed to one of the following awesome people!
@@ -35,7 +35,7 @@
 bl_info = {
     "name": "Material Utilities",
     "author": "MichaleW, ChrisHinde",
-    "version": (2, 4, 2),
+    "version": (2, 4, 3),
     "blender": (3, 00, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",

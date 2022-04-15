@@ -1,5 +1,10 @@
 # Changelog
 
+<a name="v2.4.3"></a>
+# v2.4.3 (2022-04-15)
+* Add "Remove unused materials" (Removes any material with "zero users") eac6bf436165cde1806a8e25f3a6e31f54889fe6
+* Add "Replace multiple materials" (Needs to be enabled in the settings before use!) affdbd0755ac2bb2ac7a5c0171eb46789ff5bcfe
+
 <a name="v2.4.2"></a>
 # v2.4.2 (2022-04-04)
 * Fix issue #10 where a material slot wasn't removed properly when using "Clean material slots" 887ed7012deed6219c7136e29edf6d93b8b0dafd
