@@ -101,6 +101,11 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             max = radians(180),
             default = radians(35)
             )
+    show_multiple_materials_replacement: BoolProperty(
+            name = "Enable Replace Multiple Materials",
+            description = "Enable the Replace Multiple Materials option (NB: Experimental)",
+            default = False
+    )
 
     def draw(self, context):
         layout = self.layout
@@ -136,6 +141,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         box.prop(self, "search_show_limit", expand = False)
         box.prop(self, "search_show_btm_limit", expand = False)
         box.prop(self, "material_show_limit", expand = False)
+        box.prop(self, "show_multiple_materials_replacement", expand = False)
 
 
 def materialutilities_get_preferences(context):

@@ -127,6 +127,7 @@ classes = (
     VIEW3D_OT_materialutilities_remove_all_material_slots,
 
     VIEW3D_OT_materialutilities_replace_material,
+    VIEW3D_OT_materialutilities_replace_multiple_materials,
     VIEW3D_OT_materialutilities_fake_user_set,
     VIEW3D_OT_materialutilities_change_material_link,
 

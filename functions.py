@@ -1,4 +1,5 @@
 import bpy
+import re
 from math import radians, degrees
 
 # -----------------------------------------------------------------------------
@@ -555,19 +556,10 @@ def mu_remove_all_materials(self, for_active_object = False):
 
     return {'FINISHED'}
 
-
-def mu_replace_material(material_a, material_b, all_objects=False, update_selection=False):
+def mu_do_replace_material(self, mat_org, mat_rep, all_objects=False, update_selection=False):
     """Replace one material with another material"""
 
-    # material_a is the name of original material
-    # material_b is the name of the material to replace it with
-    # 'all' will replace throughout the blend file
-
-    mat_org = bpy.data.materials.get(material_a)
-    mat_rep = bpy.data.materials.get(material_b)
-
     if mat_org != mat_rep and None not in (mat_org, mat_rep):
-        # Store active object
         scn = bpy.context.scene
 
         if all_objects:
@@ -591,8 +583,114 @@ def mu_replace_material(material_a, material_b, all_objects=False, update_select
                 if update_selection and not match:
                     obj.select_set(state = False)
 
+def mu_do_replace_multiple_materials(self, mats_org_list, mats_rep_list, all_objects=False, update_selection=False):
+    """Take a list of materials, and replace each of them with the matching one in the second list"""
+
+    mats_org_list_len = len(mats_org_list)
+    mats_rep_list_len = len(mats_rep_list)
+
+    if mats_org_list_len == 0:
+        self.report({'ERROR'},
+                    "List of materials to replace is empty! Canceling!")
+        return {'CANCELLED'}
+    if mats_rep_list_len == 0:
+        self.report({'ERROR'},
+                    "List of materials to replace with is empty! Canceling!")
+        return {'CANCELLED'}
+
+    mat_rep_last = mats_rep_list[0]
+
+    for i in range(mats_org_list_len):
+        mat_org = mats_org_list[i]
+        mat_rep = mat_rep_last if i >= mats_rep_list_len else mats_rep_list[i]
+
+        mu_do_replace_material(self, mat_org, mat_rep, all_objects, update_selection)
+
+        mat_rep_last = mat_rep
+
     return {'FINISHED'}
 
+def mu_replace_material(self, material_a, material_b, all_objects=False, update_selection=False):
+    """Replace one material with another material"""
+
+    # material_a is the name of original material
+    # material_b is the name of the material to replace it with
+    # 'all' will replace throughout the blend file
+
+    mat_org = bpy.data.materials.get(material_a)
+    mat_rep = bpy.data.materials.get(material_b)
+
+    mu_do_replace_material(self, mat_org, mat_rep, all_objects, update_selection)
+
+    return {'FINISHED'}
+
+def mu_get_materials_as_list(self, material_str_list):
+    """Take a list of material names as strings, and return a list with matching materials"""
+
+    material_list = []
+
+    for mat_str in material_str_list:
+        mat = bpy.data.materials.get(mat_str)
+
+        if (mat is None):
+            self.report({'WARNING'}, "Could not find material '" + mat_str + "'! Skipping!")
+        else:
+            material_list.append(mat)
+
+    return material_list
+
+def mu_replace_multiple_materials(self, materials_a, materials_b, all_objects=False, update_selection=False):
+    """Replace multiple materials with another material"""
+
+    # material_a is a text block with materials to replace
+    # material_b is a possible text block with materials to replace it with
+    # 'all' will replace throughout the blend file
+
+    mats_org_strlst = []
+    mats_rep_strlst = []
+
+    if not materials_a in bpy.data.texts.keys():
+        error_msg = "No text block name given" if materials_a == "" else "Couldn't find a text block called " + materials_a
+        self.report({'ERROR'},
+                    error_msg + "! Canceling!")
+        return {'CANCELLED'}
+
+    mat_org_str = bpy.data.texts[materials_a].as_string()
+    mats_org_strlst = mat_org_str.split("\n")
+
+
+    if (materials_b != ""):
+        if not materials_a in bpy.data.texts.keys():
+            self.report({'ERROR'},
+                        "Couldn't find a text block called " + materials_b + "! Canceling!")
+            return {'CANCELLED'}
+
+        mat_rep_str = bpy.data.texts[materials_b].as_string()
+        mats_rep_strlst = mat_rep_str.split("\n")
+    else:
+        mats_org_strlst_old = mats_org_strlst
+        mats_org_strlst = []
+
+        for mat in mats_org_strlst_old:
+            mat = mat.replace("\t", "  ")
+            mats = re.split("\s\s+", mat)
+
+            mats_org_strlst.append(mats[0])
+            if len(mats) != 1:
+                mats_rep_strlst.append(mats[1])
+
+    mats_org_list = mu_get_materials_as_list(self, mats_org_strlst)
+    mats_rep_list = mu_get_materials_as_list(self, mats_rep_strlst)
+
+    mats_org_list_len = len(mats_org_list)
+    mats_rep_list_len = len(mats_rep_list)
+
+    if (mats_org_list_len != mats_rep_list_len):
+        self.report({'WARNING'},
+                    "Mismatching length of material lists, unexpected results might occur! %d original materials, %d replacement materials" %
+                    (mats_org_list_len, mats_rep_list_len))
+
+    return mu_do_replace_multiple_materials(self, mats_org_list, mats_rep_list, all_objects, update_selection)
 
 def mu_set_fake_user(self, fake_user, materials, selected_collection = ""):
     """Set the fake user flag for the objects material"""

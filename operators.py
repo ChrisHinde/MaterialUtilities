@@ -298,12 +298,12 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
     bl_label = "Replace Material (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
-    matorg: StringProperty(
+    mat_org: StringProperty(
             name = "Original",
             description = "Material to find and replace",
             maxlen = 63,
             )
-    matrep: StringProperty(name="Replacement",
+    mat_rep: StringProperty(name="Replacement",
             description = "Material that will be used instead of the Original material",
             maxlen = 63,
             )
@@ -321,8 +321,8 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
 
-        layout.prop_search(self, "matorg", bpy.data, "materials")
-        layout.prop_search(self, "matrep", bpy.data, "materials")
+        layout.prop_search(self, "mat_org", bpy.data, "materials")
+        layout.prop_search(self, "mat_rep", bpy.data, "materials")
         layout.separator()
 
         layout.prop(self, "all_objects", icon = "BLANK1")
@@ -332,8 +332,51 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_replace_material(self.matorg, self.matrep, self.all_objects, self.update_selection)
+        return mu_replace_material(self, self.mat_org, self.mat_rep, self.all_objects, self.update_selection)
 
+
+class VIEW3D_OT_materialutilities_replace_multiple_materials(bpy.types.Operator):
+    """Replace a list of material by names"""
+    bl_idname = "view3d.materialutilities_replace_multiple_materials"
+    bl_label = "Replace Multiple Material (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    mats_org: StringProperty(
+            name = "Original",
+            description = "Materials to find and replace",
+            maxlen = 63
+            )
+    mats_rep: StringProperty(
+            name = "Replacement",
+            description = "Materials that will be used instead of the Original material",
+            maxlen = 63
+            )
+    all_objects: BoolProperty(
+            name = "All Objects",
+            description = "Replace for all objects in this blend file (otherwise only selected objects)",
+            default = True,
+            )
+    update_selection: BoolProperty(
+            name = "Update Selection",
+            description = "Select affected objects and deselect unaffected",
+            default = True,
+            )
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.prop_search(self, "mats_org", bpy.data, "texts")
+        layout.prop_search(self, "mats_rep", bpy.data, "texts")
+        layout.separator()
+
+        layout.prop(self, "all_objects", icon = "BLANK1")
+        layout.prop(self, "update_selection", icon = "SELECT_INTERSECT")
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        return mu_replace_multiple_materials(self, self.mats_org, self.mats_rep, self.all_objects, self.update_selection)
 
 class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
     """Enable/disable fake user for materials"""

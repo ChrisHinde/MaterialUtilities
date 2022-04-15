@@ -288,9 +288,15 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
                     icon = 'NODE_MATERIAL')
 
         layout.separator()
+
         layout.operator(VIEW3D_OT_materialutilities_replace_material.bl_idname,
                         text = 'Replace Material',
                         icon = 'OVERLAY')
+
+        if mu_prefs.show_multiple_materials_replacement:
+            layout.operator(VIEW3D_OT_materialutilities_replace_multiple_materials.bl_idname,
+                            text = 'Replace Multiple Materials',
+                            icon = 'OVERLAY')
 
         op = layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
                        text = 'Set Fake User',
