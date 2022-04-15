@@ -245,6 +245,12 @@ class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
 
         layout.separator()
 
+        op = layout.operator(MATERIAL_OT_materialutilities_remove_unused_materials.bl_idname,
+                        text = "Remove unused materials",
+                        icon = "TRASH")
+
+        layout.separator()
+
         op = layout.operator(MATERIAL_OT_materialutilities_auto_smooth_angle.bl_idname,
                         text = "Set Auto Smooth",
                         icon = "SHADING_SOLID")

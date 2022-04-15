@@ -870,3 +870,21 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
 
     def execute(self, context):
         return mu_set_auto_smooth(self, self.angle, self.affect, self.set_smooth_shading, self.selected_collection)
+
+
+
+class MATERIAL_OT_materialutilities_remove_unused_materials(bpy.types.Operator):
+    """Remove any unused (zero users) materials"""
+    # By request by Hologram
+
+    bl_idname = "view3d.materialutilities_remove_unused_materials"
+    bl_label = "Remove unused materials (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        return mu_remove_unused_materials(self)

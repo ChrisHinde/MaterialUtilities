@@ -739,6 +739,21 @@ def mu_set_auto_smooth(self, angle, affect, set_smooth_shading, selected_collect
 
     return {'FINISHED'}
 
+def mu_remove_unused_materials(self):
+    """Remove any unused (zero users) materials"""
+    # By request by Hologram
+
+    count = 0
+
+    for mat in bpy.data.materials:
+        if mat.users == 0:
+            bpy.data.materials.remove(mat)
+            count += 1
+
+    self.report({'INFO'}, '%d unused materials were removed' %
+                            (count))
+
+    return {'FINISHED'}
 
 def mu_materials_filter_poll(self, material):
     return not material.is_grease_pencil
