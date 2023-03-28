@@ -277,7 +277,7 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
         layout.separator()
 
         active_object = bpy.context.active_object
-        copy_lbl = 'Copy Material to Selected' if active_object.mode == 'EDIT' else 'Copy Materials to Selected'
+        copy_lbl = 'Copy Material to Selected' if active_object != None and active_object.mode == 'EDIT' else 'Copy Materials to Selected'
         layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
                          text = copy_lbl,
                          icon = 'COPY_ID')
