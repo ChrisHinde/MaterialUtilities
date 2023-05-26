@@ -1,4 +1,4 @@
-# Material utilities v2.4.3 (Stable)
+# Material utilities v2.4.4 (Stable)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 An add-on for Blender 2.8x and 3.x that lets the user assign materials directly in the 3D viewport
@@ -9,7 +9,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current stable version of Material Utilities is [**v2.4.3**](CHANGELOG.md#v2.4.3)\
+The current stable version of Material Utilities is [**v2.4.4**](CHANGELOG.md#v2.4.4)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 

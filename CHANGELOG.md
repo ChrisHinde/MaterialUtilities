@@ -1,5 +1,10 @@
 # Changelog
 
+<a name="v2.4.4"></a>
+# v2.4.4 (2023-03-28)
+* Fix bug that occures when there's no active object e0603a51312070b1b68b4de170c2af94bf69b7e1
+
+
 <a name="v2.4.3"></a>
 # v2.4.3 (2022-04-15)
 * Add "Remove unused materials" (Removes any material with "zero users") eac6bf436165cde1806a8e25f3a6e31f54889fe6

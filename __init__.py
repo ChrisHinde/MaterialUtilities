@@ -1,9 +1,9 @@
-# Material Utilities v2.4.3
+# Material Utilities v2.4.4
 #
 #  Usage: Shift + Q in the 3D viewport
 #
 # Ported from 2.6/2.7 to 2.8x+ by
-#    Christopher Hindefjord (chrishinde) 2019-2022
+#    Christopher Hindefjord (chrishinde) 2019-2023
 #
 # ## Port based on 2010 version by MichaelW with some code added from latest 2.7x version
 # ## Same code may be attributed to one of the following awesome people!
