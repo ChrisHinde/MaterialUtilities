@@ -1209,11 +1209,27 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         added_nodes.append(node)
 
     if prefs.connect:
-        uvmap   = nodes.new('ShaderNodeUVMap')
-        reroute = nodes.new('NodeReroute')
-        uvmap.location   = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
-        reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
-        links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
+        uvmap   = None
+        reroute = None
+
+        if nodes.find('MUAddedUVMap') >= 0:
+            uvmap = nodes['MUAddedUVMap']
+        elif nodes.find('UV Map') >= 0:
+            uvmap = nodes['UV Map']
+
+        if uvmap is not None:
+            if uvmap.outputs['UV'].links[0].to_node.bl_idname == 'NodeReroute':
+                reroute = uvmap.outputs['UV'].links[0].to_node
+        else:
+            uvmap = nodes.new('ShaderNodeUVMap')
+            uvmap.name     = 'MUAddedUVMap'
+            uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
+
+        if reroute is None:
+            reroute = nodes.new('NodeReroute')
+            reroute.name     = 'MUAddedUVReroute'
+            reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
+            links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
 
         if has_normal and has_bump:
             uvmap.location.x   -= 200
