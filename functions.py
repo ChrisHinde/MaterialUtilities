@@ -1,6 +1,10 @@
 import bpy
 import re
+import os
+from types import SimpleNamespace
 from math import radians, degrees
+
+from .enum_values import *
 
 # -----------------------------------------------------------------------------
 # utility functions
@@ -751,7 +755,7 @@ def mu_change_material_link(self, link, affect, override_data_material = False, 
         objects = bpy.context.collection.objects
     elif affect == "SELECTED_COLLECTION":
         objects = bpy.data.collections[selected_collection].objects
-    elif affect == "SCENE":
+    elif affect == 'Scene':
         objects = bpy.context.scene.objects
     elif affect == "ALL":
         objects = bpy.data.objects
@@ -810,7 +814,7 @@ def mu_set_auto_smooth(self, angle, affect, set_smooth_shading, selected_collect
         objects = bpy.context.collection.objects
     elif affect == "SELECTED_COLLECTION":
         objects = bpy.data.collections[selected_collection].objects
-    elif affect == "SCENE":
+    elif affect == 'Scene':
         objects = bpy.context.scene.objects
     elif affect == "ALL":
         objects = bpy.data.objects
@@ -855,3 +859,380 @@ def mu_remove_unused_materials(self):
 
 def mu_materials_filter_poll(self, material):
     return not material.is_grease_pencil
+
+def mu_open_image_texture_set(self, image_path):
+    if image_path == "":
+        a = ""
+
+    return {'FINISHED'}
+
+def mu_get_filetype(filename):
+    filename = filename.lower()
+
+    ext = os.path.splitext(filename)[1].strip('.')
+    type = 'NOT_IMG'
+    colorspace = 'NA'
+    override_colorspace = False
+    texture_map = 'UNKNOWN'
+    non_color = False
+    has_alpha = False
+
+    if ext == 'jpg' or ext == 'jpeg':
+        type = 'JPG'
+        colorspace = 'sRGB'
+        override_colorspace = False
+    elif ext == 'png':
+        type = 'PNG'
+        colorspace = 'sRGB'
+        override_colorspace = False
+    elif ext == 'exr':
+        type = 'EXR'
+        colorspace = 'LINEAR'
+        override_colorspace = True
+    elif ext == 'hdr':
+        type = 'HDR'
+        colorspace = 'LINEAR'
+        override_colorspace = True
+    elif ext == 'tif' or ext == 'tiff':
+        type = 'TIF'
+        colorspace = 'LINEAR'
+        override_colorspace = True
+    elif ext == 'tga':
+        type = 'TGA'
+        colorspace = 'LINEAR'
+        override_colorspace = True
+
+    if 'albedo' in filename:
+        texture_map = 'ALBEDO'
+        has_alpha = True
+    elif 'diffuse' in filename:
+        texture_map = 'DIFFUSE'
+        has_alpha = True
+    elif 'ao' in filename or 'occlusion' in filename:
+        texture_map = 'AO'
+        non_color = True
+    elif 'rough' in filename:
+        texture_map = 'ROUGHNESS'
+        non_color = True
+    elif 'gloss' in filename:
+        texture_map = 'GLOSSINESS'
+        non_color = True
+    elif 'spec' in filename:
+        texture_map = 'SPECULAR'
+        non_color = True
+    elif 'refl' in filename:
+        texture_map = 'REFLECTION'
+        non_color = True
+    elif 'metal' in filename:
+        texture_map = 'METALNESS'
+        non_color = True
+    elif 'height' in filename:
+        texture_map = 'HEIGHT'
+        non_color = True
+    elif 'disp' in filename or 'dsp' in filename:
+        texture_map = 'DISPLACE'
+        non_color = True
+    elif 'bump' in filename or 'bmp' in filename:
+        texture_map = 'BUMP'
+        non_color = True
+    elif 'nor' in filename or 'nrm' in filename:
+        texture_map = 'NORMAL'
+        non_color = True
+    elif 'col' in filename or 'base' in filename:
+        texture_map = 'COLOR'
+        has_alpha = True
+    elif 'alpha' in filename or 'opacity' in filename or 'transparent' in filename:
+        texture_map = 'ALPHA'
+        non_color = True
+    elif 'mask' in filename:
+        texture_map = 'MASK'
+        non_color = True
+    elif 'trans' in filename:
+        texture_map = 'TRANSMISSION'
+    elif 'emission' in filename:
+        texture_map = 'EMISSION'
+    elif 'render' in filename:
+        texture_map = 'RENDER'
+
+    if override_colorspace:
+        if 'filmic' in filename:
+            colorspace = 'FILMIC_LOG' if 'log' in filename else 'FILMIC_sRGB'
+        elif 'acescg' in filename:
+            colorspace = 'ACEScg'
+        elif 'aces' in filename:
+            colorspace = 'ACES'
+        elif 'linear' in filename:
+            colorspace = 'LINEAR'
+        elif 'srgb' in filename:
+            colorspace = 'sRGB'
+
+    return SimpleNamespace(type=type, colorspace=colorspace, map=texture_map, orig_map=texture_map,
+                           override_colorspace=override_colorspace, non_color=non_color, has_alpha=has_alpha)
+
+def mu_faux_shader_node(out_node):
+    return SimpleNamespace(name='FAUX', bl_idname='FAUX', location=out_node.location, width=out_node.width)
+
+def mu_set_image_colorspace(colsp, filetype):
+    if filetype.non_color and not filetype.override_colorspace:
+        colsp.name = 'Non-Color'
+    elif filetype.colorspace == 'FILMIC_sRGB':
+        colsp.name = 'Filmic sRGB'
+    elif filetype.colorspace == 'FILMIC_LOG':
+        colsp.name = 'Filmic Log'
+    elif filetype.colorspace == 'LINEAR':
+        colsp.name = 'Linear'
+    elif filetype.colorspace == 'ACES':
+        colsp.name = 'Linear ACES'
+    elif filetype.colorspace == 'ACEScg':
+        colsp.name = 'Linear ACEScg'
+    elif filetype.colorspace == 'sRGB':
+        colsp.name = 'sRGB'
+
+def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=0, y_offset=0, map = None, prefs = None):
+    location = [0,0]
+    ft_map = 'COLOR'
+    if map is None:
+        map = filetype.map
+    grp = 'EXP' if prefs is None else prefs.pos_group
+
+    if filetype is None or map == '_DISPLACEMENT':
+        ft_map = map
+    else:
+        ft_map = filetype.map
+
+    if engine == 'CYCLES':
+        if map == '_BUMPNODE' or map == '_NORMALNODE':
+            x_offset -= 0 + 50
+        elif map == '_DISPLACEMENT':
+            x_offset -= first_node.width + node.width + 10
+        elif map == '_INVERT':
+            x_offset -= 0 + 50
+        elif map == '_UVNODE':
+            x_offset += 585 + 50
+        elif map == '_UVREROUTE':
+            x_offset += 370 + 50
+        elif map == 'BUMP':
+            x_offset += 200 + 50
+        elif map == 'HEIGHT' or map == 'DISPLACEMENT':
+            x_offset -= 150
+        elif map == 'NORMAL':
+            x_offset += 200 + 50
+        elif map == 'GLOSSINESS':
+            x_offset += 200 + 50
+
+    location[0] = first_node.location[0] - first_node.width - node.width - x_offset
+    location[1] = first_node.location[1] + y_offset
+
+    if ft_map != 'None':# and ft_map != 'UNKNOWN':
+        location[1] -= mu_node_positions[engine][grp][first_node.bl_idname][ft_map]
+    #print(ft_map, ";", map, "; G:", grp, "; xo:", x_offset, "; yo:", y_offset, "; p:", mu_node_positions[engine][grp][first_node.bl_idname][ft_map])
+    #print(first_node.location, location)
+
+    return location
+
+def mu_add_image_texture(filename, filetype, prefs, #set_label = True, connect = False, connect_alpha = False,
+                         nodes = None, links = None,
+                         out_node = None, first_node = None, engine=''):
+    x_offset = -100
+
+    try:
+        img = bpy.data.images.load(filename)
+    except:
+        raise NameError("Cannot load image %s" % filename)
+
+    mu_set_image_colorspace(img.colorspace_settings, filetype) # Octane will ignore this, but for Cycles the colorspace is connected to the image data
+
+    if engine == 'CYCLES':
+        node = nodes.new('ShaderNodeTexImage')
+
+        if prefs.connect and filetype.map != 'UNKNOWN':
+            input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
+            link_node = node
+
+            if filetype.map == 'BUMP':
+                bump_node = nodes.new('ShaderNodeBump')
+                bump_node.name = 'MUAddedBump'
+                bump_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_BUMPNODE', prefs=prefs)
+                bump_node.inputs['Distance'].default_value = prefs.bump_distance
+
+                i = mu_node_inputs[engine]['ShaderNodeBump'][filetype.map]
+                links.new(node.outputs['Color'], bump_node.inputs[i])
+                link_node = bump_node
+                #links.new(bump_node.outputs[0], first_node.inputs[input])
+            elif filetype.map == 'NORMAL':
+                nrm_node = nodes.new('ShaderNodeNormalMap')
+                nrm_node.name = 'MUAddedNormalMap'
+                nrm_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_NORMALNODE', prefs=prefs)
+
+                i = mu_node_inputs[engine]['ShaderNodeNormalMap'][filetype.map]
+                links.new(node.outputs['Color'], nrm_node.inputs[i])
+                link_node = nrm_node
+                #links.new(nrm_node.outputs[0], first_node.inputs[input])
+            elif filetype.map == 'GLOSSINESS':
+                inv_node = nodes.new('ShaderNodeInvert')
+                inv_node.name = 'MUAddedInvert'
+                inv_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_INVERT', prefs=prefs)
+                inv_node.hide = True
+
+                links.new(node.outputs['Color'], inv_node.inputs['Color'])
+                link_node = inv_node
+            elif filetype.map == 'DISPLACEMENT':
+                dsp_node = nodes.new('ShaderNodeDisplacement')
+                dsp_node.name = 'MUAddedDisplacement'
+                dsp_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_DISPLACEMENT', prefs=prefs)
+
+                links.new(node.outputs['Color'], dsp_node.inputs['Height'])
+                links.new(dsp_node.outputs['Displacement'], out_node.inputs['Displacement'])
+
+            if input is not None:
+                links.new(link_node.outputs[0], first_node.inputs[input])
+            else:
+                print("Material Utilities - No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname))
+
+            if filetype.has_alpha and prefs.connect_alpha:
+                input = mu_node_inputs[engine][first_node.bl_idname]['ALPHA']
+                if input is not No:
+                    links.new(node.outputs['Alpha'], first_node.inputs[input])
+
+            node.image = img
+    elif engine == 'OCTANE':
+        bpy.ops.octane.add_default_node_helper(default_node_name="OctaneRGBImage", use_transform=False)
+
+    node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset, prefs=prefs)
+
+    if prefs.collapse_texture_nodes:
+        node.hide = True
+
+    if prefs.set_label:
+        node.label = filetype.orig_map
+
+    return node
+
+def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_path = ''): # set_label = True, connect = False, connect_alpha = False, height_map = 'NC'
+    files = []
+
+    if directory is not None:
+        dir = os.path.dirname(directory)
+        for filename in os.listdir(dir):
+            f = os.path.join(directory, filename)
+            if os.path.isfile(f):
+                files.append(f)
+    else:
+        for file in file_list:
+            f = os.path.join(file_path, file.name)
+            files.append(f)
+
+    engine = bpy.data.scenes['Scene'].render.engine
+    mat = bpy.context.active_object.active_material
+
+    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE': # Cycles and Eevee uses the same nodes
+        engine = 'CYCLES'
+    elif engine == 'octane':
+        engine = engine.upper()
+    else:
+        print("Material Utilities - Add image Textures: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
+        self.report({'WARNING'}, "The render engine '" + bpy.data.scenes['Scene'].render.engine +
+                                    "' isn't supported by Material Utilities!")
+        return {'CANCELLED'}
+
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    out_node = nodes.get('Material Output')
+    first_node = None
+    has_bump = False
+    has_normal = False
+    #has_displace = False
+    bump_tex_node = None
+    normal_tex_node = None
+    #displace_tex_node = None
+
+    if out_node is None:
+        self.report({'WARNING'}, "Couldn't find an Material Output! Creating one!")
+        out_node = bpy.ops.node.add_node(type="ShaderNodeOutputMaterial", use_transform=False)
+        out_node.location = (400, 100)
+
+    if out_node.inputs['Surface'].is_linked:
+        first_node = out_node.inputs['Surface'].links[0].from_node
+    else:
+        con_msg = ""
+        if prefs.connect:
+            prefs.connect = False
+            con_msg = " Wont try to connect added textures!"
+        self.report({'WARNING'}, "Couldn't find a surface node connected to the material output!" + con_msg)
+
+        # Create a "faux-node" so to aid in further operations
+        first_node = mu_faux_shader_node(out_node)
+        first_node.location[0] -= first_node.width + 300
+
+    # If the first node is an unsupported note
+    if first_node.bl_idname not in mu_node_positions[engine][prefs.pos_group].keys():
+        if first_node.bl_idname != 'FAUX':
+            con_msg = ""
+            if prefs.connect:
+                prefs.connect = False
+                con_msg = " Wont try to connect added textures!"
+            self.report({'WARNING'}, ("The first node ('%s') is not supported!" % first_node.name) + con_msg)
+
+        location = first_node.location
+
+        # Create a "faux-node" so to aid in further operations
+        first_node = mu_faux_shader_node(out_node)
+        first_node.location = location
+
+    added_nodes = []
+
+    for file in files:
+        filename = os.path.basename(file)
+        filetype = mu_get_filetype(filename)
+
+        if filetype.type == 'NOT_IMG' or filetype.map == 'RENDER':
+            print("Skipping: %s (%s / %s)" % (filename, filetype.type, filetype.map))
+            continue
+
+        if filetype.map == 'HEIGHT':
+            if prefs.height_map != 'NC':
+                filetype.map = prefs.height_map
+
+        node = mu_add_image_texture(file, filetype=filetype, prefs=prefs, nodes=nodes, links=links,
+                                    out_node=out_node, first_node=first_node, engine=engine)
+
+        if filetype.map == 'BUMP':
+            has_bump = True
+            bump_tex_node = node
+        if filetype.map == 'NORMAL':
+            has_normal = True
+            normal_tex_node = node
+        if filetype.map == 'DISPLACEMENT':
+            has_normal = True
+            normal_tex_node = node
+
+        added_nodes.append(node)
+
+    if prefs.connect:
+        uvmap = nodes.new('ShaderNodeUVMap')
+        reroute = nodes.new('NodeReroute')
+        uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
+        reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
+        links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
+
+        if has_normal and has_bump:
+            uvmap.location.x -= 200
+            reroute.location.x -= 200
+
+            bump_node   = nodes['MUAddedBump']
+            normal_node = nodes['MUAddedNormalMap']
+
+            bump_node.location.x += 75
+            bump_tex_node.location.x -= 100
+            normal_node.location.x -= 90
+            normal_node.location.y -= 140
+            normal_tex_node.location.x -= 100
+            normal_tex_node.location.y -= 240
+
+            links.new(normal_node.outputs['Normal'], bump_node.inputs['Normal'])
+            links.new(bump_node.outputs['Normal'], first_node.inputs['Normal'])
+        
+        for node in added_nodes:
+            links.new(reroute.outputs['Output'], node.inputs['Vector'])
+
+    return {'FINISHED'}

@@ -7,12 +7,16 @@ from bpy.props import (
     EnumProperty,
     IntProperty,
     FloatProperty,
-    PointerProperty
+    PointerProperty,
+    CollectionProperty
     )
 
 
 from .enum_values import *
 from .functions import *
+from .preferences import *
+
+from types import SimpleNamespace
 
 from math import radians
 
@@ -914,11 +918,9 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
     def execute(self, context):
         return mu_set_auto_smooth(self, self.angle, self.affect, self.set_smooth_shading, self.selected_collection)
 
-
-
 class MATERIAL_OT_materialutilities_remove_unused_materials(bpy.types.Operator):
     """Remove any unused (zero users) materials"""
-    # By request by Hologram
+    # On request by Hologram
 
     bl_idname = "view3d.materialutilities_remove_unused_materials"
     bl_label = "Remove unused materials (Material Utilities)"
@@ -931,3 +933,252 @@ class MATERIAL_OT_materialutilities_remove_unused_materials(bpy.types.Operator):
 
     def execute(self, context):
         return mu_remove_unused_materials(self)
+
+class MU_materialutilites_select_texture_base(bpy.types.Operator):
+    """Base class to collect common functions & properties for texture selecting dialogs"""
+    
+    only_selected: BoolProperty(
+            name = "Only selected nodes",
+            description = "Only replace image textures on the selected nodes",
+            default = False,
+            )
+    set_fake_user: BoolProperty(
+            name = "Set Fake user",
+            description = "Set the fake user flag for existing images",
+            default = False,
+            )
+    set_label: BoolProperty(
+            name = "Set node labels",
+            description = "Set the labels of the added nodes to the corresponding pass",
+            default = True,
+            )
+    connect: BoolProperty(
+            name = "Connect to shader",
+            description = "Tries to connect the added textures to the right input",
+            default = True,
+            )
+    use_alpha_channel: BoolProperty(
+            name = "Connect Alpha channel",
+            description = "Connects the alpha channel (if detected) of Diffuse texture to the opacity/alpha input",
+            default = False,
+            )
+    collapse_texture_nodes: BoolProperty(
+            name = "Collapse texture nodes",
+            description = "Hides the texture nodes for a cleaner node setup",
+            default = True,
+            )
+    height_map_option: EnumProperty(
+            name = "Height map treatment",
+            description = "How should height maps be treated",
+            items = mu_height_map_option_enums,
+            default = 'DISPLACEMENT'
+            )
+
+    add: BoolProperty(
+            default = False,
+            )
+    
+    selecting_files: False
+
+    @classmethod
+    def poll(cls, context):
+        return context.area.ui_type == 'ShaderNodeTree' and bpy.context.active_object.active_material is not None
+
+    def draw(self, context):
+        layout = self.layout
+
+        if not self.add:
+            layout.prop(self, 'set_fake_user', icon = 'FAKE_USER_ON')
+            layout.prop(self, 'only_selected', icon = 'SELECT_INTERSECT')
+        else:
+            layout.prop(self, 'set_label')
+            layout.prop(self, 'connect')
+            row = layout.row()
+            row.prop(self, 'use_alpha_channel')
+            row.enabled = self.connect
+            layout.prop(self, 'collapse_texture_nodes')
+            layout.prop(self, 'height_map_option')
+
+    def _invoke(self, context, event):
+        mu_prefs = materialutilities_get_preferences(context)
+        
+        if mu_prefs.tex_texture_directory == 'DEFAULT':
+            self.directory = bpy.context.preferences.filepaths.texture_directory
+        elif mu_prefs.tex_texture_directory == 'LAST':
+            self.directory = mu_prefs.tex_last_texture_directory
+        else:
+            self.directory = mu_prefs.tex_texture_directory_path
+
+        self.only_selected          = mu_prefs.tex_only_selected
+        self.set_fake_user          = mu_prefs.tex_set_fake_user
+        self.set_label              = mu_prefs.tex_set_label
+        self.connect                = mu_prefs.tex_connect
+        self.use_alpha_channel      = mu_prefs.tex_use_alpha_channel
+        self.collapse_texture_nodes = mu_prefs.tex_collapse_texture_nodes
+        self.height_map_option      = mu_prefs.tex_height_map_option
+
+        wm = context.window_manager
+        wm.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        print(self.directory)
+        print("ADD:", self.add)
+
+        mu_prefs = materialutilities_get_preferences(context)
+        mu_prefs.tex_last_texture_directory = self.directory
+    
+        if self.add:
+            prefs = SimpleNamespace(set_label      = self.set_label,
+                                    connect        = self.connect,
+                                    connect_alpha  = self.use_alpha_channel,
+                                    height_map     = self.height_map_option,
+                                    bump_distance  = mu_prefs.tex_bump_distance,
+                                    collapse_texture_nodes = self.collapse_texture_nodes,
+                                    pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP'
+                                    )
+
+            if self.selecting_files:
+                params = dict(file_path = self.directory, file_list = self.files)
+            else:
+                params = dict(directory = self.directory)
+
+            return mu_add_image_textures(self, prefs, **params)
+        else:
+            return mu_replace_image_textures(self,
+                                             directory     = self.directory,
+                                             only_selected = self.only_selected, 
+                                             set_fake_user = self.set_fake_user)
+            #mu_replace_image_textures(self, self.image_path, self.only_selected, self.set_fake_user)
+    
+class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_texture_base):
+    """Select image textures to import to shader setup"""
+    
+    bl_idname = 'node.materialutilites_select_texture_files'
+    bl_label = "Select textures"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    files: CollectionProperty(
+                name="File Path",
+                type=bpy.types.OperatorFileListElement,
+                )
+    directory: StringProperty(subtype='DIR_PATH')
+
+    def invoke(self, context, event):
+        self.selecting_files = True
+        return self._invoke(context, event)
+
+class NODE_OT_materialutilites_select_texture_directory(MU_materialutilites_select_texture_base):
+    """Select directory with image textures to import to shader setup"""
+    
+    bl_idname = 'node.materialutilites_select_texture_directory'
+    bl_label = "Select directory"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    directory: StringProperty(
+                                name="Image set Path",
+                                description="Path to image texture set"
+                                )
+
+    def invoke(self, context, event):
+        self.selecting_files = False
+        return self._invoke(context, event)
+
+class NODE_OT_materialutilities_add_image_textures(bpy.types.Operator):
+    """Open a PBR image texture set"""
+
+    bl_idname = 'node.materialutilities_add_image_textures'
+    bl_label = "Open image texture set (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if bpy.data.scenes['Scene'].render.engine not in mu_supported_engines:
+            print("Material Utilities - Nodes menu: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
+            return False
+        return context.area.ui_type == 'ShaderNodeTree' and context.space_data.shader_type == 'OBJECT' and bpy.context.active_object.active_material is not None
+
+    def invoke(self, context, event):
+        mode = 'dsd'
+        if event.shift:
+            mode = 'fsd'
+        elif event.ctrl:
+            mode = 'dsd'
+        elif event.alt:
+            mode = 'pud'
+
+        wm = context.window_manager
+
+        if mode == 'fsd':
+            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = True)
+            return  {'RUNNING_MODAL'}
+        elif mode == 'dsd':
+            bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = True)
+            return  {'RUNNING_MODAL'}
+        #elif mode == 'pud':
+        #    return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        return {'FINISHED'} #mu_open_image_texture_set(self, self.image_path)
+
+class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
+    """Replace image textures with matching from another set"""
+
+    bl_idname = 'node.materialutilities_replace_image_textures'
+    bl_label = "Replace image texture set (Material Utilities)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    """     only_selected: BoolProperty(
+                name = "Only selected nodes",
+                description = "Only replace image textures on the selected nodes",
+                default = False,
+                )
+        set_fake_user: BoolProperty(
+                name = "Set Fake user",
+                description = "Set the fake user flag for existing images",
+                default = False,
+                )
+        image_path: StringProperty(
+                name = "Path",
+                description = "The path to the image textures",
+                default = ""
+        )
+    """
+    @classmethod
+    def poll(cls, context):
+        if bpy.data.scenes['Scene'].render.engine not in mu_supported_engines:
+            print("Material Utilities - Nodes menu: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
+            return False
+        return context.area.ui_type == 'ShaderNodeTree' and context.space_data.shader_type == 'OBJECT' and bpy.context.active_object.active_material is not None
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.prop(self, 'set_fake_user', icon = 'FAKE_USER_ON')
+        layout.prop(self, 'only_selected', icon = 'SELECT_INTERSECT')
+
+        #layout.separator()
+        #layout.prop(self, "image_path", expand = True)
+
+    def invoke(self, context, event):
+        mu_prefs = materialutilities_get_preferences(context)
+        mode = mu_prefs.tex_default_dialog
+        
+        if event.shift:
+            mode = 'FILES'
+        elif event.ctrl:
+            mode = 'DIR'
+#        elif event.alt:
+#            mode = 'PUD'
+
+        if mode == 'FILES':
+            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = False )
+            return  {'RUNNING_MODAL'}
+        elif mode == 'DIL':
+            bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = False)
+            return  {'RUNNING_MODAL'}
+        #elif mode == 'pud':
+        #    return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        return {'FINISHED'}

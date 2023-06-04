@@ -107,6 +107,77 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             default = False
     )
 
+    tex_texture_directory: EnumProperty(
+            name = "Texture directory",
+            description = "Default directory for loading PBR textures",
+            items = mu_texture_directory_enums,
+            default = 'DEFAULT'
+            )
+    tex_texture_directory_path: StringProperty(
+            name = "Custom directory",
+            description = "Default custem directory for loading PBR textures",
+            subtype = 'DIR_PATH',
+            default = '//',
+            )
+    tex_last_texture_directory: StringProperty(
+            name = "Last Texture directory", description = "",
+            subtype = 'DIR_PATH',
+            default = '//'
+            )
+    tex_default_dialog: EnumProperty(
+            name = "File selection",
+            description = "Select directory or individual files for import by default",
+            items = mu_import_dialog_enums,
+            default = 'DIR'
+            )
+    tex_add_to_editor_header: BoolProperty(
+            name = "Add menu to editor header",
+            description = "Add Material Utilities menu to shader editor header",
+            default = False,
+            )
+    tex_only_selected: BoolProperty(
+            name = "Only selected nodes",
+            description = "Only replace image textures on the selected nodes",
+            default = False,
+            )
+    tex_set_fake_user: BoolProperty(
+            name = "Set Fake user",
+            description = "Set the fake user flag for existing images",
+            default = False,
+            )
+    tex_set_label: BoolProperty(
+            name = "Set node labels",
+            description = "Set the labels of the added nodes to the corresponding pass",
+            default = True,
+            )
+    tex_connect: BoolProperty(
+            name = "Connect to shader",
+            description = "Tries to connect the added textures to the right input",
+            default = True,
+            )
+    tex_use_alpha_channel: BoolProperty(
+            name = "Connect Alpha channel",
+            description = "Connects the alpha channel (if detected) of Diffuse texture to the opacity/alpha input",
+            default = False,
+            )
+    tex_collapse_texture_nodes: BoolProperty(
+            name = "Collapse texture nodes",
+            description = "Hides the texture nodes for a cleaner node setup",
+            default = True,
+            )
+    tex_bump_distance: FloatProperty(
+            name = "Bump distance",
+            description = "Default distance value to use for added bump nodes",
+            min = 0,
+            default = 0.5
+            )
+    tex_height_map_option: EnumProperty(
+            name = "Height map treatment",
+            description = "How should height maps be treated",
+            items = mu_height_map_option_enums,
+            default = 'DISPLACEMENT'
+            )
+
     def draw(self, context):
         layout = self.layout
         layout.use_property_split = True
@@ -133,6 +204,24 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         d.label(text = "Set Auto Smooth")
         d.row().prop(self, "auto_smooth_angle", expand = False)
         d.row().prop(self, "set_smooth_affect", expand = False)
+        
+        e = box.box()
+        e.label(text = "PBR Texture Set Import")
+        e.row().prop(self, 'tex_texture_directory', expand = False)
+        if self.tex_texture_directory == 'CUSTOM':
+                e.row().prop(self, 'tex_texture_directory_path')
+        e.row().prop(self, 'tex_height_map_option', expand = False)
+        e.row().prop(self, 'tex_bump_distance', expand = False)
+        e.row().prop(self, 'tex_add_to_editor_header', expand = False)
+        er = e.row()
+        e1 = er.column()
+        e1.row().prop(self, 'tex_set_label', expand = False)
+        e1.row().prop(self, 'tex_connect', expand = False)
+        e1.row().prop(self, 'tex_collapse_texture_nodes', expand = False)
+        e2 = er.column()
+        e2.row().prop(self, 'tex_use_alpha_channel', expand = False)
+        e2.row().prop(self, 'tex_set_fake_user', expand = False)
+        e2.row().prop(self, 'tex_only_selected', expand = False)
 
         box = layout.box()
         box.label(text = "Miscellaneous")

@@ -315,8 +315,29 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
                         icon = 'SOLO_ON')
 
 
+class NODE_MT_materialutilities_shadereditor_menu(bpy.types.Menu):
+    """Shader editor menu for Material Utilities"""
 
-def materialutilities_specials_menu(self, contxt):
+    bl_idname = "NODE_MT_materialutilities_shader_menu"
+    bl_label = "Material Utilities"
+
+    def draw(self, context):
+        mu_prefs = materialutilities_get_preferences(context)
+
+        layout = self.layout
+        layout.operator_context = 'INVOKE_REGION_WIN'
+
+        op = layout.operator(NODE_OT_materialutilities_add_image_textures.bl_idname,
+                             text = 'Open image texture set',
+                             icon = 'FILE_IMAGE')
+        op = layout.operator(NODE_OT_materialutilities_replace_image_textures.bl_idname,
+                             text = 'Replace image texture set',
+                             icon = 'FILE_REFRESH')
+        
+def materialutilities_shadereditor_menu(self, context):
+    self.layout.menu(NODE_MT_materialutilities_shadereditor_menu.bl_idname)
+
+def materialutilities_specials_menu(self, context):
     self.layout.separator()
     self.layout.menu(VIEW3D_MT_materialutilities_main.bl_idname)
 
