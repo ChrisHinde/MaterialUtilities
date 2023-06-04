@@ -1099,24 +1099,20 @@ class NODE_OT_materialutilities_add_image_textures(bpy.types.Operator):
         return context.area.ui_type == 'ShaderNodeTree' and context.space_data.shader_type == 'OBJECT' and bpy.context.active_object.active_material is not None
 
     def invoke(self, context, event):
-        mode = 'dsd'
+        mu_prefs = materialutilities_get_preferences(context)
+        mode = mu_prefs.tex_default_dialog
+
         if event.shift:
-            mode = 'fsd'
+            mode = 'FILES'
         elif event.ctrl:
-            mode = 'dsd'
-        elif event.alt:
-            mode = 'pud'
+            mode = 'DIR'
 
-        wm = context.window_manager
-
-        if mode == 'fsd':
+        if mode == 'FILES':
             bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = True)
             return  {'RUNNING_MODAL'}
-        elif mode == 'dsd':
+        elif mode == 'DIR':
             bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = True)
             return  {'RUNNING_MODAL'}
-        #elif mode == 'pud':
-        #    return wm.invoke_props_dialog(self)
 
     def execute(self, context):
         return {'FINISHED'} #mu_open_image_texture_set(self, self.image_path)
@@ -1151,15 +1147,6 @@ class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
             return False
         return context.area.ui_type == 'ShaderNodeTree' and context.space_data.shader_type == 'OBJECT' and bpy.context.active_object.active_material is not None
 
-    def draw(self, context):
-        layout = self.layout
-
-        layout.prop(self, 'set_fake_user', icon = 'FAKE_USER_ON')
-        layout.prop(self, 'only_selected', icon = 'SELECT_INTERSECT')
-
-        #layout.separator()
-        #layout.prop(self, "image_path", expand = True)
-
     def invoke(self, context, event):
         mu_prefs = materialutilities_get_preferences(context)
         mode = mu_prefs.tex_default_dialog
@@ -1168,17 +1155,13 @@ class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
             mode = 'FILES'
         elif event.ctrl:
             mode = 'DIR'
-#        elif event.alt:
-#            mode = 'PUD'
 
         if mode == 'FILES':
-            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = False )
+            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = False)
             return  {'RUNNING_MODAL'}
-        elif mode == 'DIL':
+        elif mode == 'DIR':
             bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = False)
             return  {'RUNNING_MODAL'}
-        #elif mode == 'pud':
-        #    return wm.invoke_props_dialog(self)
 
     def execute(self, context):
         return {'FINISHED'}

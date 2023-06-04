@@ -215,6 +215,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         e.row().prop(self, 'tex_texture_directory', expand = False)
         if self.tex_texture_directory == 'CUSTOM':
                 e.row().prop(self, 'tex_texture_directory_path')
+        e.row().prop(self, 'tex_default_dialog', expand = False)
         e.row().prop(self, 'tex_height_map_option', expand = False)
         e.row().prop(self, 'tex_bump_distance', expand = False)
         e.row().prop(self, 'tex_add_to_editor_header', expand = False)
