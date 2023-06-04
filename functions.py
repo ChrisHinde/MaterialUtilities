@@ -1091,7 +1091,7 @@ def mu_add_image_texture(filename, filetype, prefs, #set_label = True, connect =
 
             if filetype.has_alpha and prefs.connect_alpha:
                 input = mu_node_inputs[engine][first_node.bl_idname]['ALPHA']
-                if input is not No:
+                if input is not None:
                     links.new(node.outputs['Alpha'], first_node.inputs[input])
 
             node.image = img
@@ -1123,7 +1123,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             files.append(f)
 
     engine = bpy.data.scenes['Scene'].render.engine
-    mat = bpy.context.active_object.active_material
+    mat    = bpy.context.active_object.active_material
 
     if engine == 'CYCLES' or engine == 'BLENDER_EEVEE': # Cycles and Eevee uses the same nodes
         engine = 'CYCLES'
@@ -1137,12 +1137,12 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     nodes = mat.node_tree.nodes
     links = mat.node_tree.links
-    out_node = nodes.get('Material Output')
+    out_node   = nodes.get('Material Output')
     first_node = None
-    has_bump = False
+    has_bump   = False
     has_normal = False
     #has_displace = False
-    bump_tex_node = None
+    bump_tex_node   = None
     normal_tex_node = None
     #displace_tex_node = None
 
@@ -1202,30 +1202,30 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         if filetype.map == 'NORMAL':
             has_normal = True
             normal_tex_node = node
-        if filetype.map == 'DISPLACEMENT':
-            has_normal = True
-            normal_tex_node = node
+        #if filetype.map == 'DISPLACEMENT':
+        #    has_displace = True
+        #    displace_tex_node = node
 
         added_nodes.append(node)
 
     if prefs.connect:
-        uvmap = nodes.new('ShaderNodeUVMap')
+        uvmap   = nodes.new('ShaderNodeUVMap')
         reroute = nodes.new('NodeReroute')
-        uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
+        uvmap.location   = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
         reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
         links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
 
         if has_normal and has_bump:
-            uvmap.location.x -= 200
+            uvmap.location.x   -= 200
             reroute.location.x -= 200
 
             bump_node   = nodes['MUAddedBump']
             normal_node = nodes['MUAddedNormalMap']
 
-            bump_node.location.x += 75
-            bump_tex_node.location.x -= 100
-            normal_node.location.x -= 90
-            normal_node.location.y -= 140
+            bump_node.location.x       += 75
+            bump_tex_node.location.x   -= 100
+            normal_node.location.x     -= 90
+            normal_node.location.y     -= 140
             normal_tex_node.location.x -= 100
             normal_tex_node.location.y -= 240
 
