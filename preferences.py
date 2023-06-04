@@ -177,6 +177,11 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             items = mu_height_map_option_enums,
             default = 'DISPLACEMENT'
             )
+    tex_add_new_uvmap: BoolProperty(
+            name = "Add new UV Map node",
+            description = "Always add a new UV Map node on import, even if one exists",
+            default = False,
+            )
 
     def draw(self, context):
         layout = self.layout
@@ -218,6 +223,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         e1.row().prop(self, 'tex_set_label', expand = False)
         e1.row().prop(self, 'tex_connect', expand = False)
         e1.row().prop(self, 'tex_collapse_texture_nodes', expand = False)
+        e1.row().prop(self, 'tex_add_new_uvmap', expand = False)
         e2 = er.column()
         e2.row().prop(self, 'tex_use_alpha_channel', expand = False)
         e2.row().prop(self, 'tex_set_fake_user', expand = False)

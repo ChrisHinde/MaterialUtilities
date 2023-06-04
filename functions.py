@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from math import radians, degrees
 
 from .enum_values import *
+from .preferences import *
 
 # -----------------------------------------------------------------------------
 # utility functions
@@ -1212,13 +1213,20 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         added_nodes.append(node)
 
     if prefs.connect:
-        uvmap   = None
-        reroute = None
+        uvmap     = None
+        reroute   = None
+        has_uvmap = False
+        
+        mu_prefs = materialutilities_get_preferences(bpy.context)
 
-        if nodes.find('MUAddedUVMap') >= 0:
-            uvmap = nodes['MUAddedUVMap']
-        elif nodes.find('UV Map') >= 0:
-            uvmap = nodes['UV Map']
+        if mu_prefs.tex_add_new_uvmap:
+            if nodes.find('MUAddedUVMap') >= 0:
+                has_uvmap = True
+        else:
+            if nodes.find('MUAddedUVMap') >= 0:
+                uvmap = nodes['MUAddedUVMap']
+            elif nodes.find('UV Map') >= 0:
+                uvmap = nodes['UV Map']
 
         if uvmap is not None:
             if uvmap.outputs['UV'].links[0].to_node.bl_idname == 'NodeReroute':
@@ -1233,7 +1241,12 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             reroute = nodes.new('NodeReroute')
             reroute.name     = 'MUAddedUVReroute'
             reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
+
             links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
+
+        if has_uvmap:
+            reroute.location.y += 150
+            uvmap.location.y   += 150
 
         if has_normal and has_bump:
             uvmap.location.x   -= 200
