@@ -1118,9 +1118,12 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             if os.path.isfile(f):
                 files.append(f)
     else:
+        dir = os.path.dirname(file_path)
         for file in file_list:
             f = os.path.join(file_path, file.name)
             files.append(f)
+
+    dir_name = os.path.basename(dir)
 
     engine = bpy.data.scenes['Scene'].render.engine
     mat    = bpy.context.active_object.active_material
@@ -1223,6 +1226,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         else:
             uvmap = nodes.new('ShaderNodeUVMap')
             uvmap.name     = 'MUAddedUVMap'
+            uvmap.label    = dir_name
             uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
 
         if reroute is None:
