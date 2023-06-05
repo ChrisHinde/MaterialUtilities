@@ -861,13 +861,9 @@ def mu_remove_unused_materials(self):
 def mu_materials_filter_poll(self, material):
     return not material.is_grease_pencil
 
-def mu_open_image_texture_set(self, image_path):
-    if image_path == "":
-        a = ""
-
-    return {'FINISHED'}
-
 def mu_get_filetype(filename):
+    """Look at the filename to determine file type, map type, and colorspace"""
+
     filename = filename.lower()
 
     ext = os.path.splitext(filename)[1].strip('.')
@@ -971,9 +967,13 @@ def mu_get_filetype(filename):
                            override_colorspace=override_colorspace, non_color=non_color, has_alpha=has_alpha)
 
 def mu_faux_shader_node(out_node):
+    """Create a 'faux shader", to be used instead of an existing shader node"""
+
     return SimpleNamespace(name='FAUX', bl_idname='FAUX', location=out_node.location, width=out_node.width)
 
 def mu_set_image_colorspace(colsp, filetype):
+    """Set the colorspace of an internal image block to match the colorspace in the texture file"""
+
     if filetype.non_color and not filetype.override_colorspace:
         colsp.name = 'Non-Color'
     elif filetype.colorspace == 'FILMIC_sRGB':
@@ -990,6 +990,8 @@ def mu_set_image_colorspace(colsp, filetype):
         colsp.name = 'sRGB'
 
 def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=0, y_offset=0, map = None, prefs = None):
+    """Caculate the proper location of the, to be, added texture node, based on the map type"""
+
     location = [0,0]
     ft_map = 'COLOR'
     if map is None:
@@ -1026,14 +1028,14 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=0, y_o
 
     if ft_map != 'None':# and ft_map != 'UNKNOWN':
         location[1] -= mu_node_positions[engine][grp][first_node.bl_idname][ft_map]
-    #print(ft_map, ";", map, "; G:", grp, "; xo:", x_offset, "; yo:", y_offset, "; p:", mu_node_positions[engine][grp][first_node.bl_idname][ft_map])
-    #print(first_node.location, location)
 
     return location
 
-def mu_add_image_texture(filename, filetype, prefs, #set_label = True, connect = False, connect_alpha = False,
+def mu_add_image_texture(filename, filetype, prefs,
                          nodes = None, links = None,
-                         out_node = None, first_node = None, engine=''):
+                         out_node = None, first_node = None, engine = ''):
+    """Add an image texture to the material node tree, and (if selected) try to connect it up"""
+
     x_offset = -100
 
     try:
@@ -1110,6 +1112,8 @@ def mu_add_image_texture(filename, filetype, prefs, #set_label = True, connect =
     return node
 
 def mu_replace_image(self, filename, prefs, node, engine):
+    """Replace the image file in an existing, specified, texture node"""
+
     try:
         img = bpy.data.images.load(filename)
     except:
@@ -1122,63 +1126,69 @@ def mu_replace_image(self, filename, prefs, node, engine):
         node.image = img
         print("Replaced file in node '%s' ('%s') with %s" % (node.name, node.label, filename))
 
-def mu_replace_selected_image_texture(self, filename, filetype, prefs, nodes=[], engine=''):
-        found      = False
-        found_node = None
+def mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes=[], engine=''):
+    """Replace the image files in the selected nodes, if matching, with a new set"""
 
-        for node in nodes:
-            if engine == 'CYCLES' and node.bl_idname == 'ShaderNodeTexImage':
-                ft = mu_get_filetype(node.image.name)
-                if node.label.upper() == filetype.map or ft.map == filetype.map:
-                    found      = True
-                    found_node = node
-                    break
+    found      = False
+    found_node = None
 
-        if found:
-            mu_replace_image(self, filename, prefs, found_node, engine)
-        else:
-            print("Didn't find a texture node for '%s'" % filename)
+    for node in nodes:
+        if engine == 'CYCLES' and node.bl_idname == 'ShaderNodeTexImage':
+            ft = mu_get_filetype(node.image.name)
+            if node.label.upper() == filetype.map or ft.map == filetype.map:
+                found      = True
+                found_node = node
+                break
+
+    if found:
+        mu_replace_image(self, filename, prefs, found_node, engine)
+    else:
+        print("Didn't find a texture node for '%s'" % filename)
 
 def mu_replace_image_texture(self, filename, filetype, prefs, nodes = None,
                              out_node = None, first_node = None, engine=''):
-        found = False
-        found_node = None
+    """Try to find and replace the image file in an existing texture node"""
 
-        # If it's a height/displacement map, look for it in the Displacement input on the Material out node
-        if filetype.map == 'DISPLACEMENT' or filetype.map == 'HEIGHT':
-            if out_node.inputs['Displacement'].is_linked:
-                disp_node = out_node.inputs['Displacement'].links[0].from_node
-                if disp_node.inputs['Height'].is_linked:
-                    node = disp_node.inputs['Height'].links[0].from_node
+    found = False
+    found_node = None
 
-                    if node is not None and node.bl_idname == 'ShaderNodeTexImage':
-                        found = True
-                        found_node = node
+    # If it's a height/displacement map, look for it in the Displacement input on the Material out node
+    if filetype.map == 'DISPLACEMENT' or filetype.map == 'HEIGHT':
+        if out_node.inputs['Displacement'].is_linked:
+            disp_node = out_node.inputs['Displacement'].links[0].from_node
+            if disp_node.inputs['Height'].is_linked:
+                node = disp_node.inputs['Height'].links[0].from_node
 
-        # Look for matching texture nodes in the inputs of the first shader node
-        #  If the node setup is more complex (and the first node isn't a Principled BSDF or similar)
-        #  we wont go looking for it further (even if we could), because it would get too involved
-        #  Easier to just go through the whole node list than a bunch of links
-        if not found and first_node is not None:
-            input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
-            if input is not None and first_node.inputs[input].is_linked:
-                node = first_node.inputs[input].links[0].from_node
-                
                 if node is not None and node.bl_idname == 'ShaderNodeTexImage':
                     found = True
                     found_node = node
 
-        # Just search through all nodes if we haven't found the right one yet (and wide search is enabled)
-        if not found and prefs.go_wide:
-            # Use the replaced selected textures functions, but use all nodes as "selected" nodes
-            return mu_replace_selected_image_texture(self, filename, filetype, prefs, nodes, engine)
+    # Look for matching texture nodes in the inputs of the first shader node
+    #  If the node setup is more complex (and the first node isn't a Principled BSDF or similar)
+    #  we wont go looking for it further (even if we could), because it would get too involved
+    #  Easier to just go through the whole node list than a bunch of links
+    if not found and first_node is not None:
+        input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
+        if input is not None and first_node.inputs[input].is_linked:
+            node = first_node.inputs[input].links[0].from_node
+            
+            if node is not None and node.bl_idname == 'ShaderNodeTexImage':
+                found = True
+                found_node = node
 
-        if found:
-            mu_replace_image(self, filename, prefs, found_node, engine)
-        else:
-            print("Didn't find a texture node for '%s'" % filename )
+    # Just search through all nodes if we haven't found the right one yet (and wide search is enabled)
+    if not found and prefs.go_wide:
+        # Use the replaced selected textures functions, but use all nodes as "selected" nodes
+        return mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes, engine)
+
+    if found:
+        mu_replace_image(self, filename, prefs, found_node, engine)
+    else:
+        print("Didn't find a texture node for '%s'" % filename )
 
 def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_path = ''):
+    """Add a new texture set to the material (doesn't care about any existing textures)"""
+
     files = []
 
     if directory is not None:
@@ -1342,7 +1352,9 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     return {'FINISHED'}
 
-def mu_replace_image_textures(self, prefs, directory = None, file_list = [], file_path = ''): # set_label = True, connect = False, connect_alpha = False, height_map = 'NC'
+def mu_replace_image_textures(self, prefs, directory = None, file_list = [], file_path = ''):
+    """Try to find and replace imagee files in existing texture nodes with a new set (Does NOT add a new texture if there's an new image texture without matching node!)"""
+
     files = []
 
     if directory is not None:
@@ -1391,7 +1403,7 @@ def mu_replace_image_textures(self, prefs, directory = None, file_list = [], fil
             continue
 
         if prefs.only_selected:
-            mu_replace_selected_image_texture(self, file, filetype=filetype, prefs=prefs, nodes=prefs.context.selected_nodes, engine=engine)
+            mu_replace_selected_image_textures(self, file, filetype=filetype, prefs=prefs, nodes=prefs.context.selected_nodes, engine=engine)
         else:
             mu_replace_image_texture(self, file, filetype=filetype, prefs=prefs, nodes=nodes, out_node=out_node, first_node=first_node, engine=engine)
 
