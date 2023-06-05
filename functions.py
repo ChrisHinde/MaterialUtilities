@@ -1109,7 +1109,76 @@ def mu_add_image_texture(filename, filetype, prefs, #set_label = True, connect =
 
     return node
 
-def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_path = ''): # set_label = True, connect = False, connect_alpha = False, height_map = 'NC'
+def mu_replace_image(self, filename, prefs, node, engine):
+    try:
+        img = bpy.data.images.load(filename)
+    except:
+        self.report({'WARNING'}, "Cannot load image %s" % filename)
+        return
+
+    if engine == 'CYCLES':
+        if prefs.set_fake_user:
+            node.image.use_fake_user = True
+        node.image = img
+        print("Replaced file in node '%s' ('%s') with %s" % (node.name, node.label, filename))
+
+def mu_replace_selected_image_texture(self, filename, filetype, prefs, nodes=[], engine=''):
+        found      = False
+        found_node = None
+
+        for node in nodes:
+            if engine == 'CYCLES' and node.bl_idname == 'ShaderNodeTexImage':
+                ft = mu_get_filetype(node.image.name)
+                if node.label.upper() == filetype.map or ft.map == filetype.map:
+                    found      = True
+                    found_node = node
+                    break
+
+        if found:
+            mu_replace_image(self, filename, prefs, found_node, engine)
+        else:
+            print("Didn't find a texture node for '%s'" % filename)
+
+def mu_replace_image_texture(self, filename, filetype, prefs, nodes = None,
+                             out_node = None, first_node = None, engine=''):
+        found = False
+        found_node = None
+
+        # If it's a height/displacement map, look for it in the Displacement input on the Material out node
+        if filetype.map == 'DISPLACEMENT' or filetype.map == 'HEIGHT':
+            if out_node.inputs['Displacement'].is_linked:
+                disp_node = out_node.inputs['Displacement'].links[0].from_node
+                if disp_node.inputs['Height'].is_linked:
+                    node = disp_node.inputs['Height'].links[0].from_node
+
+                    if node is not None and node.bl_idname == 'ShaderNodeTexImage':
+                        found = True
+                        found_node = node
+
+        # Look for matching texture nodes in the inputs of the first shader node
+        #  If the node setup is more complex (and the first node isn't a Principled BSDF or similar)
+        #  we wont go looking for it further (even if we could), because it would get too involved
+        #  Easier to just go through the whole node list than a bunch of links
+        if not found and first_node is not None:
+            input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
+            if input is not None and first_node.inputs[input].is_linked:
+                node = first_node.inputs[input].links[0].from_node
+                
+                if node is not None and node.bl_idname == 'ShaderNodeTexImage':
+                    found = True
+                    found_node = node
+
+        # Just search through all nodes if we haven't found the right one yet (and wide search is enabled)
+        if not found and prefs.go_wide:
+            # Use the replaced selected textures functions, but use all nodes as "selected" nodes
+            return mu_replace_selected_image_texture(self, filename, filetype, prefs, nodes, engine)
+
+        if found:
+            mu_replace_image(self, filename, prefs, found_node, engine)
+        else:
+            print("Didn't find a texture node for '%s'" % filename )
+
+def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_path = ''):
     files = []
 
     if directory is not None:
@@ -1197,20 +1266,23 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             if prefs.height_map != 'NC':
                 filetype.map = prefs.height_map
 
-        node = mu_add_image_texture(file, filetype=filetype, prefs=prefs, nodes=nodes, links=links,
-                                    out_node=out_node, first_node=first_node, engine=engine)
+        try:
+            node = mu_add_image_texture(file, filetype=filetype, prefs=prefs, nodes=nodes, links=links,
+                                        out_node=out_node, first_node=first_node, engine=engine)
 
-        if filetype.map == 'BUMP':
-            has_bump = True
-            bump_tex_node = node
-        if filetype.map == 'NORMAL':
-            has_normal = True
-            normal_tex_node = node
-        #if filetype.map == 'DISPLACEMENT':
-        #    has_displace = True
-        #    displace_tex_node = node
+            if filetype.map == 'BUMP':
+                has_bump = True
+                bump_tex_node = node
+            if filetype.map == 'NORMAL':
+                has_normal = True
+                normal_tex_node = node
+            #if filetype.map == 'DISPLACEMENT':
+            #    has_displace = True
+            #    displace_tex_node = node
 
-        added_nodes.append(node)
+            added_nodes.append(node)
+        except NameError as err:
+            self.report({'WARNING'}, str(err))
 
     if prefs.connect:
         uvmap     = None
@@ -1267,5 +1339,60 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         
         for node in added_nodes:
             links.new(reroute.outputs['Output'], node.inputs['Vector'])
+
+    return {'FINISHED'}
+
+def mu_replace_image_textures(self, prefs, directory = None, file_list = [], file_path = ''): # set_label = True, connect = False, connect_alpha = False, height_map = 'NC'
+    files = []
+
+    if directory is not None:
+        dir = os.path.dirname(directory)
+        for filename in os.listdir(dir):
+            f = os.path.join(directory, filename)
+            if os.path.isfile(f):
+                files.append(f)
+    else:
+        dir = os.path.dirname(file_path)
+        for file in file_list:
+            f = os.path.join(file_path, file.name)
+            files.append(f)
+
+    engine = bpy.data.scenes['Scene'].render.engine
+    mat    = bpy.context.active_object.active_material
+
+    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE': # Cycles and Eevee uses the same nodes
+        engine = 'CYCLES'
+    elif engine == 'octane':
+        engine = engine.upper()
+    else:
+        print("Material Utilities - Add image Textures: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
+        self.report({'WARNING'}, "The render engine '" + bpy.data.scenes['Scene'].render.engine +
+                                    "' isn't supported by Material Utilities!")
+        return {'CANCELLED'}
+
+    nodes = mat.node_tree.nodes
+    out_node   = nodes.get('Material Output')
+    first_node = None
+
+    if out_node is None:
+        self.report({'WARNING'}, "Couldn't find an Material Output!")
+    elif out_node.inputs['Surface'].is_linked:
+        first_node = out_node.inputs['Surface'].links[0].from_node
+
+    if first_node is not None and first_node.bl_idname not in mu_node_inputs[engine].keys():
+        first_node = None
+
+    for file in files:
+        filename = os.path.basename(file)
+        filetype = mu_get_filetype(filename)
+        
+        if filetype.type == 'NOT_IMG' or filetype.map == 'RENDER':
+            print("Skipping: %s (%s / %s)" % (filename, filetype.type, filetype.map))
+            continue
+
+        if prefs.only_selected:
+            mu_replace_selected_image_texture(self, file, filetype=filetype, prefs=prefs, nodes=prefs.context.selected_nodes, engine=engine)
+        else:
+            mu_replace_image_texture(self, file, filetype=filetype, prefs=prefs, nodes=nodes, out_node=out_node, first_node=first_node, engine=engine)
 
     return {'FINISHED'}

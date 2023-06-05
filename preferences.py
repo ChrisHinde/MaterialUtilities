@@ -182,6 +182,12 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             description = "Always add a new UV Map node on import, even if one exists",
             default = False,
             )
+    tex_go_wide: BoolProperty(
+            name = "Replace - Wide search",
+            description = "Go through all nodes in the material, to find the right node, if not immediately found.\n"
+                            "This might take a longer time in complex materials, and might also replace unwanted textures",
+            default = False,
+            )
 
     def draw(self, context):
         layout = self.layout
@@ -229,6 +235,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         e2.row().prop(self, 'tex_use_alpha_channel', expand = False)
         e2.row().prop(self, 'tex_set_fake_user', expand = False)
         e2.row().prop(self, 'tex_only_selected', expand = False)
+        e2.row().prop(self, 'tex_go_wide', expand = False)
 
         box = layout.box()
         box.label(text = "Miscellaneous")

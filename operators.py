@@ -973,6 +973,12 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             items = mu_height_map_option_enums,
             default = 'DISPLACEMENT'
             )
+    go_wide: BoolProperty(
+            name = "Wide search",
+            description = "Go through all nodes in the material, to find the right node, if not immediately found.\n"
+                            "This might take a longer time in complex materials, and might also replace unwanted textures",
+            default = True,
+            )
 
     add: BoolProperty(
             default = False,
@@ -988,8 +994,11 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         layout = self.layout
 
         if not self.add:
-            layout.prop(self, 'set_fake_user', icon = 'FAKE_USER_ON')
-            layout.prop(self, 'only_selected', icon = 'SELECT_INTERSECT')
+            layout.prop(self, 'set_fake_user')#, icon = 'FAKE_USER_ON')
+            layout.prop(self, 'only_selected')#, icon = 'SELECT_INTERSECT')
+            row = layout.row()
+            row.prop(self, 'go_wide')#, icon = 'SELECT_INTERSECT')
+            row.enabled = not self.only_selected
         else:
             layout.prop(self, 'set_label')
             layout.prop(self, 'connect')
@@ -1009,8 +1018,9 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         else:
             self.directory = mu_prefs.tex_texture_directory_path
 
-        self.only_selected          = mu_prefs.tex_only_selected
         self.set_fake_user          = mu_prefs.tex_set_fake_user
+        self.only_selected          = mu_prefs.tex_only_selected
+        self.go_wide                = mu_prefs.tex_go_wide
         self.set_label              = mu_prefs.tex_set_label
         self.connect                = mu_prefs.tex_connect
         self.use_alpha_channel      = mu_prefs.tex_use_alpha_channel
@@ -1022,12 +1032,16 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def execute(self, context):
-        print(self.directory)
-        print("ADD:", self.add)
+        print("Looking for textures in: ", self.directory)
 
         mu_prefs = materialutilities_get_preferences(context)
         mu_prefs.tex_last_texture_directory = self.directory
-    
+
+        if self.selecting_files:
+            params = dict(file_path = self.directory, file_list = self.files)
+        else:
+            params = dict(directory = self.directory)
+
         if self.add:
             prefs = SimpleNamespace(set_label      = self.set_label,
                                     connect        = self.connect,
@@ -1035,20 +1049,19 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     height_map     = self.height_map_option,
                                     bump_distance  = mu_prefs.tex_bump_distance,
                                     collapse_texture_nodes = self.collapse_texture_nodes,
-                                    pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP'
+                                    pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP',
+                                    context        = context
                                     )
-
-            if self.selecting_files:
-                params = dict(file_path = self.directory, file_list = self.files)
-            else:
-                params = dict(directory = self.directory)
 
             return mu_add_image_textures(self, prefs, **params)
         else:
-            return mu_replace_image_textures(self,
-                                             directory     = self.directory,
-                                             only_selected = self.only_selected, 
-                                             set_fake_user = self.set_fake_user)
+            prefs = SimpleNamespace(set_fake_user  = self.set_fake_user,
+                                    only_selected  = self.only_selected,
+                                    go_wide        = self.go_wide,
+                                    context        = context
+                                    )
+
+            return mu_replace_image_textures(self, prefs, **params)
             #mu_replace_image_textures(self, self.image_path, self.only_selected, self.set_fake_user)
     
 class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_texture_base):
@@ -1124,22 +1137,6 @@ class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
     bl_label = "Replace image texture set (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
-    """     only_selected: BoolProperty(
-                name = "Only selected nodes",
-                description = "Only replace image textures on the selected nodes",
-                default = False,
-                )
-        set_fake_user: BoolProperty(
-                name = "Set Fake user",
-                description = "Set the fake user flag for existing images",
-                default = False,
-                )
-        image_path: StringProperty(
-                name = "Path",
-                description = "The path to the image textures",
-                default = ""
-        )
-    """
     @classmethod
     def poll(cls, context):
         if bpy.data.scenes['Scene'].render.engine not in mu_supported_engines:
