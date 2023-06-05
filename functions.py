@@ -967,7 +967,7 @@ def mu_get_filetype(filename):
                            override_colorspace=override_colorspace, non_color=non_color, has_alpha=has_alpha)
 
 def mu_faux_shader_node(out_node):
-    """Create a 'faux shader", to be used instead of an existing shader node"""
+    """Create a 'faux shader', to be used instead of an existing shader node"""
 
     return SimpleNamespace(name='FAUX', bl_idname='FAUX', location=out_node.location, width=out_node.width)
 
@@ -1111,7 +1111,7 @@ def mu_add_image_texture(filename, filetype, prefs,
 
     return node
 
-def mu_replace_image(self, filename, prefs, node, engine):
+def mu_replace_image(self, filename, filetype, prefs, node, engine):
     """Replace the image file in an existing, specified, texture node"""
 
     try:
@@ -1123,6 +1123,9 @@ def mu_replace_image(self, filename, prefs, node, engine):
     if engine == 'CYCLES':
         if prefs.set_fake_user:
             node.image.use_fake_user = True
+
+        mu_set_image_colorspace(img.colorspace_settings, filetype) # Octane will ignore this, but for Cycles the colorspace is connected to the image data
+
         node.image = img
         print("Replaced file in node '%s' ('%s') with %s" % (node.name, node.label, filename))
 
@@ -1141,7 +1144,7 @@ def mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes=[]
                 break
 
     if found:
-        mu_replace_image(self, filename, prefs, found_node, engine)
+        mu_replace_image(self, filename, filetype, prefs, found_node, engine)
     else:
         print("Didn't find a texture node for '%s'" % filename)
 
@@ -1182,7 +1185,7 @@ def mu_replace_image_texture(self, filename, filetype, prefs, nodes = None,
         return mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes, engine)
 
     if found:
-        mu_replace_image(self, filename, prefs, found_node, engine)
+        mu_replace_image(self, filename, filetype, prefs, found_node, engine)
     else:
         print("Didn't find a texture node for '%s'" % filename )
 
