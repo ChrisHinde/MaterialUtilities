@@ -1050,6 +1050,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     bump_distance  = mu_prefs.tex_bump_distance,
                                     collapse_texture_nodes = self.collapse_texture_nodes,
                                     pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP',
+                                    gamma          = 1.0,
                                     context        = context
                                     )
 

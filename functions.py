@@ -998,7 +998,7 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=0, y_o
         map = filetype.map
     grp = 'EXP' if prefs is None else prefs.pos_group
 
-    if filetype is None or map == '_DISPLACEMENT':
+    if filetype is None or (engine == 'CYCLES' and map == '_DISPLACEMENT'):
         ft_map = map
     else:
         ft_map = filetype.map
@@ -1022,6 +1022,20 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=0, y_o
             x_offset += 200 + 50
         elif map == 'GLOSSINESS':
             x_offset += 200 + 50
+    elif engine == 'OCTANE':
+        print(map)
+        if map == '_UVNODE':
+            x_offset += 505 + 50
+        elif map == '_UVREROUTE':
+            x_offset += 290 + 50
+        elif map == 'HEIGHT' or map == 'DISPLACEMENT':
+            x_offset += 140 + 50
+        elif map == '_DISPLACEMENT':
+            x_offset -= 40
+        elif map == 'EMISSION':
+            x_offset += 140 + 50
+        elif map == '_EMISSION':
+            x_offset -= 40
 
     location[0] = first_node.location[0] - first_node.width - node.width - x_offset
     location[1] = first_node.location[1] + y_offset
@@ -1031,8 +1045,63 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=0, y_o
 
     return location
 
+def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[], name=None, label=None):
+    node = None
+    is_img = False
+
+    # m = bpy.data.materials[mat.name]
+    if type == 'uvmap':
+        type = 'OctaneMeshUVProjection'
+    elif type == 'displacement':
+        type = 'OctaneTextureDisplacement'
+    elif type == 'emission':
+        type = 'OctaneTextureEmission'
+    elif type == 'RGBimage':
+        type = 'OctaneRGBImage'
+    elif type == 'alpha_image':
+        type = 'OctaneAlphaImage'
+    elif type == 'image':
+        is_img = True
+        if filetype.non_color and filetype.map != 'NORMAL':
+            type = 'OctaneGreyscaleImage'
+        else:
+            type = 'OctaneRGBImage'
+
+    # count = len(m.node_tree.nodes)
+    # bpy.ops.octane.add_default_node_helper(default_node_name=type)
+    # node = nodes[count-1]
+    
+    node = nodes.new(type)
+
+    if name is not None:
+        node.name = name
+    if label is not None:
+        node.label = label
+    elif prefs.set_label and is_img:
+        node.label = filetype.orig_map
+
+    if prefs.collapse_texture_nodes: # and type != 'OctaneMeshUVProjection':
+        node.hide = True
+
+    # if type == 'OctaneMeshUVProjection':
+    #     return node
+    if type == 'OctaneTextureDisplacement':
+        node.inputs['Height'].default_value = prefs.bump_distance
+        return node
+
+    if is_img:
+        if filetype.non_color:
+            node.inputs['Legacy gamma'].default_value = 1.0
+        else:
+            node.inputs['Legacy gamma'].default_value = prefs.gamma
+
+        if filetype.map == 'GLOSSINESS':
+            node.inputs['Invert'].default_value = True
+
+    return node
+
 def mu_add_image_texture(filename, filetype, prefs,
-                         nodes = None, links = None,
+                         nodes = None, links = None, material = None,
                          out_node = None, first_node = None, engine = ''):
     """Add an image texture to the material node tree, and (if selected) try to connect it up"""
 
@@ -1047,6 +1116,11 @@ def mu_add_image_texture(filename, filetype, prefs,
 
     if engine == 'CYCLES':
         node = nodes.new('ShaderNodeTexImage')
+
+        if prefs.set_label:
+            node.label = filetype.orig_map
+        if prefs.collapse_texture_nodes:
+            node.hide = True
 
         if prefs.connect and filetype.map != 'UNKNOWN':
             input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
@@ -1099,15 +1173,32 @@ def mu_add_image_texture(filename, filetype, prefs,
 
             node.image = img
     elif engine == 'OCTANE':
-        bpy.ops.octane.add_default_node_helper(default_node_name="OctaneRGBImage", use_transform=False)
+        node = mu_add_octane_node('image', filetype=filetype, nodes=nodes, prefs=prefs)
+        node.image = img
+
+        if prefs.connect and filetype.map != 'UNKNOWN':
+            input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
+            link_node = node
+            
+            if filetype.map == 'EMISSION':
+                emit_node = mu_add_octane_node('emission', nodes=nodes, prefs=prefs, name='MUAddedEmission')
+                emit_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset, prefs=prefs, map='_EMISSION')
+                
+                links.new(node.outputs[0], emit_node.inputs['Texture'])
+                link_node = emit_node
+            elif filetype.map == 'DISPLACEMENT':
+                disp_node = mu_add_octane_node('displacement', nodes=nodes, prefs=prefs, name='MUAddedDisplacement')
+                disp_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset, prefs=prefs, map='_DISPLACEMENT')
+                
+                links.new(node.outputs[0], disp_node.inputs['Texture'])
+                link_node = disp_node
+
+            if input is not None:
+                links.new(link_node.outputs[0], first_node.inputs[input])
+            else:
+                print("Material Utilities - No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname))
 
     node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset, prefs=prefs)
-
-    if prefs.collapse_texture_nodes:
-        node.hide = True
-
-    if prefs.set_label:
-        node.label = filetype.orig_map
 
     return node
 
@@ -1223,10 +1314,13 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     nodes = mat.node_tree.nodes
     links = mat.node_tree.links
-    out_node   = nodes.get('Material Output')
-    first_node = None
-    has_bump   = False
-    has_normal = False
+    out_node    = nodes.get('Material Output')
+    first_node  = None
+    has_bump    = False
+    has_normal  = False
+    gloss_rough = 0
+    gloss_node  = None
+    rough_node  = None
     #has_displace = False
     bump_tex_node   = None
     normal_tex_node = None
@@ -1240,11 +1334,12 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     if out_node.inputs['Surface'].is_linked:
         first_node = out_node.inputs['Surface'].links[0].from_node
     else:
-        con_msg = ""
+        msg = "Couldn't find a surface node connected to the material output!"
         if prefs.connect:
             prefs.connect = False
-            con_msg = " Wont try to connect added textures!"
-        self.report({'WARNING'}, "Couldn't find a surface node connected to the material output!" + con_msg)
+            msg += " Wont try to connect added textures!"
+        print("Material Utilies - " + msg)
+        self.report({'WARNING'},  msg)
 
         # Create a "faux-node" so to aid in further operations
         first_node = mu_faux_shader_node(out_node)
@@ -1253,11 +1348,12 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     # If the first node is an unsupported note
     if first_node.bl_idname not in mu_node_positions[engine][prefs.pos_group].keys():
         if first_node.bl_idname != 'FAUX':
-            con_msg = ""
+            msg = "The first node ('%s') is not supported!" % first_node.name
             if prefs.connect:
                 prefs.connect = False
-                con_msg = " Wont try to connect added textures!"
-            self.report({'WARNING'}, ("The first node ('%s') is not supported!" % first_node.name) + con_msg)
+                msg += " Wont try to connect added textures!"
+            print("Material Utilites - " + msg)
+            self.report({'WARNING'}, msg)
 
         location = first_node.location
 
@@ -1280,22 +1376,41 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 filetype.map = prefs.height_map
 
         try:
-            node = mu_add_image_texture(file, filetype=filetype, prefs=prefs, nodes=nodes, links=links,
+            node = mu_add_image_texture(file, filetype=filetype, prefs=prefs, nodes=nodes, links=links, material=mat,
                                         out_node=out_node, first_node=first_node, engine=engine)
+            
+            if filetype.map == 'GLOSSINESS':
+                gloss_rough += 1
+                gloss_node = node
+            if filetype.map == 'ROUGHNESS':
+                gloss_rough += 1
+                rough_node = node
 
-            if filetype.map == 'BUMP':
-                has_bump = True
-                bump_tex_node = node
-            if filetype.map == 'NORMAL':
-                has_normal = True
-                normal_tex_node = node
-            #if filetype.map == 'DISPLACEMENT':
-            #    has_displace = True
-            #    displace_tex_node = node
+            if engine == 'CYCLES':
+                if filetype.map == 'BUMP':
+                    has_bump = True
+                    bump_tex_node = node
+                if filetype.map == 'NORMAL':
+                    has_normal = True
+                    normal_tex_node = node
+                #if filetype.map == 'DISPLACEMENT':
+                #    has_displace = True
+                #    displace_tex_node = node
 
             added_nodes.append(node)
         except NameError as err:
             self.report({'WARNING'}, str(err))
+
+    if gloss_rough > 0:
+        connected = "one"
+        if gloss_node.outputs[0].is_linked:
+            rough_node.location.x -= 150
+            connected = "Glossiness"
+        else:
+            gloss_node.location.x -= 150
+            connected = "Roughness"
+
+        self.report({'WARNING'}, "Texture set has both Roughness and Glosiness, " + connected + " has taken presidence!")
 
     if prefs.connect:
         uvmap     = None
@@ -1304,54 +1419,88 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         
         mu_prefs = materialutilities_get_preferences(bpy.context)
 
-        if mu_prefs.tex_add_new_uvmap:
-            if nodes.find('MUAddedUVMap') >= 0:
-                has_uvmap = True
-        else:
-            if nodes.find('MUAddedUVMap') >= 0:
-                uvmap = nodes['MUAddedUVMap']
-            elif nodes.find('UV Map') >= 0:
-                uvmap = nodes['UV Map']
+        if engine == 'CYCLES':
+            if mu_prefs.tex_add_new_uvmap:
+                if nodes.find('MUAddedUVMap') >= 0:
+                    has_uvmap = True
+            else:
+                if nodes.find('MUAddedUVMap') >= 0:
+                    uvmap = nodes['MUAddedUVMap']
+                elif nodes.find('UV Map') >= 0:
+                    uvmap = nodes['UV Map']
 
-        if uvmap is not None:
-            if uvmap.outputs['UV'].links[0].to_node.bl_idname == 'NodeReroute':
-                reroute = uvmap.outputs['UV'].links[0].to_node
-        else:
-            uvmap = nodes.new('ShaderNodeUVMap')
-            uvmap.name     = 'MUAddedUVMap'
-            uvmap.label    = dir_name
-            uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
+            if uvmap is not None:
+                if uvmap.outputs['UV'].links[0].to_node.bl_idname == 'NodeReroute':
+                    reroute = uvmap.outputs['UV'].links[0].to_node
+            else:
+                uvmap = nodes.new('ShaderNodeUVMap')
+                uvmap.name     = 'MUAddedUVMap'
+                uvmap.label    = dir_name + " UV"
+                uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
 
-        if reroute is None:
-            reroute = nodes.new('NodeReroute')
-            reroute.name     = 'MUAddedUVReroute'
-            reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
+            if reroute is None:
+                reroute = nodes.new('NodeReroute')
+                reroute.name     = 'MUAddedUVReroute'
+                reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
 
-            links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
+                links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
 
-        if has_uvmap:
-            reroute.location.y += 150
-            uvmap.location.y   += 150
+            if has_uvmap:
+                reroute.location.y += 150
+                uvmap.location.y   += 150
 
-        if has_normal and has_bump:
-            uvmap.location.x   -= 200
-            reroute.location.x -= 200
+            if has_normal and has_bump:
+                uvmap.location.x   -= 200
+                reroute.location.x -= 200
 
-            bump_node   = nodes['MUAddedBump']
-            normal_node = nodes['MUAddedNormalMap']
+                bump_node   = nodes['MUAddedBump']
+                normal_node = nodes['MUAddedNormalMap']
 
-            bump_node.location.x       += 75
-            bump_tex_node.location.x   -= 100
-            normal_node.location.x     -= 90
-            normal_node.location.y     -= 140
-            normal_tex_node.location.x -= 100
-            normal_tex_node.location.y -= 240
+                bump_node.location.x       += 75
+                bump_tex_node.location.x   -= 100
+                normal_node.location.x     -= 90
+                normal_node.location.y     -= 140
+                normal_tex_node.location.x -= 100
+                normal_tex_node.location.y -= 240
 
-            links.new(normal_node.outputs['Normal'], bump_node.inputs['Normal'])
-            links.new(bump_node.outputs['Normal'], first_node.inputs['Normal'])
-        
-        for node in added_nodes:
-            links.new(reroute.outputs['Output'], node.inputs['Vector'])
+                links.new(normal_node.outputs['Normal'], bump_node.inputs['Normal'])
+                links.new(bump_node.outputs['Normal'], first_node.inputs['Normal'])
+
+            for node in added_nodes:
+                links.new(reroute.outputs['Output'], node.inputs['Vector'])
+
+        elif engine == 'OCTANE':
+            if mu_prefs.tex_add_new_uvmap:
+                if nodes.find('MUAddedUVMapOctane') >= 0:
+                    has_uvmap = True
+            else:
+                if nodes.find('MUAddedUVMapOctane') >= 0:
+                    uvmap = nodes['MUAddedUVMapOctane']
+                elif nodes.find('Mesh UV projection') >= 0:
+                    uvmap = nodes['Mesh UV projection']
+
+            if uvmap is not None:
+                if uvmap.outputs['Projection out'].links[0].to_node.bl_idname == 'NodeReroute':
+                    reroute = uvmap.outputs['Projection out'].links[0].to_node
+            else:
+                uvmap = mu_add_octane_node('uvmap', name='MUAddedUVMapOctane', label=dir_name + " UV", nodes=nodes, prefs=prefs)
+                #uvmap.name     = 'MUAddedUVMap'
+                #uvmap.label    = dir_name
+                uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
+            
+            if reroute is None:
+                reroute = nodes.new('NodeReroute')
+                reroute.name     = 'MUAddedUVReroute'
+                reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
+
+                links.new(uvmap.outputs['Projection out'], reroute.inputs['Input'])
+
+            if has_uvmap:
+                reroute.location.y += 150
+                uvmap.location.y   += 150
+
+            for node in added_nodes:
+                links.new(reroute.outputs['Output'], node.inputs['Projection'])
 
     return {'FINISHED'}
 

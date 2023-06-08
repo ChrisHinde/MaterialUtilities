@@ -183,6 +183,60 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             '_UVNODE': 50, '_UVREROUTE': 50,
         }
       }
+    },
+    'OCTANE': {
+        'EXP': {
+            'OctaneUniversalMaterial': {
+                'AO': -240, 'REFLECTION': -320,
+                'ALPHA': -160, 'MASK': -80,
+                'DIFFUSE': 180, 'ALBEDO': 180, 'COLOR': 180,
+                'SPECULAR': 309, 'METALNESS': 212,
+                'ROUGHNESS': 402, 'GLOSSINESS': 402,
+                'TRANSMISSION': 84, 'EMISSION': 1824,
+                'BUMP': 1608, 'NORMAL': 1640,
+                'HEIGHT': 1670, 'DISPLACEMENT': 1670,
+                'UNKNOWN': -500,
+                '_UVNODE': 1000, '_UVREROUTE': 1000,
+            },
+            'FAUX': {
+                'AO': -300, 'REFLECTION': -400, 'ALPHA': -200, 'MASK': -100,
+                'DIFFUSE': 0, 'ALBEDO': 0, 'COLOR': 0,
+                'SPECULAR': 100, 'METALNESS': 100,
+                'ROUGHNESS': 200, 'GLOSSINESS': 300,
+                'TRANSMISSION': 400, 'EMISSION': 500,
+                'BUMP': 600, 'NORMAL': 700,
+                'HEIGHT': 800, 'DISPLACEMENT': 900,
+                'UNKNOWN': -500,
+                '_UVNODE': 50, '_UVREROUTE': 50,
+            }
+        },
+        'COL': {
+            'OctaneUniversalMaterial': {
+                'AO': -100, 'REFLECTION': -200,
+                'TRANSMISSION': 40,
+                'DIFFUSE': 113, 'ALBEDO': 113, 'COLOR': 113,
+                'SPECULAR': 259, 'METALNESS': 186,
+                'ROUGHNESS': 332, 'GLOSSINESS': 332,
+
+                'ALPHA': 970, 'MASK': 970,
+                'BUMP': 1043, 'NORMAL': 1116,
+                'HEIGHT': 1189, 'DISPLACEMENT': 1189,
+                'EMISSION': 1263,
+                'UNKNOWN': -500,
+                '_UVNODE': 653, '_UVREROUTE': 665,
+            },
+            'FAUX': {
+                'AO': -240, 'REFLECTION': -320, 'ALPHA': -160, 'MASK': -80,
+                'DIFFUSE': 0, 'ALBEDO': 0, 'COLOR': 0,
+                'SPECULAR': 80, 'METALNESS': 80,
+                'ROUGHNESS': 160, 'GLOSSINESS': 240,
+                'TRANSMISSION': 320, 'EMISSION': 400,
+                'BUMP': 480, 'NORMAL': 560,
+                'HEIGHT': 640, 'DISPLACEMENT': 720,
+                'UNKNOWN': -500,
+                '_UVNODE': 50, '_UVREROUTE': 50,
+            }
+        }
     }
 }
 mu_node_inputs = { # input <-> output mappings for adding nodes to the shader node tree
@@ -228,6 +282,30 @@ mu_node_inputs = { # input <-> output mappings for adding nodes to the shader no
         },
         'ShaderNodeNormalMap': {
             'NORMAL': 'Color'
+        },
+        'FAUX': {
+            'AO': None, 'REFLECTION': None, 'ALPHA': None, 'MASK': None,
+            'DIFFUSE': None, 'ALBEDO': None, 'COLOR': None,
+            'SPECULAR': None, 'METALNESS': None,
+            'ROUGHNESS': None, 'GLOSSINESS': None,
+            'TRANSMISSION': None, 'EMISSION': None,
+            'BUMP': None, 'NORMAL': None,
+            'HEIGHT': None, 'DISPLACEMENT': None,
+            '_BUMPNODE': None, '_NORMALNODE': None,
+        }
+    },
+    'OCTANE': {
+        'OctaneUniversalMaterial': {
+            'AO': None, 'REFLECTION': None,                              # NOT AUTOMATICALLY CONNECTED TO NODE
+            'HEIGHT': None,                                              # Not connected to shader node
+            'DIFFUSE': 'Albedo', 'ALBEDO': 'Albedo', 'COLOR': 'Albedo',  # Treating Albedo/Diffuse/Color as the same
+            'ROUGHNESS': 'Roughness', 'GLOSSINESS': 'Roughness',         # Same input, but different values
+            'SPECULAR': 'Specular',
+            'METALNESS': 'Metallic',
+            'BUMP': 'Bump', 'NORMAL': 'Normal', 'DISPLACEMENT': 'Displacement',
+            'ALPHA': 'Opacity', 'MASK': 'Opacity',                       # Currently treating Alpha and Mask as the same thing
+            'TRANSMISSION': 'Transmission',
+            'EMISSION': 'Emission',
         },
         'FAUX': {
             'AO': None, 'REFLECTION': None, 'ALPHA': None, 'MASK': None,
