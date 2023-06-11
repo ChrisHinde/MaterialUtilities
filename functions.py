@@ -1155,6 +1155,8 @@ def mu_add_image_texture(filename, filetype, prefs,
     if engine == 'CYCLES':
         node = nodes.new('ShaderNodeTexImage')
 
+        name = 'MUAdded' + filetype.map
+        node.name = name
         if prefs.set_label:
             node.label = filetype.orig_map
         if prefs.collapse_texture_nodes:
@@ -1166,7 +1168,7 @@ def mu_add_image_texture(filename, filetype, prefs,
 
             if filetype.map == 'BUMP':
                 bump_node = nodes.new('ShaderNodeBump')
-                bump_node.name = 'MUAddedBump'
+                bump_node.name = 'MUAddedBumpNode'
                 bump_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_BUMPNODE', prefs=prefs)
                 bump_node.inputs['Distance'].default_value = prefs.bump_distance
 
@@ -1176,7 +1178,7 @@ def mu_add_image_texture(filename, filetype, prefs,
                 #links.new(bump_node.outputs[0], first_node.inputs[input])
             elif filetype.map == 'NORMAL':
                 nrm_node = nodes.new('ShaderNodeNormalMap')
-                nrm_node.name = 'MUAddedNormalMap'
+                nrm_node.name = 'MUAddedNormalMapNode'
                 nrm_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_NORMALNODE', prefs=prefs)
 
                 i = mu_node_inputs[engine]['ShaderNodeNormalMap'][filetype.map]
@@ -1185,7 +1187,7 @@ def mu_add_image_texture(filename, filetype, prefs,
                 #links.new(nrm_node.outputs[0], first_node.inputs[input])
             elif filetype.map == 'GLOSSINESS':
                 inv_node = nodes.new('ShaderNodeInvert')
-                inv_node.name = 'MUAddedInvert'
+                inv_node.name = 'MUAddedInvertNode'
                 inv_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_INVERT', prefs=prefs)
                 inv_node.hide = True
 
@@ -1359,10 +1361,10 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     gloss_rough = 0
     gloss_node  = None
     rough_node  = None
-    #has_displace = False
+    has_displace = False
     bump_tex_node   = None
     normal_tex_node = None
-    #displace_tex_node = None
+    displace_tex_node = None
     colorspaces = {}
 
     if out_node is None:
@@ -1435,9 +1437,9 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 if filetype.map == 'NORMAL':
                     has_normal = True
                     normal_tex_node = node
-                #if filetype.map == 'DISPLACEMENT':
-                #    has_displace = True
-                #    displace_tex_node = node
+                if filetype.map == 'DISPLACEMENT':
+                   has_displace = True
+                   displace_tex_node = node
             elif engine == 'OCTANE':
                 color = 'GREYSCALE' if filetype.is_greyscale else 'RGB'
 
@@ -1500,12 +1502,14 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 reroute.location.y += 150
                 uvmap.location.y   += 150
 
+            if has_bump:
+                bump_node   = nodes['MUAddedBumpNode']
+            if has_normal:
+                normal_node = nodes['MUAddedNormalMapNode']
+
             if has_normal and has_bump:
                 uvmap.location.x   -= 200
-                reroute.location.x -= 200
-
-                bump_node   = nodes['MUAddedBump']
-                normal_node = nodes['MUAddedNormalMap']
+                reroute.location.x -= 20
 
                 # Seperate the bump and normal nodes
                 bump_node.location.x       += 75
@@ -1520,6 +1524,108 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
             for node in added_nodes:
                 links.new(reroute.outputs['Output'], node.inputs['Vector'])
+
+            if prefs.stairstep and not prefs.pos_group == 'COL':
+                from operator import attrgetter
+                added_nodes.sort(key=attrgetter('location.y'), reverse=True)
+                pos_y = first_node.location.y
+                offs_y1 = 250
+                offs_y2 = 40
+                offs_x1 = 250
+                offs_x2 = 300
+                offs_x3 = offs_x1 * 2
+                odd = True
+
+                if uvmap is not None:
+                    uvmap.location.x   -= offs_x2
+                    reroute.location.x -= offs_x2
+                
+                for node in added_nodes:
+                    if node.name == 'MUAddedGLOSSINESS' or not node.outputs[0].is_linked:
+                        if node.name == 'MUAddedAO':
+                            node.location.y = first_node.location.y + offs_y1 + offs_y2
+                        elif node.name == 'MUAddedGLOSSINESS' or node.name == 'MUAddedROUGHNESS':
+                            node.location.x -= offs_x2
+                            node.location.y = first_node.location.y + offs_y1 + offs_y2
+                            if node.name == 'MUAddedGLOSSINESS':
+                                nodes['MUAddedInvertNode'].location = node.location
+                                nodes['MUAddedInvertNode'].location.x += offs_x2
+                                nodes['MUAddedInvertNode'].location.y -= 20
+                        
+                        continue
+                    if node.name in ['MUAddedDISPLACEMENT', 'MUAddedBUMP', 'MUAddedNORMAL']:
+                        continue
+
+                    node.location.y = pos_y
+
+                    if odd:
+                        pos_y -= offs_y1
+                    else:
+                        pos_y -= offs_y2
+                        node.location.x -= offs_x1
+
+                    # if node.name in ['MUAddedDISPLACEMENT', 'MUAddedBUMP', 'MUAddedNORMAL']:
+                    #     if node.name == 'MUAddedDISPLACEMENT':
+                    #         nid = 'MUAddedDisplacementNode'
+                    #     elif node.name == 'MUAddedBUMP':
+                    #         nid = 'MUAddedBumpNode'
+                    #     elif node.name == 'MUAddedNORMAL':
+                    #         nid = 'MUAddedNormalMapNode'
+                    #     pos_t = mu_calc_node_location(first_node, node, None, engine, prefs=prefs, map='None')
+                    #     node.location.x = pos_t[0]
+                    #     nodes[nid].location = node.location
+                    #     if odd:
+                    #         print("ODD")
+                    #         node.location.x -= offs_x3
+                    #     else:
+                    #         print("EVEN")
+                    #         node.location.x -= offs_x3
+
+                    odd = not odd
+
+                if has_displace:
+                    pos_t = mu_calc_node_location(first_node, displace_tex_node, None, engine, prefs=prefs, map='None')
+                    pos_t[1] = pos_y
+                    
+                    displace_tex_node.location = pos_t
+                    nodes['MUAddedDisplacementNode'].location.y = first_node.location.y - 700
+                    nodes['MUAddedDisplacementNode'].location.x = first_node.location.x
+
+                    if odd:
+                        pos_y -= offs_y1
+                    else:
+                        pos_y -= offs_y2
+                        displace_tex_node.location.x -= offs_x1
+
+                    odd = not odd
+
+                if has_bump:
+                    pos_t = mu_calc_node_location(first_node, bump_node, None, engine, prefs=prefs, map='None')
+                    pos_t[1] = pos_y
+
+                    bump_tex_node.location = pos_t
+                    bump_tex_node.location.x -= offs_x3
+                    bump_node.location = pos_t
+                    bump_node.location.y = pos_y
+
+                    if odd:
+                        pos_y -= offs_y1
+                    else:
+                        pos_y -= offs_y2
+
+                    odd = not odd
+
+                if has_normal:
+                    pos_t = mu_calc_node_location(first_node, normal_node, None, engine, prefs=prefs, map='None')
+                    pos_t[1] = pos_y
+
+                    normal_tex_node.location = pos_t
+                    normal_tex_node.location.x -= offs_x3
+                    normal_node.location = pos_t
+                    normal_node.location.y = pos_y
+                    if has_bump:
+                        normal_node.location.x -= offs_x1
+
 
         elif engine == 'OCTANE':
             transform  = None
@@ -1572,9 +1678,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             if prefs.add_colorspace:
                 y_offset = 0
                 for cs, nodetypes in colorspaces.items():
-                    print(cs)
                     for nt, texnodes in nodetypes.items():
-                        print(nt)
                         cs_node = mu_add_octane_node('colorspace', name='MUAddedColorSpace_' + cs + '_' + nt, 
                                                      label='ColorSpace - %s (%s)' % (cs, nt), nodes=nodes, prefs=prefs)
                         cs_node.location = mu_calc_node_location(first_node, cs_node, None, engine, map='_COLORSPACENODE', prefs=prefs, y_offset=y_offset)
@@ -1637,17 +1741,12 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                         pos_y -= offs_y2
                         node.location.x -= offs_x1
 
-                    if (node.name == 'MUAddedDISPLACEMENT' or node.name == 'MUAddedEMISSION'):
+                    if node.name == 'MUAddedDISPLACEMENT' or node.name == 'MUAddedEMISSION':
                         nid = 'MUAddedDisplacementNode' if node.name == 'MUAddedDISPLACEMENT' else 'MUAddedEmissionNode'
                         pos_t = mu_calc_node_location(first_node, node, None, engine, prefs=prefs, map='None')
                         node.location.x = pos_t[0]
                         nodes[nid].location = node.location
-                        if odd:
-                            print("ODD")
-                            node.location.x -= offs_x3
-                        else:
-                            print("EVEN")
-                            node.location.x -= offs_x3
+                        node.location.x -= offs_x3
 
                     odd = not odd
 
