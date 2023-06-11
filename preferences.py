@@ -188,6 +188,16 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                             "This might take a longer time in complex materials, and might also replace unwanted textures",
             default = False,
             )
+    tex_reflection_as_specular: BoolProperty(
+            name = "Reflection as Specular",
+            description = "Connect Reflection maps as Specular",
+            default = True,
+            )
+    tex_add_colorspaces: BoolProperty(
+            name = "Add ColorSpaces",
+            description = "Add appropriate ColorSpace nodes",
+            default = True,
+            )
 
     def draw(self, context):
         layout = self.layout
@@ -236,6 +246,12 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         e2.row().prop(self, 'tex_set_fake_user', expand = False)
         e2.row().prop(self, 'tex_only_selected', expand = False)
         e2.row().prop(self, 'tex_go_wide', expand = False)
+        r = e1.row(align=True)
+        r.alignment = 'CENTER'
+        r.label(text = "Octane Specific")
+        e1.row().prop(self, 'tex_reflection_as_specular', expand = False)
+        e2.row().label(text = "")
+        e2.row().prop(self, 'tex_add_colorspaces', expand = False)
 
         box = layout.box()
         box.label(text = "Miscellaneous")

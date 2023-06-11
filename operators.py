@@ -967,6 +967,16 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             description = "Hides the texture nodes for a cleaner node setup",
             default = True,
             )
+    reflection_as_specular: BoolProperty(
+            name = "Reflection as Specular",
+            description = "Connect Reflection maps as Specular",
+            default = True,
+            )
+    add_colorspaces: BoolProperty(
+            name = "Add ColorSpaces",
+            description = "Add appropriate ColorSpace nodes",
+            default = True,
+            )
     height_map_option: EnumProperty(
             name = "Height map treatment",
             description = "How should height maps be treated",
@@ -1005,7 +1015,12 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             row = layout.row()
             row.prop(self, 'use_alpha_channel')
             row.enabled = self.connect
+            if bpy.data.scenes['Scene'].render.engine == 'octane':
+                row = layout.row()
+                row.prop(self, 'add_colorspaces')
+                row.enabled = self.connect
             layout.prop(self, 'collapse_texture_nodes')
+            layout.prop(self, 'reflection_as_specular')
             layout.prop(self, 'height_map_option')
 
     def _invoke(self, context, event):
@@ -1025,6 +1040,8 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         self.connect                = mu_prefs.tex_connect
         self.use_alpha_channel      = mu_prefs.tex_use_alpha_channel
         self.collapse_texture_nodes = mu_prefs.tex_collapse_texture_nodes
+        self.reflection_as_specular = mu_prefs.tex_reflection_as_specular
+        self.add_colorspaces        = mu_prefs.tex_add_colorspaces
         self.height_map_option      = mu_prefs.tex_height_map_option
 
         wm = context.window_manager
@@ -1049,6 +1066,9 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     height_map     = self.height_map_option,
                                     bump_distance  = mu_prefs.tex_bump_distance,
                                     collapse_texture_nodes = self.collapse_texture_nodes,
+                                    reflection_as_specular = self.reflection_as_specular,
+                                    add_colorspace = self.add_colorspaces,
+                                    stairstep      = True,
                                     pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP',
                                     gamma          = 1.0,
                                     context        = context
