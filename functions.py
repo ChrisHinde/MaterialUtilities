@@ -1251,14 +1251,13 @@ def mu_replace_image(self, filename, filetype, prefs, node, engine):
         self.report({'WARNING'}, "Cannot load image %s" % filename)
         return
 
-    if engine == 'CYCLES':
-        if prefs.set_fake_user:
-            node.image.use_fake_user = True
+    if prefs.set_fake_user:
+        node.image.use_fake_user = True
 
-        mu_set_image_colorspace(img.colorspace_settings, filetype) # Octane will ignore this, but for Cycles the colorspace is connected to the image data
+    mu_set_image_colorspace(img.colorspace_settings, filetype) # Octane will ignore this, but for Cycles the colorspace is connected to the image data
 
-        node.image = img
-        print("Replaced file in node '%s' ('%s') with %s" % (node.name, node.label, filename))
+    node.image = img
+    print("Replaced file in node '%s' ('%s') with %s" % (node.name, node.label, filename))
 
 def mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes=[], engine=''):
     """Replace the image files in the selected nodes, if matching, with a new set"""
@@ -1267,7 +1266,8 @@ def mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes=[]
     found_node = None
 
     for node in nodes:
-        if engine == 'CYCLES' and node.bl_idname == 'ShaderNodeTexImage':
+        if (engine == 'CYCLES' and node.bl_idname == 'ShaderNodeTexImage') or \
+           (engine == 'OCTANE' and node.bl_idname in ['OctaneGreyscaleImage', 'OctaneRGBImage']):
             ft = mu_get_filetype(node.image.name)
             if node.label.upper() == filetype.map or ft.map == filetype.map:
                 found      = True
@@ -1753,7 +1753,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     return {'FINISHED'}
 
 def mu_replace_image_textures(self, prefs, directory = None, file_list = [], file_path = ''):
-    """Try to find and replace imagee files in existing texture nodes with a new set (Does NOT add a new texture if there's an new image texture without matching node!)"""
+    """Try to find and replace image files in existing texture nodes with a new set (Does NOT add a new texture if there's an new image texture without matching node!)"""
 
     files = []
 
