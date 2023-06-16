@@ -935,7 +935,7 @@ def mu_get_filetype(filename):
         non_color = True
         is_greyscale = True
     elif 'disp' in filename or 'dsp' in filename:
-        texture_map = 'DISPLACE'
+        texture_map = 'DISPLACEMENT'
         non_color = True
         is_greyscale = True
     elif 'bump' in filename or 'bmp' in filename:
@@ -1454,7 +1454,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         except NameError as err:
             self.report({'WARNING'}, str(err))
 
-    if gloss_rough > 0:
+    if gloss_rough > 1:
         connected = "one"
         if rough_node.outputs[0].is_linked:
             gloss_node.location.x -= 150
