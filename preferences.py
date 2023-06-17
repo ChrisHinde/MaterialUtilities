@@ -198,6 +198,11 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             description = "Add appropriate ColorSpace nodes",
             default = True,
             )
+    tex_stair_step: BoolProperty(
+            name = "Stair step nodes",
+            description = "Arrange the image nodes in a \"stair step\" (alternating) layout (Does not affect collapsed nodes).",
+            default = True,
+            )
 
     def draw(self, context):
         layout = self.layout
@@ -240,6 +245,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         e1.row().prop(self, 'tex_set_label', expand = False)
         e1.row().prop(self, 'tex_connect', expand = False)
         e1.row().prop(self, 'tex_collapse_texture_nodes', expand = False)
+        e1.row().prop(self, 'tex_stair_step', expand = False)
         e1.row().prop(self, 'tex_add_new_uvmap', expand = False)
         e2 = er.column()
         e2.row().prop(self, 'tex_use_alpha_channel', expand = False)

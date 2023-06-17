@@ -990,6 +990,12 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             default = True,
             )
 
+    stair_step: BoolProperty(
+            name = "Stair step nodes",
+            description = "Arrange the image nodes in a \"stair step\" (alternating) layout.",
+            default = True,
+            )
+
     add: BoolProperty(
             default = False,
             )
@@ -1020,6 +1026,8 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                 row.prop(self, 'add_colorspaces')
                 row.enabled = self.connect
             layout.prop(self, 'collapse_texture_nodes')
+            if not self.collapse_texture_nodes:
+                layout.prop(self, 'stair_step')
             layout.prop(self, 'reflection_as_specular')
             layout.prop(self, 'height_map_option')
 
@@ -1043,6 +1051,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         self.reflection_as_specular = mu_prefs.tex_reflection_as_specular
         self.add_colorspaces        = mu_prefs.tex_add_colorspaces
         self.height_map_option      = mu_prefs.tex_height_map_option
+        self.stair_step             = mu_prefs.tex_stair_step
 
         wm = context.window_manager
         wm.fileselect_add(self)
@@ -1068,7 +1077,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     collapse_texture_nodes = self.collapse_texture_nodes,
                                     reflection_as_specular = self.reflection_as_specular,
                                     add_colorspace = self.add_colorspaces,
-                                    stairstep      = True,
+                                    stairstep      = self.stair_step,
                                     pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP',
                                     gamma          = 1.0,
                                     context        = context
