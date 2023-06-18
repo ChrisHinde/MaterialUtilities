@@ -1010,26 +1010,38 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         layout = self.layout
 
         if not self.add:
-            layout.prop(self, 'set_fake_user')#, icon = 'FAKE_USER_ON')
-            layout.prop(self, 'only_selected')#, icon = 'SELECT_INTERSECT')
+            layout.prop(self, 'only_selected')
             row = layout.row()
-            row.prop(self, 'go_wide')#, icon = 'SELECT_INTERSECT')
+            row.prop(self, 'go_wide')
             row.enabled = not self.only_selected
+            layout.prop(self, 'set_fake_user')
         else:
-            layout.prop(self, 'set_label')
-            layout.prop(self, 'connect')
-            row = layout.row()
-            row.prop(self, 'use_alpha_channel')
+            box = layout.box()
+            box.label(text = "Connections:")
+            col = mu_ui_col_split(box)
+            col.prop(self, 'connect')
+            row = col.row()
             row.enabled = self.connect
+            row.prop(self, 'use_alpha_channel')
             if bpy.data.scenes['Scene'].render.engine == 'octane':
-                row = layout.row()
+                row = col.row()
                 row.prop(self, 'add_colorspaces')
                 row.enabled = self.connect
-            layout.prop(self, 'collapse_texture_nodes')
-            if not self.collapse_texture_nodes:
-                layout.prop(self, 'stair_step')
-            layout.prop(self, 'reflection_as_specular')
-            layout.prop(self, 'height_map_option')
+
+            box = layout.box()
+            box.label(text = "Apperance:")
+            col = mu_ui_col_split(box)
+            col.prop(self, 'set_label')
+            col.prop(self, 'collapse_texture_nodes')
+            row = col.row()
+            row.enabled = not self.collapse_texture_nodes
+            row.prop(self, 'stair_step')
+
+            box = layout.box()
+            box.label(text = "Map options:")
+            col = mu_ui_col_split(box)
+            col.prop(self, 'reflection_as_specular')
+            col.prop(self, 'height_map_option')
 
     def _invoke(self, context, event):
         mu_prefs = materialutilities_get_preferences(context)

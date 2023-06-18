@@ -10,6 +10,12 @@ from .preferences import *
 # -----------------------------------------------------------------------------
 # utility functions
 
+def mu_ui_col_split(layout, factor=0.02):
+    spl = layout.split(factor=factor)
+    spl.column()
+    spl2 = spl.column().split(factor=1-factor/(1-factor))
+    return spl2.column()
+
 def mu_assign_material_slots(object, material_list):
     """Given an object and a list of material names removes all material slots from the object
        adds new ones for each material in the material list, adds the materials to the slots as well."""

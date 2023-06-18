@@ -336,16 +336,6 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                 col.prop(self, 'tex_default_dialog', expand = False)
                 layout.separator()
 
-            layout.prop(self, 'textures_height_expanded',
-                        icon='DISCLOSURE_TRI_DOWN' if self.textures_height_expanded
-                        else 'DISCLOSURE_TRI_RIGHT')
-            if self.textures_height_expanded:
-                layout.separator()
-                col = mu_ui_col_split(layout)
-                col.prop(self, 'tex_height_map_option', expand = False)
-                col.prop(self, 'tex_bump_distance',     expand = False)
-                layout.separator()
-
             layout.prop(self, 'textures_connections_expanded',
                         icon='DISCLOSURE_TRI_DOWN' if self.textures_connections_expanded
                         else 'DISCLOSURE_TRI_RIGHT')
@@ -371,6 +361,16 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                 col1.prop(self, 'tex_stair_step',             expand = False)
                 col2 = col.column()
                 col2.prop(self, 'tex_set_label', expand = False)
+                layout.separator()
+
+            layout.prop(self, 'textures_height_expanded',
+                        icon='DISCLOSURE_TRI_DOWN' if self.textures_height_expanded
+                        else 'DISCLOSURE_TRI_RIGHT')
+            if self.textures_height_expanded:
+                layout.separator()
+                col = mu_ui_col_split(layout)
+                col.prop(self, 'tex_height_map_option', expand = False)
+                col.prop(self, 'tex_bump_distance',     expand = False)
                 layout.separator()
     
             layout.prop(self, 'textures_replace_expanded',
