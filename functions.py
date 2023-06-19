@@ -966,7 +966,7 @@ def mu_get_filetype(filename):
         texture_map = 'TRANSMISSION'
     elif 'emission' in filename:
         texture_map = 'EMISSION'
-    elif 'render' in filename:
+    elif 'render' in filename or 'sample' in filename:
         texture_map = 'RENDER'
 
     if override_colorspace:
