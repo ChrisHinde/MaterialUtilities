@@ -1139,7 +1139,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
 class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_texture_base):
     """Select image textures to import to shader setup"""
     
-    bl_idname = 'node.materialutilites_select_texture_files'
+    bl_idname = 'node.materialutilities_select_texture_files'
     bl_label = "Select textures"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -1156,7 +1156,7 @@ class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_t
 class NODE_OT_materialutilites_select_texture_directory(MU_materialutilites_select_texture_base):
     """Select directory with image textures to import to shader setup"""
     
-    bl_idname = 'node.materialutilites_select_texture_directory'
+    bl_idname = 'node.materialutilities_select_texture_directory'
     bl_label = "Select directory"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -1193,10 +1193,10 @@ class NODE_OT_materialutilities_add_image_textures(bpy.types.Operator):
             mode = 'DIR'
 
         if mode == 'FILES':
-            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = True)
+            bpy.ops.node.materialutilities_select_texture_files('INVOKE_DEFAULT', add = True)
             return  {'RUNNING_MODAL'}
         elif mode == 'DIR':
-            bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = True)
+            bpy.ops.node.materialutilities_select_texture_directory('INVOKE_DEFAULT', add = True)
             return  {'RUNNING_MODAL'}
 
     def execute(self, context):
@@ -1226,10 +1226,10 @@ class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
             mode = 'DIR'
 
         if mode == 'FILES':
-            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = False)
+            bpy.ops.node.materialutilities_select_texture_files('INVOKE_DEFAULT', add = False)
             return  {'RUNNING_MODAL'}
         elif mode == 'DIR':
-            bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = False)
+            bpy.ops.node.materialutilities_select_texture_directory('INVOKE_DEFAULT', add = False)
             return  {'RUNNING_MODAL'}
 
     def execute(self, context):
@@ -1260,10 +1260,10 @@ class VIEW3D_OT_materialutilities_assign_pbr_material(bpy.types.Operator):
             mode = 'DIR'
 
         if mode == 'FILES':
-            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = True, add_material = True)
+            bpy.ops.node.materialutilities_select_texture_files('INVOKE_DEFAULT', add = True, add_material = True)
             return  {'RUNNING_MODAL'}
         elif mode == 'DIR':
-            bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = True, add_material = True)
+            bpy.ops.node.materialutilities_select_texture_directory('INVOKE_DEFAULT', add = True, add_material = True)
             return  {'RUNNING_MODAL'}
 
     def execute(self, context):
