@@ -66,6 +66,11 @@ mu_height_map_option_enums = (
 
 mu_supported_engines = ['CYCLES', 'BLENDER_EEVEE', 'octane']
 
+mu_default_shader_nodes = {
+    'CYCLES': 'ShaderNodeBsdfPrincipled',
+    'OCTANE': 'OctaneUniversalMaterial'
+}
+
 mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
     'CYCLES': {
       'EXP': {  # Expanded nodes

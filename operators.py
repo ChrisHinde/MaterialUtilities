@@ -996,6 +996,22 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             default = True,
             )
 
+    override_type: EnumProperty(
+            name = 'Assignment method',
+            description = '',
+            items = mu_override_type_enums
+            )
+    material_name: StringProperty(
+            name = "Material Name",
+            description = "Name of the new material\n (The name of the directory will be used if this is left empty)",
+            default = "",
+            maxlen = 63
+            )
+
+    add_material: BoolProperty(
+            default = False,
+            )
+
     add: BoolProperty(
             default = False,
             )
@@ -1004,7 +1020,9 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.area.ui_type == 'ShaderNodeTree' and bpy.context.active_object.active_material is not None
+        if context.area.ui_type == 'ShaderNodeTree':
+            return context.area.ui_type == 'ShaderNodeTree' and bpy.context.active_object.active_material is not None
+        return context.area.ui_type == 'VIEW_3D'
 
     def draw(self, context):
         layout = self.layout
@@ -1029,7 +1047,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                 row.enabled = self.connect
 
             box = layout.box()
-            box.label(text = "Apperance:")
+            box.label(text = "Appearance:")
             col = mu_ui_col_split(box)
             col.prop(self, 'set_label')
             col.prop(self, 'collapse_texture_nodes')
@@ -1042,6 +1060,14 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             col = mu_ui_col_split(box)
             col.prop(self, 'reflection_as_specular')
             col.prop(self, 'height_map_option')
+
+            if self.add_material:
+                box = layout.box()
+                box.label(text = "Material options:")
+                col = mu_ui_col_split(box)
+                if context.active_object.mode == 'OBJECT':
+                    col.prop(self, 'override_type')
+                col.prop(self, 'material_name')
 
     def _invoke(self, context, event):
         mu_prefs = materialutilities_get_preferences(context)
@@ -1081,6 +1107,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             params = dict(directory = self.directory)
 
         if self.add:
+            override_type = self.override_type if context.active_object.mode == 'OBJECT' else 'APPEND_MATERIAL'
             prefs = SimpleNamespace(set_label      = self.set_label,
                                     connect        = self.connect,
                                     connect_alpha  = self.use_alpha_channel,
@@ -1090,6 +1117,9 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     reflection_as_specular = self.reflection_as_specular,
                                     add_colorspace = self.add_colorspaces,
                                     stairstep      = self.stair_step,
+                                    new_material   = self.add_material,
+                                    material_name  = self.material_name,
+                                    override_type  = override_type,
                                     pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP',
                                     gamma          = 1.0,
                                     context        = context
@@ -1200,6 +1230,40 @@ class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
             return  {'RUNNING_MODAL'}
         elif mode == 'DIR':
             bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = False)
+            return  {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+class VIEW3D_OT_materialutilities_assign_pbr_material(bpy.types.Operator):
+    """Import PBR textures in a new material"""
+
+    bl_idname = 'view3d.materialutilities_assign_pbr_material'
+    bl_label = "Assign PBR material"
+    bl_description = "Import PBR textures in a new material"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if bpy.data.scenes['Scene'].render.engine not in mu_supported_engines:
+            print("Material Utilities - Assign PBR Material: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
+            return False
+        return context.active_object is not None
+
+    def invoke(self, context, event):
+        mu_prefs = materialutilities_get_preferences(context)
+        mode = mu_prefs.tex_default_dialog
+        
+        if event.shift:
+            mode = 'FILES'
+        elif event.ctrl:
+            mode = 'DIR'
+
+        if mode == 'FILES':
+            bpy.ops.node.materialutilites_select_texture_files('INVOKE_DEFAULT', add = True, add_material = True)
+            return  {'RUNNING_MODAL'}
+        elif mode == 'DIR':
+            bpy.ops.node.materialutilites_select_texture_directory('INVOKE_DEFAULT', add = True, add_material = True)
             return  {'RUNNING_MODAL'}
 
     def execute(self, context):

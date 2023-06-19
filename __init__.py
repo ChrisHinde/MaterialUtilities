@@ -152,6 +152,8 @@ classes = (
     NODE_OT_materialutilities_add_image_textures,
     NODE_OT_materialutilities_replace_image_textures,
     NODE_MT_materialutilities_shadereditor_menu,
+    
+    VIEW3D_OT_materialutilities_assign_pbr_material,
 
     VIEW3D_MT_materialutilities_preferences
 )

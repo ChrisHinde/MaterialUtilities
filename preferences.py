@@ -247,8 +247,8 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
     textures_connections_expanded: BoolProperty(
         name = "Connections & Support Nodes"
     )
-    textures_appearence_expanded: BoolProperty(
-        name = "Placement & Appearence"
+    textures_appearance_expanded: BoolProperty(
+        name = "Placement & Appearance"
     )
     textures_replace_expanded: BoolProperty(
         name = "Replacing Textures"
@@ -350,10 +350,10 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                 col2.prop(self, 'tex_add_new_uvmap',          expand = False)
                 layout.separator()
     
-            layout.prop(self, 'textures_appearence_expanded',
-                        icon='DISCLOSURE_TRI_DOWN' if self.textures_appearence_expanded
+            layout.prop(self, 'textures_appearance_expanded',
+                        icon='DISCLOSURE_TRI_DOWN' if self.textures_appearance_expanded
                         else 'DISCLOSURE_TRI_RIGHT')
-            if self.textures_appearence_expanded:
+            if self.textures_appearance_expanded:
                 layout.separator()
                 col = mu_ui_col_split(layout).split()
                 col1 = col.column()

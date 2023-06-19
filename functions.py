@@ -989,6 +989,19 @@ def mu_faux_shader_node(out_node):
 
     return SimpleNamespace(name='FAUX', bl_idname='FAUX', location=out_node.location, width=out_node.width)
 
+def mu_create_default_shader_node(nodes, engine, node, out_node = None, links = None, set_target = False):
+    """Create a "default" shader node appropriate for the current render engine"""
+
+    if out_node is None:
+        out_node = nodes.get('Material Output')
+
+    node = nodes.new(mu_default_shader_nodes[engine])
+    node.location = out_node.location
+    node.location.x -= 300
+
+    if links is not None:
+        links.new(node.outputs[0], out_node.inputs['Surface'])
+
 def mu_set_image_colorspace(colsp, filetype):
     """Set the colorspace of an internal image block to match the colorspace in the texture file"""
 
@@ -1009,6 +1022,7 @@ def mu_set_image_colorspace(colsp, filetype):
 
 def mu_get_ocio_colorspace(colsp, imgtype):
     """Get the OCIO Color Space based on incoming colorspace"""
+
     cs = 'Other'
 
     if colsp in mu_ocio_colorspace_map:
@@ -1083,7 +1097,6 @@ def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[], name=None, lab
     is_img  = False
     lbl_sfx = ''
 
-    # m = bpy.data.materials[mat.name]
     if type == 'uvmap':
         type = 'OctaneMeshUVProjection'
     elif type == 'transform' or type == '2Dtransform':
@@ -1109,10 +1122,6 @@ def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[], name=None, lab
             type = 'OctaneRGBImage'
             lbl_sfx = ' - RGB'
 
-    # count = len(m.node_tree.nodes)
-    # bpy.ops.octane.add_default_node_helper(default_node_name=type)
-    # node = nodes[count-1]
-    
     node = nodes.new(type)
 
     if name is not None:
@@ -1346,7 +1355,6 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     dir_name = os.path.basename(dir)
 
     engine = bpy.data.scenes['Scene'].render.engine
-    mat    = bpy.context.active_object.active_material
 
     if engine == 'CYCLES' or engine == 'BLENDER_EEVEE': # Cycles and Eevee uses the same nodes
         engine = 'CYCLES'
@@ -1358,16 +1366,36 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                                     "' isn't supported by Material Utilities!")
         return {'CANCELLED'}
 
-    nodes = mat.node_tree.nodes
-    links = mat.node_tree.links
-    out_node    = nodes.get('Material Output')
     first_node  = None
+
+    if prefs.new_material:
+        mat_name = dir_name if prefs.material_name == "" else prefs.material_name
+        mat = bpy.data.materials.new(mu_new_material_name(mat_name))
+        mat.use_nodes = True
+
+        nodes    = mat.node_tree.nodes
+        links    = mat.node_tree.links
+        out_node = nodes.get('Material Output')
+
+        # Remove the default shader node
+        #  (we're not sure that the default node is the one we want, so we try to start with an "empty" material)
+        if out_node.inputs['Surface'].is_linked:
+            nodes.remove(out_node.inputs['Surface'].links[0].from_node)
+
+        mu_create_default_shader_node(nodes, engine, first_node, links=links, out_node=out_node)
+    else:
+        mat = bpy.context.active_object.active_material
+
+        nodes    = mat.node_tree.nodes
+        links    = mat.node_tree.links
+        out_node = nodes.get('Material Output')
+
     has_bump    = False
     has_normal  = False
     gloss_rough = 0
     gloss_node  = None
     rough_node  = None
-    has_displace = False
+    has_displace    = False
     bump_tex_node   = None
     normal_tex_node = None
     displace_tex_node = None
@@ -1375,8 +1403,10 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     if out_node is None:
         self.report({'WARNING'}, "Couldn't find an Material Output! Creating one!")
-        out_node = bpy.ops.node.add_node(type="ShaderNodeOutputMaterial", use_transform=False)
+        out_node = nodes.new(type="ShaderNodeOutputMaterial")
         out_node.location = (400, 100)
+
+        mu_create_default_shader_node(nodes, engine, first_node, links=links, out_node=out_node)
 
     if out_node.inputs['Surface'].is_linked:
         first_node = out_node.inputs['Surface'].links[0].from_node
@@ -1689,7 +1719,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                                                      label='ColorSpace - %s (%s)' % (cs, nt), nodes=nodes, prefs=prefs)
                         cs_node.location = mu_calc_node_location(first_node, cs_node, None, engine, map='_COLORSPACENODE', prefs=prefs, y_offset=y_offset)
                         cs_node.ocio_color_space_name = mu_get_ocio_colorspace(cs,nt)
-                        
+
                         cs_nodes.append(cs_node)
 
                         for txnode in texnodes:
@@ -1736,7 +1766,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                             pos_t = mu_calc_node_location(first_node, node, None, engine, prefs=prefs, map='None')
                             node.location.x = pos_t[0] - offs_x1
                             node.location.y = first_node.location.y + offs_y1 + offs_y2
-                        
+
                         continue
 
                     node.location.y = pos_y
@@ -1755,6 +1785,9 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                         node.location.x -= offs_x3
 
                     odd = not odd
+
+    if prefs.new_material:
+        mu_assign_material(self, material_name=mat.name, override_type=prefs.override_type)
 
     return {'FINISHED'}
 

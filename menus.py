@@ -228,7 +228,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
     """Specials menu for Material Utilities"""
 
-    bl_idname = "VIEW3D_MT_materialutilities_specials"
+    bl_idname = 'VIEW3D_MT_materialutilities_specials'
     bl_label = "Specials"
 
     def draw(self, context):
@@ -237,30 +237,36 @@ class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
 
         layout.operator(MATERIAL_OT_materialutilities_merge_base_names.bl_idname,
                         text = "Merge Base Names",
-                        icon = "GREASEPENCIL")
+                        icon = 'GREASEPENCIL')
 
         layout.operator(MATERIAL_OT_materialutilities_join_objects.bl_idname,
                         text = "Join by material",
-                        icon = "OBJECT_DATAMODE")
+                        icon = 'OBJECT_DATAMODE')
+
+        layout.separator()
+
+        layout.operator(VIEW3D_OT_materialutilities_assign_pbr_material.bl_idname,
+                        text = "Assign new PBR material",
+                        icon = 'IMAGE_DATA')
 
         layout.separator()
 
         op = layout.operator(MATERIAL_OT_materialutilities_remove_unused_materials.bl_idname,
                         text = "Remove unused materials",
-                        icon = "TRASH")
+                        icon = 'TRASH')
 
         layout.separator()
 
         op = layout.operator(MATERIAL_OT_materialutilities_auto_smooth_angle.bl_idname,
                         text = "Set Auto Smooth",
-                        icon = "SHADING_SOLID")
+                        icon = 'SHADING_SOLID')
         op.affect = mu_prefs.set_smooth_affect
         op.angle = mu_prefs.auto_smooth_angle
 
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
     """Main menu for Material Utilities"""
 
-    bl_idname = "VIEW3D_MT_materialutilities_main"
+    bl_idname = 'VIEW3D_MT_materialutilities_main'
     bl_label = "Material Utilities"
 
     def draw(self, context):
