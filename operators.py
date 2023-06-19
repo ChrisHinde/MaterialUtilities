@@ -1058,8 +1058,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             box = layout.box()
             box.label(text = "Map options:")
             col = mu_ui_col_split(box)
-            col.label(text = "Reflection as Specular")
-            col.prop(self, 'reflection_as_specular', text = "")
+            col.prop(self, 'reflection_as_specular')
             col.label(text = "Height Map Treatment")
             col.prop(self, 'height_map_option', text = "")
 
