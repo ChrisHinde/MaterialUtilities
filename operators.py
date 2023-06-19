@@ -1058,16 +1058,20 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             box = layout.box()
             box.label(text = "Map options:")
             col = mu_ui_col_split(box)
-            col.prop(self, 'reflection_as_specular')
-            col.prop(self, 'height_map_option')
+            col.label(text = "Reflection as Specular")
+            col.prop(self, 'reflection_as_specular', text = "")
+            col.label(text = "Height Map Treatment")
+            col.prop(self, 'height_map_option', text = "")
 
             if self.add_material:
                 box = layout.box()
                 box.label(text = "Material options:")
                 col = mu_ui_col_split(box)
                 if context.active_object.mode == 'OBJECT':
-                    col.prop(self, 'override_type')
-                col.prop(self, 'material_name')
+                    col.label(text = "Assignment Method")
+                    col.prop(self, 'override_type', text = "")
+                col.label(text = "Material Name")
+                col.prop(self, 'material_name', text = "")
 
     def _invoke(self, context, event):
         mu_prefs = materialutilities_get_preferences(context)
