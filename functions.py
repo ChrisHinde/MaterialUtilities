@@ -1035,7 +1035,7 @@ def mu_get_ocio_colorspace(colsp, imgtype):
 
     return cs
 
-def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=-100, y_offset=0, map=None, prefs = None):
+def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=300, y_offset=0, map=None, prefs = None):
     """Caculate the proper location of the, to be, added texture node, based on the map type"""
 
     location = [0,0]
@@ -1048,43 +1048,42 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=-100, 
         ft_map = map
     else:
         ft_map = filetype.map
+    print("map:",map,"Xo:",x_offset,"n_w:",node.width)
 
     if engine == 'CYCLES':
-        if map == '_BUMPNODE' or map == '_NORMALNODE':
-            x_offset -= 0 + 50
+        # x_offset += 100
+
+        if map == 'BUMP':
+            x_offset += 90 + 50
+        elif map == 'HEIGHT' or map == 'DISPLACEMENT':
+            x_offset -= 120
         elif map == '_DISPLACEMENT':
-            x_offset -= first_node.width + node.width + 10
+            x_offset -= node.width + 160
+        elif map == 'NORMAL':
+            x_offset += 220 + 50
+        elif map == '_BUMPNODE' or map == '_NORMALNODE':
+            x_offset -= 0 + 0
         elif map == '_INVERT':
             x_offset -= 0 + 50
         elif map == '_UVNODE':
-            x_offset += 585 + 50
+            x_offset += 385 + 50
         elif map == '_UVREROUTE':
             x_offset += 370 + 50
-        elif map == 'BUMP':
-            x_offset += 200 + 50
-        elif map == 'HEIGHT' or map == 'DISPLACEMENT':
-            x_offset -= 150
-        elif map == 'NORMAL':
-            x_offset += 200 + 50
         elif map == 'GLOSSINESS':
-            x_offset += 200 + 50
+            x_offset += 100 + 50
     elif engine == 'OCTANE':
-        if map == '_UVNODE' or map == '_TRANSFORM':
-            x_offset += 500 + 50
+        if map == '_UVNODE' or map == '_TRANSFORM' or map == '_COLORSPACENODE':
+            x_offset += 530 + 50
         elif map == '_UVREROUTE' or map == '_TRANSFORMREROUTE':
-            x_offset += 270 + 50
-        elif map == '_COLORSPACENODE':
-            x_offset += 500 + 50
-        elif map == 'HEIGHT' or map == 'DISPLACEMENT':
-            x_offset += 150 + 50
-        elif map == '_DISPLACEMENT':
-            x_offset -= 40
-        elif map == 'EMISSION':
-            x_offset += 150 + 50
-        elif map == '_EMISSION':
-            x_offset -= 40
+            x_offset += 300 + 50
+        elif map == 'HEIGHT' or map == 'DISPLACEMENT' or map == 'EMISSION':
+            x_offset += 190 + 50
+        # elif map == '_DISPLACEMENT':
+        #     x_offset -= 40
+        # elif map == '_EMISSION':
+        #     x_offset -= 40
 
-    location[0] = first_node.location[0] - first_node.width*2 - x_offset
+    location[0] = first_node.location[0] - x_offset
     location[1] = first_node.location[1] + y_offset
 
     if ft_map != 'None':# and ft_map != 'UNKNOWN':
@@ -1158,7 +1157,7 @@ def mu_add_image_texture(filename, filetype, prefs,
                          out_node = None, first_node = None, engine = ''):
     """Add an image texture to the material node tree, and (if selected) try to connect it up"""
 
-    x_offset = -100
+    x_offset = 300
 
     try:
         img = bpy.data.images.load(filename)
@@ -1234,16 +1233,16 @@ def mu_add_image_texture(filename, filetype, prefs,
         if prefs.connect and filetype.map != 'UNKNOWN':
             input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
             link_node = node
-            
+
             if filetype.map == 'EMISSION':
                 emit_node = mu_add_octane_node('emission', nodes=nodes, prefs=prefs, name='MUAddedEmissionNode')
-                emit_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset, prefs=prefs, map='_EMISSION')
+                emit_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs, map='_EMISSION')
                 
                 links.new(node.outputs[0], emit_node.inputs['Texture'])
                 link_node = emit_node
             elif filetype.map == 'DISPLACEMENT':
                 disp_node = mu_add_octane_node('displacement', nodes=nodes, prefs=prefs, name='MUAddedDisplacementNode')
-                disp_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset, prefs=prefs, map='_DISPLACEMENT')
+                disp_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs, map='_DISPLACEMENT')
                 
                 links.new(node.outputs[0], disp_node.inputs['Texture'])
                 link_node = disp_node
@@ -1253,7 +1252,7 @@ def mu_add_image_texture(filename, filetype, prefs,
             else:
                 print("Material Utilities - No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname))
 
-    node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset, prefs=prefs)
+    node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs)
 
     return node
 
