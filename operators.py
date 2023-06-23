@@ -989,6 +989,11 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                             "This might take a longer time in complex materials, and might also replace unwanted textures",
             default = True,
             )
+    emission_map_option: EnumProperty(
+            name = "Emission map treatment",
+            description = "How should the emission map be treated",
+            items = mu_emission_map_option_enums
+            )
 
     stair_step: BoolProperty(
             name = "Stair step nodes",
@@ -997,15 +1002,22 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             )
 
     override_type: EnumProperty(
-            name = 'Assignment method',
-            description = '',
+            name = "Assignment method",
+            description = "",
             items = mu_override_type_enums
             )
     material_name: StringProperty(
             name = "Material Name",
             description = "Name of the new material\n (The name of the directory will be used if this is left empty)",
-            default = "",
+            default = '',
             maxlen = 63
+            )
+
+    material_node_type: EnumProperty(
+            name = "Material Node Type",
+            description = "What material node type to use in the new material",
+            items = mu_octane_std_material_enums,
+            default = 'UNIVERSAL'
             )
 
     add_material: BoolProperty(
@@ -1062,13 +1074,23 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             col.label(text = "Height Map Treatment")
             col.prop(self, 'height_map_option', text = "")
 
+            if self.material_node_type == 'STD_SURF':
+                col.label(text = "Emission map treatment")
+                col.prop(self, 'emission_map_option', text = "")
+
             if self.add_material:
                 box = layout.box()
                 box.label(text = "Material options:")
                 col = mu_ui_col_split(box)
+
                 if context.active_object.mode == 'OBJECT':
                     col.label(text = "Assignment Method")
                     col.prop(self, 'override_type', text = "")
+
+                if bpy.data.scenes['Scene'].render.engine == 'octane':
+                    col.label(text = "Material Node Type")
+                    col.prop(self, 'material_node_type', text = "")
+
                 col.label(text = "Material Name")
                 col.prop(self, 'material_name', text = "")
 
@@ -1094,6 +1116,14 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         self.height_map_option      = mu_prefs.tex_height_map_option
         self.stair_step             = mu_prefs.tex_stair_step
 
+        if not self.add_material and bpy.data.scenes['Scene'].render.engine == 'octane':
+            mat = context.active_object.active_material
+            out_node = mat.node_tree.nodes.get('Material Output')
+            if out_node is not None and out_node.inputs['Surface'].is_linked:
+                first_node = out_node.inputs['Surface'].links[0].from_node
+                if first_node.bl_idname == 'OctaneStandardSurfaceMaterial':
+                    self.material_node_type = 'STD_SURF'
+
         wm = context.window_manager
         wm.fileselect_add(self)
         return {'RUNNING_MODAL'}
@@ -1118,14 +1148,16 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     bump_distance  = mu_prefs.tex_bump_distance,
                                     collapse_texture_nodes = self.collapse_texture_nodes,
                                     reflection_as_specular = self.reflection_as_specular,
-                                    add_colorspace = self.add_colorspaces,
-                                    stairstep      = self.stair_step,
-                                    new_material   = self.add_material,
-                                    material_name  = self.material_name,
-                                    override_type  = override_type,
-                                    pos_group      = 'COL' if self.collapse_texture_nodes else 'EXP',
-                                    gamma          = 1.0,
-                                    context        = context
+                                    add_colorspace  = self.add_colorspaces,
+                                    stairstep       = self.stair_step,
+                                    new_material    = self.add_material,
+                                    material_name   = self.material_name,
+                                    override_type   = override_type,
+                                    mat_node_type   = self.material_node_type,
+                                    emission_option = self.emission_map_option,
+                                    pos_group       = 'COL' if self.collapse_texture_nodes else 'EXP',
+                                    gamma           = 1.0,
+                                    context         = context
                                     )
 
             return mu_add_image_textures(self, prefs, **params)

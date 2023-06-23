@@ -989,13 +989,25 @@ def mu_faux_shader_node(out_node):
 
     return SimpleNamespace(name='FAUX', bl_idname='FAUX', location=out_node.location, width=out_node.width)
 
-def mu_create_default_shader_node(nodes, engine, node, out_node = None, links = None, set_target = False):
+def mu_create_default_shader_node(nodes, engine, node, out_node = None, links = None, prefs = None, set_target = False):
     """Create a "default" shader node appropriate for the current render engine"""
 
     if out_node is None:
         out_node = nodes.get('Material Output')
+        
+    def_node = ''
 
-    node = nodes.new(mu_default_shader_nodes[engine])
+    if engine == 'OCTANE':
+        if prefs.mat_node_type not in mu_default_shader_nodes[engine].keys():
+            print("Material Utilities - No matching node for '%s' found, using default node!" % prefs.mat_node_type)
+            def_node = '_DEFAULT'
+
+        def_node = mu_default_shader_nodes[engine][prefs.mat_node_type]
+    else:
+        def_node = mu_default_shader_nodes[engine]
+
+    node = nodes.new(def_node)
+
     node.location = out_node.location
     node.location.x -= 300
 
@@ -1048,11 +1060,8 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=300, y
         ft_map = map
     else:
         ft_map = filetype.map
-    print("map:",map,"Xo:",x_offset,"n_w:",node.width)
 
     if engine == 'CYCLES':
-        # x_offset += 100
-
         if map == 'BUMP':
             x_offset += 90 + 50
         elif map == 'HEIGHT' or map == 'DISPLACEMENT':
@@ -1072,12 +1081,14 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=300, y
         elif map == 'GLOSSINESS':
             x_offset += 100 + 50
     elif engine == 'OCTANE':
-        if map == '_UVNODE' or map == '_TRANSFORM' or map == '_COLORSPACENODE':
+        if map == 'EMISSION' and prefs.mat_node_type == 'STD_SURF' and prefs.emission_option != 'NODE':
+            y_offset = -15
+        elif map == '_UVNODE' or map == '_TRANSFORM' or map == '_COLORSPACENODE':
             x_offset += 530 + 50
-        elif map == '_UVREROUTE' or map == '_TRANSFORMREROUTE':
-            x_offset += 300 + 50
         elif map == 'HEIGHT' or map == 'DISPLACEMENT' or map == 'EMISSION':
             x_offset += 190 + 50
+        elif map == '_UVREROUTE' or map == '_TRANSFORMREROUTE':
+            x_offset += 300 + 50
         # elif map == '_DISPLACEMENT':
         #     x_offset -= 40
         # elif map == '_EMISSION':
@@ -1233,24 +1244,42 @@ def mu_add_image_texture(filename, filetype, prefs,
         if prefs.connect and filetype.map != 'UNKNOWN':
             input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
             link_node = node
+            msg = None
 
             if filetype.map == 'EMISSION':
-                emit_node = mu_add_octane_node('emission', nodes=nodes, prefs=prefs, name='MUAddedEmissionNode')
-                emit_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs, map='_EMISSION')
-                
-                links.new(node.outputs[0], emit_node.inputs['Texture'])
-                link_node = emit_node
+                skip = False
+
+                if prefs.emission_option == 'NC':
+                    skip  = True
+                    input = None
+                    msg   = "Emission set to Don't connect, skipping link"
+                elif prefs.mat_node_type == 'STD_SURF':
+                    first_node.inputs['Emission weight'].default_value = 1.0
+                    if prefs.emission_option == 'NODE':
+                        first_node.inputs['Emission color'].default_value = (1.0, 1.0, 1.0)
+                    else:
+                        skip = True
+                        input = mu_node_inputs[engine][first_node.bl_idname]['EMISSION_COLOR']
+
+                if not skip:
+                    emit_node = mu_add_octane_node('emission', nodes=nodes, prefs=prefs, name='MUAddedEmissionNode')
+                    emit_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs, map='_EMISSION')
+
+                    links.new(node.outputs[0], emit_node.inputs['Texture'])
+                    link_node = emit_node
             elif filetype.map == 'DISPLACEMENT':
                 disp_node = mu_add_octane_node('displacement', nodes=nodes, prefs=prefs, name='MUAddedDisplacementNode')
                 disp_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs, map='_DISPLACEMENT')
-                
+
                 links.new(node.outputs[0], disp_node.inputs['Texture'])
                 link_node = disp_node
 
             if input is not None:
                 links.new(link_node.outputs[0], first_node.inputs[input])
             else:
-                print("Material Utilities - No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname))
+                if msg is None:
+                    msg = "No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname)
+                print("Material Utilities - " + msg)
 
     node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs)
 
@@ -1319,7 +1348,7 @@ def mu_replace_image_texture(self, filename, filetype, prefs, nodes = None,
         input = mu_node_inputs[engine][first_node.bl_idname][filetype.map]
         if input is not None and first_node.inputs[input].is_linked:
             node = first_node.inputs[input].links[0].from_node
-            
+
             if node is not None and node.bl_idname == 'ShaderNodeTexImage':
                 found = True
                 found_node = node
@@ -1381,7 +1410,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         if out_node.inputs['Surface'].is_linked:
             nodes.remove(out_node.inputs['Surface'].links[0].from_node)
 
-        mu_create_default_shader_node(nodes, engine, first_node, links=links, out_node=out_node)
+        mu_create_default_shader_node(nodes, engine, first_node, links=links, out_node=out_node, prefs=prefs)
     else:
         mat = bpy.context.active_object.active_material
 
@@ -1457,7 +1486,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         try:
             node = mu_add_image_texture(file, filetype=filetype, prefs=prefs, nodes=nodes, links=links, material=mat,
                                         out_node=out_node, first_node=first_node, engine=engine)
-            
+
             if filetype.map == 'GLOSSINESS':
                 gloss_rough += 1
                 gloss_node = node
@@ -1504,7 +1533,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         uvmap     = None
         reroute   = None
         has_uvmap = False
-        
+
         mu_prefs = materialutilities_get_preferences(bpy.context)
 
         if engine == 'CYCLES':
@@ -1574,7 +1603,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 if uvmap is not None:
                     uvmap.location.x   -= offs_x2
                     reroute.location.x -= offs_x2
-                
+
                 for node in added_nodes:
                     if node.name == 'MUAddedGLOSSINESS' or not node.outputs[0].is_linked:
                         if node.name == 'MUAddedAO':
@@ -1586,7 +1615,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                                 nodes['MUAddedInvertNode'].location = node.location
                                 nodes['MUAddedInvertNode'].location.x += offs_x2
                                 nodes['MUAddedInvertNode'].location.y -= 20
-                        
+
                         continue
                     if node.name in ['MUAddedDISPLACEMENT', 'MUAddedBUMP', 'MUAddedNORMAL']:
                         continue
@@ -1621,7 +1650,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 if has_displace:
                     pos_t = mu_calc_node_location(first_node, displace_tex_node, None, engine, prefs=prefs, map='None')
                     pos_t[1] = pos_y
-                    
+
                     displace_tex_node.location = pos_t
                     nodes['MUAddedDisplacementNode'].location.y = first_node.location.y - 700
                     nodes['MUAddedDisplacementNode'].location.x = first_node.location.x
@@ -1714,7 +1743,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 y_offset = 0
                 for cs, nodetypes in colorspaces.items():
                     for nt, texnodes in nodetypes.items():
-                        cs_node = mu_add_octane_node('colorspace', name='MUAddedColorSpace_' + cs + '_' + nt, 
+                        cs_node = mu_add_octane_node('colorspace', name='MUAddedColorSpace_' + cs + '_' + nt,
                                                      label='ColorSpace - %s (%s)' % (cs, nt), nodes=nodes, prefs=prefs)
                         cs_node.location = mu_calc_node_location(first_node, cs_node, None, engine, map='_COLORSPACENODE', prefs=prefs, y_offset=y_offset)
                         cs_node.ocio_color_space_name = mu_get_ocio_colorspace(cs,nt)
@@ -1753,7 +1782,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     reroute_tr.location.x -= offs_x2
                 for cs_node in cs_nodes:
                     cs_node.location.x -= offs_x2
-                
+
                 for node in added_nodes:
                     if not node.outputs[0].is_linked:
                         if node.name == 'MUAddedAO':
@@ -1835,7 +1864,7 @@ def mu_replace_image_textures(self, prefs, directory = None, file_list = [], fil
     for file in files:
         filename = os.path.basename(file)
         filetype = mu_get_filetype(filename)
-        
+
         if filetype.type == 'NOT_IMG' or filetype.map == 'RENDER':
             print("Skipping: %s (%s / %s)" % (filename, filetype.type, filetype.map))
             continue

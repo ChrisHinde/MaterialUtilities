@@ -63,12 +63,25 @@ mu_height_map_option_enums = (
     ('BUMP', "As Bump", "Connect the Height map to Bump"),
     ('NC',   "Don't connect", "Add the map, but don't connect it to the node setup"),
 )
+mu_emission_map_option_enums = (
+    ('NODE',  "Use Texture Emission Node", "Connect the Emission map to the Emission input via an Texture Emission node\n" +
+                                        " NB: Emission color will be set to 100% white, and Emission weight to 1.0"),
+    ('COLOR', "Connect to Emission color", "Connect the Emission map to the Emission color input directly\n NB: Emission weight will be set to 1.0"),
+    ('NC',    "Don't connect", "Add the map, but don't connect it to the node setup")
+)
+mu_octane_std_material_enums = (
+    ('UNIVERSAL', "Universal Material", "Use Octane Universal Material"),
+    ('STD_SURF',  "Standard Surface Material", "Use the (Autodesk) Standard Surfaco Material")
+)
 
 mu_supported_engines = ['CYCLES', 'BLENDER_EEVEE', 'octane']
 
 mu_default_shader_nodes = {
     'CYCLES': 'ShaderNodeBsdfPrincipled',
-    'OCTANE': 'OctaneUniversalMaterial'
+    'OCTANE': {
+        '_DEFAULT':  'OctaneUniversalMaterial',
+        'UNIVERSAL': 'OctaneUniversalMaterial',
+        'STD_SURF':  'OctaneStandardSurfaceMaterial'}
 }
 
 mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
@@ -201,10 +214,11 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'BUMP': 1650, 'NORMAL': 2000,
                 'HEIGHT': 2350, 'DISPLACEMENT': 2350,
                 'EMISSION': 2700,
+                
                 '_TRANSFORM': 500, '_TRANSFORMREROUTE': 533,
                 '_UVNODE': 710, '_UVREROUTE': 743,
                 '_COLORSPACENODE': 850,
-                'UNKNOWN': -500,
+                'UNKNOWN': -1500,
 
                 # 'AO': -240, 'REFLECTION': -320,
                 # 'ALPHA': -160, 'MASK': -80,
@@ -216,6 +230,23 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 # 'HEIGHT': 1670, 'DISPLACEMENT': 1670,
                 # 'UNKNOWN': -500,
                 # '_UVNODE': 1000, '_UVREROUTE': 1000,
+            },
+            'OctaneStandardSurfaceMaterial': {
+                'AO': -800, 'REFLECTION': -1000,
+                'DIFFUSE': -450, 'ALBEDO': -450, 'COLOR': -450,
+                'METALNESS': -100,
+                'SPECULAR': 250,
+                'ROUGHNESS': 600, 'GLOSSINESS': 600,
+                'TRANSMISSION': 950,
+                'EMISSION': 1300,
+                'BUMP': 1650, 'NORMAL': 2000,
+                'HEIGHT': 2350, 'DISPLACEMENT': 2350,
+                'ALPHA': 2700, 'MASK': 2700,
+
+                '_TRANSFORM': 500, '_TRANSFORMREROUTE': 533,
+                '_UVNODE': 710, '_UVREROUTE': 743,
+                '_COLORSPACENODE': 850,
+                'UNKNOWN': -1500,
             },
             'FAUX': {
                 'AO': -300, 'REFLECTION': -400, 'ALPHA': -200, 'MASK': -100,
@@ -243,6 +274,24 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'HEIGHT': 1189, 'DISPLACEMENT': 1189,
                 'EMISSION': 1275,
                 'UNKNOWN': -500,
+
+                '_UVNODE': 650, '_UVREROUTE': 660,
+                '_TRANSFORM': 610, '_TRANSFORMREROUTE': 620,
+                '_COLORSPACENODE': 730,
+            },
+            'OctaneStandardSurfaceMaterial': {
+                'AO': -100, 'REFLECTION': -200,
+                'DIFFUSE': 40, 'ALBEDO': 40, 'COLOR': 40,
+                'SPECULAR': 186, 'METALNESS': 113,
+                'ROUGHNESS': 259, 'GLOSSINESS': 259,
+                'TRANSMISSION': 332,
+
+                'ALPHA': 1250, 'MASK': 1250,
+                'BUMP': 1043, 'NORMAL': 1116,
+                'HEIGHT': 1185, 'DISPLACEMENT': 1185,
+                'EMISSION': 955,
+                'UNKNOWN': -500,
+
                 '_UVNODE': 650, '_UVREROUTE': 660,
                 '_TRANSFORM': 610, '_TRANSFORMREROUTE': 620,
                 '_COLORSPACENODE': 730,
@@ -329,6 +378,18 @@ mu_node_inputs = { # input <-> output mappings for adding nodes to the shader no
             'ALPHA': 'Opacity', 'MASK': 'Opacity',                       # Currently treating Alpha and Mask as the same thing
             'TRANSMISSION': 'Transmission',
             'EMISSION': 'Emission',
+        },
+        'OctaneStandardSurfaceMaterial': {
+            'AO': None, 'REFLECTION': None,                              # NOT AUTOMATICALLY CONNECTED TO NODE
+            'HEIGHT': None,                                              # Not connected to shader node
+            'DIFFUSE': 'Base color', 'ALBEDO': 'Base color', 'COLOR': 'Base color',  # Treating Albedo/Diffuse/Color as the same
+            'ROUGHNESS': 'Specular roughness', 'GLOSSINESS': 'Specular roughness',     # Same input, but different values
+            'SPECULAR': 'Specular color',
+            'METALNESS': 'Metalness',
+            'BUMP': 'Bump', 'NORMAL': 'Normal', 'DISPLACEMENT': 'Displacement',
+            'ALPHA': 'Opacity', 'MASK': 'Opacity',                       # Currently treating Alpha and Mask as the same thing
+            'TRANSMISSION': 'Transmission color',
+            'EMISSION': 'Emission', 'EMISSION_COLOR': 'Emission color',
         },
         'FAUX': {
             'AO': None, 'REFLECTION': None, 'ALPHA': None, 'MASK': None,
