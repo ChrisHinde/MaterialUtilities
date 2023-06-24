@@ -45,22 +45,26 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
             name = 'Show Dialog',
             default = False
             )
-
     @classmethod
     def poll(cls, context):
         return context.active_object is not None
 
     def invoke(self, context, event):
+        if event.shift or event.ctrl:
+            return bpy.ops.view3d.materialutilities_assign_pbr_material('INVOKE_DEFAULT')
         if self.show_dialog:
             return context.window_manager.invoke_props_dialog(self)
         else:
             return self.execute(context)
 
     def draw(self, context):
+        mu_prefs = materialutilities_get_preferences(context)
+        factor = 0.85 if mu_prefs.add_pbr_import_to_assign_dlg else 0.9
+
         layout = self.layout
 
         col = layout.column()
-        row = col.split(factor = 0.9, align = True)
+        row = col.split(factor=factor, align=True)
 
         if self.new_material:
             row.prop(self, "material_name")
@@ -68,6 +72,9 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
             row.prop_search(self, "material_name", bpy.data, "materials")
 
         row.prop(self, "new_material", expand = True, icon = 'ADD')
+
+        if mu_prefs.add_pbr_import_to_assign_dlg:
+            row.operator(VIEW3D_OT_materialutilities_assign_pbr_material.bl_idname, text="", icon='FILE_IMAGE')
 
     def execute(self, context):
         material_name = self.material_name
@@ -102,7 +109,7 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
             )
     new_material: BoolProperty(
             name = '',
-            description = 'Add a new material, enter the name in the box',
+            description = 'Add a new material\nEnter a name for the new material in the box',
             default = False
             )
     show_dialog: BoolProperty(
@@ -115,16 +122,21 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
         return len(context.selected_editable_objects) > 0
 
     def invoke(self, context, event):
+        if event.shift or event.ctrl:
+            return bpy.ops.view3d.materialutilities_assign_pbr_material('INVOKE_DEFAULT')
         if self.show_dialog:
             return context.window_manager.invoke_props_dialog(self)
         else:
             return self.execute(context)
 
     def draw(self, context):
+        mu_prefs = materialutilities_get_preferences(context)
+        factor = 0.85 if mu_prefs.add_pbr_import_to_assign_dlg else 0.9
+
         layout = self.layout
 
         col = layout.column()
-        row = col.split(factor=0.9, align = True)
+        row = col.split(factor=factor, align = True)
 
         if self.new_material:
             row.prop(self, "material_name")
@@ -132,6 +144,9 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
             row.prop_search(self, "material_name", bpy.data, "materials")
 
         row.prop(self, "new_material", expand = True, icon = 'ADD')
+
+        if mu_prefs.add_pbr_import_to_assign_dlg:
+            row.operator(VIEW3D_OT_materialutilities_assign_pbr_material.bl_idname, text="", icon='FILE_IMAGE')
 
         layout.prop(self, "override_type")
 

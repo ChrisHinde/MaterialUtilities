@@ -114,6 +114,11 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
     )
 
     # Preferences for texture import
+    add_pbr_import_to_assign_dlg: BoolProperty(
+        name = "Add to Assign Material dialog (in the 3D viewport)",
+        description = "Add 'Assign PBR Material' to the 'Assign Material' popup dialog",
+        default = False
+    )
     tex_texture_directory: EnumProperty(
         name = "Texture directory",
         description = "Default directory for loading PBR textures",
@@ -320,7 +325,8 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
             layout.separator()
 
             col = mu_ui_col_split(layout)
-            col.prop(self, 'tex_add_to_editor_header', expand = False)
+            col.prop(self, 'tex_add_to_editor_header',     expand = False)
+            col.prop(self, 'add_pbr_import_to_assign_dlg', expand = False)
 
             layout.separator()
 
