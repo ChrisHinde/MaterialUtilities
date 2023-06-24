@@ -214,10 +214,10 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'BUMP': 1650, 'NORMAL': 2000,
                 'HEIGHT': 2350, 'DISPLACEMENT': 2350,
                 'EMISSION': 2700,
-                
-                '_TRANSFORM': 500, '_TRANSFORMREROUTE': 533,
-                '_UVNODE': 710, '_UVREROUTE': 743,
-                '_COLORSPACENODE': 850,
+
+                '_TRANSFORM': 750, '_TRANSFORMREROUTE': 783,
+                '_UVNODE': 980, '_UVREROUTE': 1013,
+                '_COLORSPACENODE': 450,
                 'UNKNOWN': -1500,
 
                 # 'AO': -240, 'REFLECTION': -320,
@@ -243,9 +243,9 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'HEIGHT': 2350, 'DISPLACEMENT': 2350,
                 'ALPHA': 2700, 'MASK': 2700,
 
-                '_TRANSFORM': 500, '_TRANSFORMREROUTE': 533,
-                '_UVNODE': 710, '_UVREROUTE': 743,
-                '_COLORSPACENODE': 850,
+                '_TRANSFORM': 750, '_TRANSFORMREROUTE': 783,
+                '_UVNODE': 980, '_UVREROUTE': 1013,
+                '_COLORSPACENODE': 450,
                 'UNKNOWN': -1500,
             },
             'FAUX': {
@@ -275,9 +275,9 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'EMISSION': 1275,
                 'UNKNOWN': -300,
 
-                '_UVNODE': 650, '_UVREROUTE': 660,
-                '_TRANSFORM': 610, '_TRANSFORMREROUTE': 620,
-                '_COLORSPACENODE': 730,
+                '_UVNODE': 750, '_UVREROUTE': 760,
+                '_TRANSFORM': 710, '_TRANSFORMREROUTE': 720,
+                '_COLORSPACENODE': 500,
             },
             'OctaneStandardSurfaceMaterial': {
                 'AO': -100, 'REFLECTION': -300,
@@ -292,9 +292,9 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'EMISSION': 955,
                 'UNKNOWN': -200,
 
-                '_UVNODE': 650, '_UVREROUTE': 660,
-                '_TRANSFORM': 610, '_TRANSFORMREROUTE': 620,
-                '_COLORSPACENODE': 730,
+                '_UVNODE': 750, '_UVREROUTE': 760,
+                '_TRANSFORM': 710, '_TRANSFORMREROUTE': 720,
+                '_COLORSPACENODE': 500,
             },
             'FAUX': {
                 'AO': -240, 'REFLECTION': -320, 'ALPHA': -160, 'MASK': -80,

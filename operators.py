@@ -1150,6 +1150,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     reflection_as_specular = self.reflection_as_specular,
                                     add_colorspace  = self.add_colorspaces,
                                     stairstep       = self.stair_step,
+                                    align_nodes     = True,
                                     new_material    = self.add_material,
                                     material_name   = self.material_name,
                                     override_type   = override_type,
