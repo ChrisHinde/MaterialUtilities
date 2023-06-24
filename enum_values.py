@@ -273,14 +273,14 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'BUMP': 1043, 'NORMAL': 1116,
                 'HEIGHT': 1189, 'DISPLACEMENT': 1189,
                 'EMISSION': 1275,
-                'UNKNOWN': -500,
+                'UNKNOWN': -300,
 
                 '_UVNODE': 650, '_UVREROUTE': 660,
                 '_TRANSFORM': 610, '_TRANSFORMREROUTE': 620,
                 '_COLORSPACENODE': 730,
             },
             'OctaneStandardSurfaceMaterial': {
-                'AO': -100, 'REFLECTION': -200,
+                'AO': -100, 'REFLECTION': -300,
                 'DIFFUSE': 40, 'ALBEDO': 40, 'COLOR': 40,
                 'SPECULAR': 186, 'METALNESS': 113,
                 'ROUGHNESS': 259, 'GLOSSINESS': 259,
@@ -290,7 +290,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'BUMP': 1043, 'NORMAL': 1116,
                 'HEIGHT': 1185, 'DISPLACEMENT': 1185,
                 'EMISSION': 955,
-                'UNKNOWN': -500,
+                'UNKNOWN': -200,
 
                 '_UVNODE': 650, '_UVREROUTE': 660,
                 '_TRANSFORM': 610, '_TRANSFORMREROUTE': 620,

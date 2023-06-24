@@ -909,7 +909,7 @@ def mu_get_filetype(filename):
     if 'albedo' in filename:
         texture_map = 'ALBEDO'
         has_alpha = True
-    elif 'diffuse' in filename:
+    elif 'diff' in filename:
         texture_map = 'DIFFUSE'
         has_alpha = True
     elif 'ao' in filename or 'occlusion' in filename:
