@@ -1072,11 +1072,11 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             col = mu_ui_col_split(box)
             col.prop(self, 'reflection_as_specular')
             col.label(text = "Height Map Treatment")
-            col.prop(self, 'height_map_option', text = "")
+            mu_ui_col_split(col).prop(self, 'height_map_option', text = "")
 
             if self.material_node_type == 'STD_SURF':
                 col.label(text = "Emission map treatment")
-                col.prop(self, 'emission_map_option', text = "")
+                mu_ui_col_split(col).prop(self, 'emission_map_option', text = "")
 
             if self.add_material:
                 box = layout.box()
@@ -1085,14 +1085,14 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
 
                 if context.active_object.mode == 'OBJECT':
                     col.label(text = "Assignment Method")
-                    col.prop(self, 'override_type', text = "")
+                    mu_ui_col_split(col).prop(self, 'override_type', text = "")
 
                 if bpy.data.scenes['Scene'].render.engine == 'octane':
                     col.label(text = "Material Node Type")
-                    col.prop(self, 'material_node_type', text = "")
+                    mu_ui_col_split(col).prop(self, 'material_node_type', text = "")
 
                 col.label(text = "Material Name")
-                col.prop(self, 'material_name', text = "")
+                mu_ui_col_split(col).prop(self, 'material_name', text = "")
 
     def _invoke(self, context, event):
         mu_prefs = materialutilities_get_preferences(context)
