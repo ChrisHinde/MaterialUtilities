@@ -879,6 +879,7 @@ def mu_get_filetype(filename):
     texture_map = 'UNKNOWN'
     non_color = False
     has_alpha = False
+    tagged_alpha = False
     is_greyscale = False
 
     if ext == 'jpg' or ext == 'jpeg':
@@ -969,6 +970,10 @@ def mu_get_filetype(filename):
     elif 'render' in filename or 'sample' in filename:
         texture_map = 'RENDER'
 
+    if 'walpha' in filename or 'withalpha' in filename or 'with_alpha' in filename:
+        has_alpha = True
+        tagged_alpha = True
+
     if override_colorspace:
         if 'filmic' in filename:
             colorspace = 'FILMIC_LOG' if 'log' in filename else 'FILMIC_sRGB'
@@ -982,7 +987,8 @@ def mu_get_filetype(filename):
             colorspace = 'sRGB'
 
     return SimpleNamespace(type=type, colorspace=colorspace, map=texture_map, orig_map=texture_map,
-                           override_colorspace=override_colorspace, non_color=non_color, is_greyscale=is_greyscale, has_alpha=has_alpha)
+                           override_colorspace=override_colorspace, non_color=non_color, is_greyscale=is_greyscale,
+                           has_alpha=has_alpha, tagged_alpha=tagged_alpha)
 
 def mu_faux_shader_node(out_node):
     """Create a 'faux shader', to be used instead of an existing shader node"""
@@ -1168,7 +1174,7 @@ def mu_add_image_texture(filename, filetype, prefs,
                          out_node = None, first_node = None, engine = ''):
     """Add an image texture to the material node tree, and (if selected) try to connect it up"""
 
-    x_offset = 300
+    x_offset = 300 if prefs.x_offset is None else prefs.x_offset
 
     try:
         img = bpy.data.images.load(filename)
@@ -1182,6 +1188,7 @@ def mu_add_image_texture(filename, filetype, prefs,
 
         name = 'MUAdded' + filetype.map
         node.name = name
+        node.image = img
         if prefs.set_label:
             node.label = filetype.orig_map
         if prefs.collapse_texture_nodes:
@@ -1231,12 +1238,11 @@ def mu_add_image_texture(filename, filetype, prefs,
             else:
                 print("Material Utilities - No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname))
 
-            if filetype.has_alpha and prefs.connect_alpha:
+            if prefs.connect_alpha and filetype.has_alpha:
                 input = mu_node_inputs[engine][first_node.bl_idname]['ALPHA']
                 if input is not None:
                     links.new(node.outputs['Alpha'], first_node.inputs[input])
 
-            node.image = img
     elif engine == 'OCTANE':
         node = mu_add_octane_node('image', filetype=filetype, nodes=nodes, prefs=prefs, name='_MAP')
         node.image = img
@@ -1513,6 +1519,18 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     colorspaces[filetype.colorspace][color] = []
 
                 colorspaces[filetype.colorspace][color].append(node)
+
+                if prefs.connect_alpha and filetype.tagged_alpha:
+                    alpha_node = mu_add_octane_node('alpha_image', nodes=nodes, prefs=prefs, name='MUAddedAlphaImageNode')
+                    alpha_node.image = node.image
+                    alpha_node.location = mu_calc_node_location(first_node, node, None, engine, x_offset=prefs.x_offset, prefs=prefs, map='ALPHA')
+
+                    alpha_input = mu_node_inputs[engine][first_node.bl_idname]['ALPHA']
+                    if alpha_input is not None:
+                        links.new(alpha_node.outputs[0], first_node.inputs[alpha_input])
+
+                    colorspaces[filetype.colorspace][color].append(alpha_node)
+                    added_nodes.append(alpha_node)
 
             added_nodes.append(node)
         except NameError as err:

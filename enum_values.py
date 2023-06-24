@@ -286,10 +286,10 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'ROUGHNESS': 259, 'GLOSSINESS': 259,
                 'TRANSMISSION': 332,
 
-                'ALPHA': 1250, 'MASK': 1250,
+                'EMISSION': 955,
                 'BUMP': 1043, 'NORMAL': 1116,
                 'HEIGHT': 1185, 'DISPLACEMENT': 1185,
-                'EMISSION': 955,
+                'ALPHA': 1250, 'MASK': 1250,
                 'UNKNOWN': -200,
 
                 '_UVNODE': 750, '_UVREROUTE': 760,

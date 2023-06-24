@@ -1158,6 +1158,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     emission_option = self.emission_map_option,
                                     pos_group       = 'COL' if self.collapse_texture_nodes else 'EXP',
                                     gamma           = 1.0,
+                                    x_offset        = 300,
                                     context         = context
                                     )
 
