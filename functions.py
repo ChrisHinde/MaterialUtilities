@@ -913,10 +913,6 @@ def mu_get_filetype(filename):
     elif 'diff' in filename:
         texture_map = 'DIFFUSE'
         has_alpha = True
-    elif 'ao' in filename or 'occlusion' in filename:
-        texture_map = 'AO'
-        non_color = True
-        is_greyscale = True
     elif 'rough' in filename:
         texture_map = 'ROUGHNESS'
         non_color = True
@@ -967,6 +963,10 @@ def mu_get_filetype(filename):
         texture_map = 'TRANSMISSION'
     elif 'emission' in filename:
         texture_map = 'EMISSION'
+    elif 'ao' in filename or 'occlusion' in filename:
+        texture_map = 'AO'
+        non_color = True
+        is_greyscale = True
     elif 'render' in filename or 'sample' in filename:
         texture_map = 'RENDER'
 
