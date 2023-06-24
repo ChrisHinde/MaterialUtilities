@@ -1589,7 +1589,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             for node in added_nodes:
                 links.new(reroute.outputs['Output'], node.inputs['Vector'])
 
-            if prefs.stairstep and not prefs.pos_group == 'COL':
+            if prefs.align_nodes and not prefs.pos_group == 'COL':
                 from operator import attrgetter
                 added_nodes.sort(key=attrgetter('location.y'), reverse=True)
                 pos_y = first_node.location.y
@@ -1598,7 +1598,13 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 offs_x1 = 250
                 offs_x2 = 300
                 offs_x3 = offs_x1 * 2
+                offs_x4 = 200
                 odd = True
+
+                if not prefs.stairstep:
+                    offs_x1 = 0
+                    offs_y1 += offs_y2
+                    offs_y2 = offs_y1 
 
                 if uvmap is not None:
                     uvmap.location.x   -= offs_x2
@@ -1627,23 +1633,6 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     else:
                         pos_y -= offs_y2
                         node.location.x -= offs_x1
-
-                    # if node.name in ['MUAddedDISPLACEMENT', 'MUAddedBUMP', 'MUAddedNORMAL']:
-                    #     if node.name == 'MUAddedDISPLACEMENT':
-                    #         nid = 'MUAddedDisplacementNode'
-                    #     elif node.name == 'MUAddedBUMP':
-                    #         nid = 'MUAddedBumpNode'
-                    #     elif node.name == 'MUAddedNORMAL':
-                    #         nid = 'MUAddedNormalMapNode'
-                    #     pos_t = mu_calc_node_location(first_node, node, None, engine, prefs=prefs, map='None')
-                    #     node.location.x = pos_t[0]
-                    #     nodes[nid].location = node.location
-                    #     if odd:
-                    #         print("ODD")
-                    #         node.location.x -= offs_x3
-                    #     else:
-                    #         print("EVEN")
-                    #         node.location.x -= offs_x3
 
                     odd = not odd
 
@@ -1688,8 +1677,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     normal_node.location = pos_t
                     normal_node.location.y = pos_y
                     if has_bump:
-                        normal_node.location.x -= offs_x1
-
+                        normal_node.location.x -= offs_x4
 
         elif engine == 'OCTANE':
             transform  = None
@@ -1763,7 +1751,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 links.new(reroute.outputs['Output'], node.inputs['Projection'])
                 links.new(reroute_tr.outputs['Output'], node.inputs['UV transform'])
 
-            if prefs.stairstep and not prefs.pos_group == 'COL':
+            if prefs.align_nodes and not prefs.pos_group == 'COL':
                 from operator import attrgetter
                 added_nodes.sort(key=attrgetter('location.y'), reverse=True)
                 pos_y = first_node.location.y
@@ -1773,6 +1761,11 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 offs_x2 = 300
                 offs_x3 = offs_x1 * 2
                 odd = True
+
+                if not prefs.stairstep:
+                    offs_x1 = 0
+                    offs_y1 += offs_y2
+                    offs_y2 = offs_y1 
 
                 if uvmap is not None:
                     uvmap.location.x   -= offs_x2
