@@ -1494,10 +1494,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                                         out_node=out_node, first_node=first_node, engine=engine)
 
             if filetype.map == 'GLOSSINESS':
-                gloss_rough += 1
                 gloss_node = node
             if filetype.map == 'ROUGHNESS':
-                gloss_rough += 1
                 rough_node = node
 
             if engine == 'CYCLES':
@@ -1536,7 +1534,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         except NameError as err:
             self.report({'WARNING'}, str(err))
 
-    if gloss_rough > 1:
+    if gloss_node is not None and rough_node is not None:
         connected = "one"
         if rough_node.outputs[0].is_linked:
             gloss_node.location.x -= 150
