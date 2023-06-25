@@ -881,94 +881,63 @@ def mu_get_filetype(filename):
     has_alpha = False
     tagged_alpha = False
     is_greyscale = False
+    ignore = False
+    invert = False
 
-    if ext == 'jpg' or ext == 'jpeg':
-        type = 'JPG'
-        colorspace = 'sRGB'
-        override_colorspace = False
-    elif ext == 'png':
-        type = 'PNG'
-        colorspace = 'sRGB'
-        override_colorspace = False
-    elif ext == 'exr':
-        type = 'EXR'
-        colorspace = 'LINEAR'
-        override_colorspace = True
-    elif ext == 'hdr':
-        type = 'HDR'
-        colorspace = 'LINEAR'
-        override_colorspace = True
-    elif ext == 'tif' or ext == 'tiff':
-        type = 'TIF'
-        colorspace = 'LINEAR'
-        override_colorspace = True
-    elif ext == 'tga':
-        type = 'TGA'
-        colorspace = 'LINEAR'
-        override_colorspace = True
+    if ext == 'jpeg':
+        ext = 'jpg'
+    elif ext == 'tiff':
+        ext = 'tif'
+
+    if ext.upper() in mu_file_types:
+        type = ext.upper()
+        colorspace = mu_file_types[type]['colorspace']
+        override_colorspace = mu_file_types[type]['override_colorspace']
 
     if 'albedo' in filename:
         texture_map = 'ALBEDO'
-        has_alpha = True
     elif 'diff' in filename:
         texture_map = 'DIFFUSE'
-        has_alpha = True
     elif 'rough' in filename:
         texture_map = 'ROUGHNESS'
-        non_color = True
-        is_greyscale = True
     elif 'gloss' in filename:
         texture_map = 'GLOSSINESS'
-        non_color = True
-        is_greyscale = True
     elif 'spec' in filename:
         texture_map = 'SPECULAR'
-        non_color = True
-        is_greyscale = True
     elif 'refl' in filename:
         texture_map = 'REFLECTION'
-        non_color = True
-        is_greyscale = True
     elif 'metal' in filename:
         texture_map = 'METALNESS'
-        non_color = True
-        is_greyscale = True
     elif 'height' in filename:
         texture_map = 'HEIGHT'
-        non_color = True
-        is_greyscale = True
     elif 'disp' in filename or 'dsp' in filename:
         texture_map = 'DISPLACEMENT'
-        non_color = True
-        is_greyscale = True
     elif 'bump' in filename or 'bmp' in filename:
         texture_map = 'BUMP'
-        non_color = True
-        is_greyscale = True
     elif 'nor' in filename or 'nrm' in filename:
         texture_map = 'NORMAL'
-        non_color = True
     elif 'col' in filename or 'base' in filename:
         texture_map = 'COLOR'
-        has_alpha = True
     elif 'alpha' in filename or 'opacity' in filename or 'transparent' in filename:
         texture_map = 'ALPHA'
-        non_color = True
-        is_greyscale = True
     elif 'mask' in filename:
         texture_map = 'MASK'
-        non_color = True
-        is_greyscale = True
     elif 'trans' in filename:
         texture_map = 'TRANSMISSION'
     elif 'emission' in filename:
         texture_map = 'EMISSION'
     elif 'ao' in filename or 'occlusion' in filename:
         texture_map = 'AO'
-        non_color = True
-        is_greyscale = True
     elif 'render' in filename or 'sample' in filename:
         texture_map = 'RENDER'
+
+    if texture_map in mu_texture_map_options:
+        ignore = mu_texture_map_options[texture_map]['ignore'] if 'ignore' in mu_texture_map_options[texture_map] else False
+        if not ignore:
+            invert = mu_texture_map_options[texture_map]['invert'] if 'invert' in mu_texture_map_options[texture_map] else False
+            has_alpha = mu_texture_map_options[texture_map]['has_alpha']
+            non_color = mu_texture_map_options[texture_map]['non_color']
+            is_greyscale = mu_texture_map_options[texture_map]['is_greyscale']
 
     if 'walpha' in filename or 'withalpha' in filename or 'with_alpha' in filename:
         has_alpha = True
@@ -988,7 +957,7 @@ def mu_get_filetype(filename):
 
     return SimpleNamespace(type=type, colorspace=colorspace, map=texture_map, orig_map=texture_map,
                            override_colorspace=override_colorspace, non_color=non_color, is_greyscale=is_greyscale,
-                           has_alpha=has_alpha, tagged_alpha=tagged_alpha)
+                           has_alpha=has_alpha, tagged_alpha=tagged_alpha, ignore=ignore, invert=invert)
 
 def mu_faux_shader_node(out_node):
     """Create a 'faux shader', to be used instead of an existing shader node"""
@@ -1164,7 +1133,7 @@ def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[], name=None, lab
         else:
             node.inputs['Legacy gamma'].default_value = prefs.gamma
 
-        if filetype.map == 'GLOSSINESS':
+        if filetype.invert:
             node.inputs['Invert'].default_value = True
 
     return node
@@ -1217,7 +1186,7 @@ def mu_add_image_texture(filename, filetype, prefs,
                 links.new(node.outputs['Color'], nrm_node.inputs[i])
                 link_node = nrm_node
                 #links.new(nrm_node.outputs[0], first_node.inputs[input])
-            elif filetype.map == 'GLOSSINESS':
+            elif filetype.invert: # map == 'GLOSSINESS':
                 inv_node = nodes.new('ShaderNodeInvert')
                 inv_node.name = 'MUAddedInvertNode'
                 inv_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_INVERT', prefs=prefs)
@@ -1426,7 +1395,6 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     has_bump    = False
     has_normal  = False
-    gloss_rough = 0
     gloss_node  = None
     rough_node  = None
     has_displace    = False
@@ -1478,7 +1446,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         filename = os.path.basename(file)
         filetype = mu_get_filetype(filename)
 
-        if filetype.type == 'NOT_IMG' or filetype.map == 'RENDER':
+        if filetype.type == 'NOT_IMG' or filetype.ignore:
             print("Skipping: %s (%s / %s)" % (filename, filetype.type, filetype.map))
             continue
 
@@ -1628,15 +1596,14 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
                 for node in added_nodes:
                     if node.name == 'MUAddedGLOSSINESS' or not node.outputs[0].is_linked:
-                        if node.name == 'MUAddedAO':
-                            node.location.y = first_node.location.y + offs_y1 + offs_y2
-                        elif node.name == 'MUAddedGLOSSINESS' or node.name == 'MUAddedROUGHNESS':
+                        if node.name == 'MUAddedGLOSSINESS' or node.name == 'MUAddedROUGHNESS':
                             node.location.x -= offs_x2
                             node.location.y = first_node.location.y + offs_y1 + offs_y2
                             if node.name == 'MUAddedGLOSSINESS':
-                                nodes['MUAddedInvertNode'].location = node.location
-                                nodes['MUAddedInvertNode'].location.x += offs_x2
-                                nodes['MUAddedInvertNode'].location.y -= 20
+                                inv_node = node.outputs[0].links[0].to_node
+                                inv_node.location = node.location
+                                inv_node.location.x += offs_x2
+                                inv_node.location.y -= 20
 
                         continue
                     if node.name in ['MUAddedDISPLACEMENT', 'MUAddedBUMP', 'MUAddedNORMAL']:

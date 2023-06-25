@@ -74,7 +74,7 @@ mu_octane_std_material_enums = (
     ('STD_SURF',  "Standard Surface Material", "Use the (Autodesk) Standard Surfaco Material")
 )
 
-mu_supported_engines = ['CYCLES', 'BLENDER_EEVEE', 'octane']
+mu_supported_engines = ['CYCLES', 'BLENDER_EEVEE', 'octane'] # Octane is reported in all lower case, but MU will transform it to upper case for further use
 
 mu_default_shader_nodes = {
     'CYCLES': 'ShaderNodeBsdfPrincipled',
@@ -82,6 +82,124 @@ mu_default_shader_nodes = {
         '_DEFAULT':  'OctaneUniversalMaterial',
         'UNIVERSAL': 'OctaneUniversalMaterial',
         'STD_SURF':  'OctaneStandardSurfaceMaterial'}
+}
+
+mu_file_types = {
+    'JPG': {
+        'colorspace': 'sRGB',
+        'override_colorspace': False
+    },
+    'PNG': {
+        'colorspace': 'sRGB',
+        'override_colorspace': False
+    },
+    'EXR': {
+        'colorspace': 'LINEAR',
+        'override_colorspace': False
+    },
+    'HDR': {
+        'colorspace': 'LINEAR',
+        'override_colorspace': False
+    },
+    'TIF': {
+        'colorspace': 'LINEAR',
+        'override_colorspace': False
+    },
+    'TGA': {
+        'colorspace': 'LINEAR',
+        'override_colorspace': False
+    }
+}
+mu_texture_map_options = {
+    'ALBEDO': {
+        'has_alpha': True,
+        'is_greyscale': False,
+        'non_color': False
+    },
+    'DIFFUSE': {
+        'has_alpha': True,
+        'is_greyscale': False,
+        'non_color': False
+    },
+    'COLOR': {
+        'has_alpha': True,
+        'is_greyscale': False,
+        'non_color': False
+    },
+    'ROUGHNESS': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'GLOSSINESS': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True,
+        'invert': True
+    },
+    'SPECULAR': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'REFLECTION ': {
+        'has_alpha': False,
+        'is_greyscale': False,
+        'non_color': False
+    },
+    'METALNESS': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'HEIGHT': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'DISPLACEMENT': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'BUMP': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'NORMAL': {
+        'has_alpha': False,
+        'is_greyscale': False,
+        'non_color': True
+    },
+    'ALPHA': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'MASK': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'TRANSMISSION': {
+        'has_alpha': False,
+        'is_greyscale': False,
+        'non_color': False
+    },
+    'EMISSION': {
+        'has_alpha': False,
+        'is_greyscale': False,
+        'non_color': False
+    },
+    'AO': {
+        'has_alpha': False,
+        'is_greyscale': True,
+        'non_color': True
+    },
+    'RENDER': {
+        'ignore': True
+    },
 }
 
 mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
@@ -403,6 +521,7 @@ mu_node_inputs = { # input <-> output mappings for adding nodes to the shader no
         }
     }
 }
+
 mu_ocio_colorspace_map = {
     '_DEFAULT': 'sRGB',
     'sRGB': {
