@@ -988,7 +988,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             default = True,
             )
     add_colorspaces: BoolProperty(
-            name = "Add Color Spaces",
+            name = "Add Color spaces",
             description = "Add appropriate Color space nodes",
             default = True,
             )
@@ -1172,7 +1172,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     mat_node_type   = self.material_node_type,
                                     emission_option = self.emission_map_option,
                                     pos_group       = 'COL' if self.collapse_texture_nodes else 'EXP',
-                                    gamma           = 1.0,
+                                    gamma           = 2.2,
                                     x_offset        = 300,
                                     context         = context
                                     )
