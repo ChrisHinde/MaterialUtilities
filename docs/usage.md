@@ -18,7 +18,7 @@
     - [Remove Unused Materials](#remove-unused-materials)
     - [Set Auto Smooth](#set-auto-smooth)
 - [Material Specials Menu](#material-specials-menu)
-- [Prefences](#preferences)
+- [Preferences](#preferences)
 
 ## Popup menu
 
@@ -33,20 +33,23 @@ You can set the defaults of several options, such as the default name for new ma
 ### Assign Material
 
 Gives you a list of all available materials (including the option to create a new material).\
-Assigns the material you choose to the current selection.\
-Add the top of the menu you have options to Add a new material and "Search" for a material
+It will assign the material you choose to the current selection.
+At the top of the menu you have options to Add a new material or "Search" for an existing material \
 (you can change when this appears in the preferences),
 which can be useful if you have a lot of materials in your project.
 Both of these will open the operator panel as a "dialog" in your viewport.\
-In the operator the `+` (plus) button to the right will let you add a new material.
-In Object Mode you have the option to select how the existing material (slots) should be treated
-(In Edit mode it will append the material if it's not already in a material slot).\
+The `+` (plus) toggle to the right, in the panel, will let you add a new (or search for an existing) material.\
 [![Material Assignment](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_AssignMat5-e1564786914277.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_AssignMat5.png)
+
+#### Assignment method
+
+In Object Mode you have the option to select what will happen to the existing material (slots), and where the new material should be placed.
+(In Edit mode the material will be appended if it's not already in a material slot).
 
 - **Override all assigned slots**\
 Will remove any material previously assigned to the object(s) and add the one you've chosen
 - **Assign material to currently selected slot**\
-Sets the material you choose to only the currently active material slot (in the Material Properties panel).
+Sets the material you choose to only the currently active material slot (in the *Material Properties* panel).
 It will leave the rest of the materials untouched.
 - **Assign material to each slot**\
 Keeps all the material slots, and their assignment to respective parts of the object.
@@ -60,7 +63,7 @@ and assigns the whole object to that material slot.\
 ### Select by Material
 
 Gives you a list of all available materials (in Edit mode it only shows the materials assigned to the object).\
-Selects all objects (in Object Mode) or faces (in Edit Mode) that have the material you choose.\
+When you choose a material all objects (in Object Mode) or faces (in Edit Mode),that have that material assigned, will be selected.\
 In the operator panel `[F9]` you can choose to extend your current selection, otherwise what was selected before will be unselected first.\
 [![Select By Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat_2-e1563064147331.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_SelectByMat_2.png)
 
@@ -74,8 +77,9 @@ In the operator panel `[F9]` you can choose to extend your current selection, ot
 ### Clean Slots
 
 - **Clean Material Slots**\
-Removes any material slots that isn't assigned to any part of the object
+Removes any material slots that aren't assigned to any part of the object
 - **Remove Active Slot** (Object Mode only)\
+Will remove the material slot that is currently selected.
 You can limit it to only the active object in the operator panel `[F9]`
 - **Remove All Material Slots** (Object Mode only)\
 Remove all material slots (and thus materials) assigned to the selected object(s).\
@@ -83,10 +87,10 @@ You can limit it to only the active object in the operator panel `[F9]`
 
 ### Replace Material
 
-Replace any occurence of one material, **Original**, with another material, **Replacement**.\
+Replace any occurrence of one material, **Original**, with another material, **Replacement**.\
 In the operator panel you can also choose if you want it done "globally" (for all objects in the file),
 or just for selected objects.\
-You can also choose to have the objects that were affected by the change selected (objects not affected will be deselcted).\
+You can also choose to have the objects that were affected by the change selected (objects not affected will be deselected).\
 [![Replace Material](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial_2-e1563065836955.png)](https://chris.hindefjord.se/wp-content/uploads/2019/07/MU_ReplaceMaterial_2.png)
 
 ### Replace Multiple Materials
@@ -99,7 +103,7 @@ Currently this uses text block(s) (one line per material name/substitute) for th
 1. Setup the list(s) in the text editor (or load it in from a text file).
     You have the option to use two text blocks (one for the materials that should be replaced, and one for the materials to replace with).
     Or you can use one text block, where each line contains both the material name and the material that it should be \
-    replaced with, separated by, at least, a tab or two spaces (to allow material names with [single] spcaes in them)
+    replaced with, separated by, at least, one tab or two spaces (to allow material names with [single] spaces in them)
 2. Go to **Replace Multiple Materials** in the Material Utilities menu
 3. Select the text blocks that have the materials list for **Original** and **Replacement**.
     If you only have one list that contains both the original material names and replacements, select that for \
@@ -110,24 +114,23 @@ Currently this uses text block(s) (one line per material name/substitute) for th
 
 ### Set Fake User
 
-Set the Fake User flag (to preserve unused materials) of the materials to either
-**On** or **Off**, or **Toggle** (on a per material basis) their current states.\
-You can limit the action to **Unused** materials (Default), **Used** materials, **All** materials,
+Set the *Fake User flag* (to preserve unused materials) of the materials to either
+**On** or **Off**, or **Toggle** their current states (on a per material basis).\
+You can limit the action to **Unused** materials (default), **Used** materials, **All** materials,
 materials of the **Selected** objects, of the **Active** object, of the **Active Collection**, of a **Selected Collection**, or of all objects in the current **Scene**.\
 [![Set Fake User](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetFakeUser_2-e1564786813579.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_SetFakeUser_2.png)
 
 ### Change Material Link
 
 Change how the material slots are linked, to either the **Data** (i.e. Mesh Data) or to the **Object**,
-or **Toggle** (on a per material basis) what they are currently are linked to.\
-You can limit the action to material slots of the **Selected** objects (Default), of the **Active** object,
+or **Toggle** what they are currently are linked to (on a per material basis).\
+You can limit the action to material slots of the **Selected** objects (default), of the **Active** object,
 of the **Active Collection**, of a **Selected Collection**, of all objects in the current **Scene**, or of **All** objects in the file.\
 When switching to *Linked to Object* the materials assigned the materials assigned to the slots will be kept intact.\
-When switching to *Linked to Data* there's a possibility that there's already an material assigned to the *Mesh Data*.\
+When switching to *Linked to Data* there's a possibility that there's already an material assigned to the mesh data.\
 If there is no material assigned to the data, the material of the object will be kept.\
-If there is an material assigned to the data, that material will be used by default, or you can force the use of the material assigned to the object, by enabling **Override Data Material** (Do note that this will affect all objects that share the same *Data* and have materials linked to the *Data*).\
+If there is an material assigned to the data, that material will be used by default, or you can force the use of the material assigned to the object, by enabling **Override Data Material** (Do note that this will affect all objects that share the same mesh data and have materials linked to the data).\
 If you enable **Unlink Material From Old Link** the material will be "unlinked" from what it was linked to before when the linking is changed.
-If it was linked to before the Link change.\
 [![Change Material Link](https://chris.hindefjord.se/wp-content/uploads/2020/08/MU_MaterialLink_20200801-e1596319891375.png)](https://chris.hindefjord.se/wp-content/uploads/2020/08/MU_MaterialLink_20200801.png)
 
 ### Specials
@@ -135,9 +138,9 @@ If it was linked to before the Link change.\
 #### Merge Base Names
 
 Finds materials such as `Material`, `Material.001`, `Material.002` and merges them into a single material (`Material`).\
-You can select a specific **Material Base Name** (such as `MyMaterial`) to find duplicates of (`MyMaterial.001` etc).\
+You can select a specific **Material Base Name** (such as `MyMaterial`) to find duplicates of (`MyMaterial.001` etc.).\
 By enabling **Auto Rename/Replace** it will find all materials that are "duplicates" and merge them into a single material.\
-**Do note** that this only keeps the base material (`MyMaterial`) and ignores the other versions (`MyMaterial.001` etc)\
+**Do note** that this only keeps the base material (`MyMaterial`) and ignores the other versions (`MyMaterial.001` etc.)\
 You can choose to give the material a new name after all the duplicates have been merged by "checking" the icon
 to the right of the material name (a box where you can enter the new name will appear).\
 
@@ -145,26 +148,26 @@ to the right of the material name (a box where you can enter the new name will a
 
 - **Patterns**\
     If you want to merge materials based on another pattern than the the default Blender way (such as `Material_001` instead of `Material.001`)
-    you can change the Pattern option to set a custom delimiter (eg. `.` `_` `,`) or define your own pattern with
+    you can change the Pattern option to set a custom delimiter (e.g. `.` `_` `,`) or define your own pattern with
     (Python style) Regular Expressions, you can use `%BASE_NAME` to indicate the base part of the name
-    (or just make sure it's a group, the operator expects one group matching the base name, eg `MyMaterial`, and a second group matching the suffix, eg. `042`)\
+    (or just make sure it's a group, the operator expects one group matching the base name, e.g `MyMaterial`, and a second group matching the suffix, e.g. `042`)\
     The default regular expression is `^%BASE_NAME\.(\d{1,3})$` which matches materials like `MyMaterial.003` as well as `MyMaterial.2` (The `%BASE_NAME` token just translates to `(.*)`).
 
 #### Join By Material
 
-This is the opposite of "Seperate By Material" in Edit mode.
+This is the opposite of "Separate By Material" in Edit mode.
 It finds objects that have the same material and join them together.\
 You can set a specific **Material**, where all objects that have that material will be joined.\
 Or you can choose to **Automatically Join**, where objects that share the same material will be joined (no matter what the material is).\
-If there's different types of objects (Mesh, Curves etc) that shares the same material,
+If there's different types of objects (Mesh, Curves etc.) that shares the same material,
 those will be joined according to their type.\
 **Do note** that if the objects have multiple materials, the resulting joins might not be as you predicted.\
 **Tip:** If you have objects that you don't want to be affected, you can hide them from the viewport first.\
 [![Join By Material](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial-e1564691922884.png)](https://chris.hindefjord.se/wp-content/uploads/2019/08/MU_JoinByMaterial.png)
 
-#### Assign New PBR Waterial
+#### Assign New PBR Material
 
-
+This function is detailed in the [PBR Texture Set Import documentation](pbr_import.md)
 
 #### Remove Unused Materials
 
@@ -201,12 +204,29 @@ And at the top two other options are added:
 
 ## Preferences
 
-In the Add-on Preferences (Go to the Prefences in Blender [Edit menu] and the `Add-ons` section, find the Material Utilities Add-on, either by searching or selecting the `Material` category) you have the options to change some settings for this Add-on.\
-The defaults section lets you set the default options (like the default material name when adding a new material)
-for several of the operators that is described above.\
-The `Show 'Search' Limit` lets you choose how many materials there should be before the `Search` option in the *Assign Material* and *Select By Material* menus. Set it to `0` (default) to always show `Search` in the menus. There is also an option to have the `Search` (and `Add new material`) appear at the bottom of the menus, given a certain numbers of materials.\
-For those cases where your file have a lot of materials, and using the *Assign Material* and *Select By Material* is slow
-(or even hangs Blender), there is now an limit to the number of materials shown (Defaults to 1000 materials).
-(You can still access all the materials via the `Search` option)
+The preferences panel have been updated with version 3.0.0 of Material Utilities. The preferences are now structures in three categories/tabs: `Defaults`, `Texture Set Import` and `Miscellaneous`, and each tab is divided into several subcategories (as "pulldowns").
 
 [![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2023/06/MU_Preferences_3.0.0_Defaults.png)](https://chris.hindefjord.se/wp-content/uploads/2023/06/MU_Preferences_3.0.0_Defaults.png)
+
+### Defaults
+
+This tab lets you set the default options (like the default name used when adding a new material) for several of the operators described above.
+Each setting here corresponds directly to the options for the matching operator.
+
+### Texture Set Import
+
+These settings are described in the documentation for [PBR Texture Set Import](pbr_import.md#preferences).
+
+### Miscellaneous
+
+This last tab is for settings that doesn't fit in the other two, divided in two subcategories:
+
+- **Limits**
+  - Here you can change when the option to search for materials appears at the the top of the *Assign Material* and *Select By Material* menus. Set `Show 'Search' Limit` to `0` to always show `Search` in the menus (default).
+  - `Search` (with `Add new material`) can also appear at the bottom of the menus, given a certain numbers of materials (so you don't have to go to scroll to the top of the menu if Blender happens to align the menu at the bottom). By setting `Show 'Search' at Bottom Limit` you can change when that happens.
+  - If you have a file with a lot of materials the use of *Assign Material* and *Select By Material* might become slow (or even hang Blender), so if you have those issues you can change `Material List Menu Limit` to set the number of materials shown (Defaults to 1000 materials).
+  (You can still access all the materials via the `Search` option)
+
+- **Extra / Experimental**
+  - By default any Grease Pencil materials are excluded from the lists/menus shown by Material Utilities, but you can choose to include them by enabling `Show Grease Pencil materials`
+  - By checking `Enable Replace Multiple Materials` you'll be able to use [Replace Multiple Material](#replace-multiple-materials) from the Material Utilities menu. This feature is functional, but perhaps not very polished.
