@@ -527,5 +527,20 @@ mu_ocio_colorspace_map = {
     'sRGB': {
         '_DEFAULT': 'sRGB',
         'GREYSCALE': 'sRGB'
+    },
+    'LINEAR': {
+        '_DEFAULT': 'Linear sRGB'
+    },
+    'ACES': {
+        '_DEFAULT': 'ACES2065-1'
+    },
+    'ACEScg': {
+        '_DEFAULT': 'ACEScg'
+    },
+    'FILMIC_sRGB': {
+        '_DEFAULT': 'sRGB'
+    },
+    'FILMIC_LOG': {
+        '_DEFAULT': 'sRGB'
     }
 }
