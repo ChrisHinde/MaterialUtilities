@@ -206,8 +206,8 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         default = True,
         )
     tex_add_colorspaces: BoolProperty(
-        name = "Add ColorSpaces",
-        description = "Add appropriate ColorSpace nodes",
+        name = "Add Color Spaces",
+        description = "Add appropriate Color space nodes",
         default = True,
         )
     tex_stair_step: BoolProperty(

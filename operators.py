@@ -988,8 +988,8 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             default = True,
             )
     add_colorspaces: BoolProperty(
-            name = "Add ColorSpaces",
-            description = "Add appropriate ColorSpace nodes",
+            name = "Add Color Spaces",
+            description = "Add appropriate Color space nodes",
             default = True,
             )
     height_map_option: EnumProperty(
