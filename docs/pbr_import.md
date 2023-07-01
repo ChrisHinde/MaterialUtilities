@@ -84,7 +84,7 @@ The main idea is to import PBR textures and connect them up to a universal/princ
 
 The currently recognized file formats are:
 
-- JPG
+- JPG/JP2
 - PNG
 - EXR
 - HDR

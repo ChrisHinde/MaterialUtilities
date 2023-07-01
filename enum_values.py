@@ -89,6 +89,10 @@ mu_file_types = {
         'colorspace': 'sRGB',
         'override_colorspace': False
     },
+    'JP2': {
+        'colorspace': 'sRGB',
+        'override_colorspace': True
+    },
     'PNG': {
         'colorspace': 'sRGB',
         'override_colorspace': False
