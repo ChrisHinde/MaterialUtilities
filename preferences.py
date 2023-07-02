@@ -423,11 +423,11 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                 col1 = col.column()
                 col1.prop(self, 'tex_add_colorspaces', expand = False)
                 col2 = col.column()
-                col2.prop(self, 'tex_add_gamma_nodes', expand = False)
+                col2.prop(self, 'tex_add_gamma_nodes',   expand = False)
                 col2.prop(self, 'tex_hide_gamma_values', expand = False)
                 col2.separator()
                 col2.label(text="Defaults")
-                col2.prop(self, 'tex_gamma_color', expand = False)
+                col2.prop(self, 'tex_gamma_color',    expand = False)
                 col2.prop(self, 'tex_gamma_noncolor', expand = False)
 
             layout.separator()

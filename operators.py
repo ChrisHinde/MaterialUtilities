@@ -5,9 +5,7 @@ from bpy.props import (
     StringProperty,
     BoolProperty,
     EnumProperty,
-    IntProperty,
     FloatProperty,
-    PointerProperty,
     CollectionProperty
     )
 
@@ -26,23 +24,23 @@ from math import radians
 class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
     """Assign a material to the current selection"""
 
-    bl_idname = "view3d.materialutilities_assign_material_edit"
-    bl_label = "Assign Material (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_assign_material_edit'
+    bl_label   = "Assign Material (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     material_name: StringProperty(
-            name = 'Material Name',
-            description = 'Name of Material to assign to current selection',
+            name = "Material Name",
+            description = "Name of Material to assign to current selection",
             default = "",
             maxlen = 63
             )
     new_material: BoolProperty(
-            name = '',
-            description = 'Add a new material, enter the name in the box',
+            name = "",
+            description = "Add a new material, enter the name in the box",
             default = False
             )
     show_dialog: BoolProperty(
-            name = 'Show Dialog',
+            name = "Show Dialog",
             default = False
             )
     @classmethod
@@ -67,14 +65,15 @@ class VIEW3D_OT_materialutilities_assign_material_edit(bpy.types.Operator):
         row = col.split(factor=factor, align=True)
 
         if self.new_material:
-            row.prop(self, "material_name")
+            row.prop(self, 'material_name')
         else:
-            row.prop_search(self, "material_name", bpy.data, "materials")
+            row.prop_search(self, 'material_name', bpy.data, 'materials')
 
-        row.prop(self, "new_material", expand = True, icon = 'ADD')
+        row.prop(self, 'new_material', expand = True, icon = 'ADD')
 
         if mu_prefs.add_pbr_import_to_assign_dlg:
-            row.operator(VIEW3D_OT_materialutilities_assign_pbr_material.bl_idname, text="", icon='FILE_IMAGE')
+            row.operator(VIEW3D_OT_materialutilities_assign_pbr_material.bl_idname,
+                         text="", icon='FILE_IMAGE')
 
     def execute(self, context):
         material_name = self.material_name
@@ -92,28 +91,28 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
     """Assign a material to the current selection
     (See the operator panel [F9] for more options)"""
 
-    bl_idname = "view3d.materialutilities_assign_material_object"
-    bl_label = "Assign Material (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_assign_material_object'
+    bl_label   = "Assign Material (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     material_name: StringProperty(
-            name = 'Material Name',
-            description = 'Name of Material to assign to current selection',
+            name = "Material Name",
+            description = "Name of Material to assign to current selection",
             default = "",
             maxlen = 63
             )
     override_type: EnumProperty(
-            name = 'Assignment method',
-            description = '',
+            name = "Assignment method",
+            description = "",
             items = mu_override_type_enums
             )
     new_material: BoolProperty(
-            name = '',
-            description = 'Add a new material\nEnter a name for the new material in the box',
+            name = "",
+            description = "Add a new material\nEnter a name for the new material in the box",
             default = False
             )
     show_dialog: BoolProperty(
-            name = 'Show Dialog',
+            name = "Show Dialog",
             default = False
             )
 
@@ -139,14 +138,15 @@ class VIEW3D_OT_materialutilities_assign_material_object(bpy.types.Operator):
         row = col.split(factor=factor, align = True)
 
         if self.new_material:
-            row.prop(self, "material_name")
+            row.prop(self, 'material_name')
         else:
-            row.prop_search(self, "material_name", bpy.data, "materials")
+            row.prop_search(self, 'material_name', bpy.data, 'materials')
 
         row.prop(self, "new_material", expand = True, icon = 'ADD')
 
         if mu_prefs.add_pbr_import_to_assign_dlg:
-            row.operator(VIEW3D_OT_materialutilities_assign_pbr_material.bl_idname, text="", icon='FILE_IMAGE')
+            row.operator(VIEW3D_OT_materialutilities_assign_pbr_material.bl_idname,
+                         text="", icon='FILE_IMAGE')
 
         layout.prop(self, "override_type")
 
@@ -168,21 +168,22 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     """Select geometry that has the chosen material assigned to it
     (See the operator panel [F9] for more options)"""
 
-    bl_idname = "view3d.materialutilities_select_by_material_name"
-    bl_label = "Select By Material Name (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_select_by_material_name'
+    bl_label   = "Select By Material Name (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     extend_selection: BoolProperty(
-            name = 'Extend Selection',
-            description = 'Keeps the current selection and adds faces with the material to the selection'
+            name = "Extend Selection",
+            description = "Keeps the current selection and adds faces "
+                            + "with the material to the selection"
             )
     material_name: StringProperty(
-            name = 'Material Name',
-            description = 'Name of Material to find and Select',
+            name = "Material Name",
+            description = "Name of Material to find and Select",
             maxlen = 63
             )
     show_dialog: BoolProperty(
-            name = 'Show Dialog',
+            name = "Show Dialog",
             default = False
     )
 
@@ -198,9 +199,9 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop_search(self, "material_name", bpy.data, "materials")
+        layout.prop_search(self, 'material_name', bpy.data, 'materials')
 
-        layout.prop(self, "extend_selection", icon = "SELECT_EXTEND")
+        layout.prop(self, 'extend_selection', icon = 'SELECT_EXTEND')
 
     def execute(self, context):
         material_name = self.material_name
@@ -211,8 +212,8 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
 class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
     """Copy the material(s) of the active object to the other selected objects"""
 
-    bl_idname = "view3d.materialutilities_copy_material_to_others"
-    bl_label = "Copy material(s) to others (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_copy_material_to_others'
+    bl_label   = "Copy material(s) to others (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -233,14 +234,14 @@ class VIEW3D_OT_materialutilities_copy_material_to_others(bpy.types.Operator):
 class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
     """Removes any material slots from the selected objects that are not used"""
 
-    bl_idname = "view3d.materialutilities_clean_material_slots"
-    bl_label = "Clean Material Slots (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_clean_material_slots'
+    bl_label   = "Clean Material Slots (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     only_active: BoolProperty(
-            name = 'Only active object',
-            description = 'Only remove the material slots for the active object ' +
-                            '(otherwise do it for every selected object)',
+            name = "Only active object",
+            description = "Only remove the material slots for the active object "
+                          + "(otherwise do it for every selected object)",
             default = True
             )
 
@@ -250,10 +251,10 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "only_active", icon = "PIVOT_ACTIVE")
+        layout.prop(self, 'only_active', icon = 'PIVOT_ACTIVE')
 
     def execute(self, context):
-        affect = "ACTIVE" if self.only_active else "SELECTED"
+        affect = 'ACTIVE' if self.only_active else 'SELECTED'
 
         return mu_cleanmatslots(self, affect)
 
@@ -262,14 +263,14 @@ class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
     """Remove the active material slot from selected object(s)
     (See the operator panel [F9] for more options)"""
 
-    bl_idname = "view3d.materialutilities_remove_material_slot"
-    bl_label = "Remove Active Material Slot (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_remove_material_slot'
+    bl_label   = "Remove Active Material Slot (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     only_active: BoolProperty(
-            name = 'Only active object',
-            description = 'Only remove the active material slot for the active object ' +
-                            '(otherwise do it for every selected object)',
+            name = "Only active object",
+            description = "Only remove the active material slot for the active object "
+                            + "(otherwise do it for every selected object)",
             default = True
             )
 
@@ -279,7 +280,7 @@ class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "only_active", icon = "PIVOT_ACTIVE")
+        layout.prop(self, 'only_active', icon = 'PIVOT_ACTIVE')
 
     def execute(self, context):
         return mu_remove_material(self, self.only_active)
@@ -288,14 +289,14 @@ class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
     """Remove all material slots from selected object(s)
     (See the operator panel [F9] for more options)"""
 
-    bl_idname = "view3d.materialutilities_remove_all_material_slots"
-    bl_label = "Remove All Material Slots (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_remove_all_material_slots'
+    bl_label   = "Remove All Material Slots (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     only_active: BoolProperty(
-            name = 'Only active object',
-            description = 'Only remove the material slots for the active object ' +
-                            '(otherwise do it for every selected object)',
+            name = "Only active object",
+            description = "Only remove the material slots for the active object "
+                          + "(otherwise do it for every selected object)",
             default = True
             )
 
@@ -305,7 +306,7 @@ class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "only_active", icon = "PIVOT_ACTIVE")
+        layout.prop(self, 'only_active', icon = 'PIVOT_ACTIVE')
 
     def execute(self, context):
         return mu_remove_all_materials(self, self.only_active)
@@ -313,8 +314,8 @@ class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
 
 class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
     """Replace a material by name"""
-    bl_idname = "view3d.materialutilities_replace_material"
-    bl_label = "Replace Material (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_replace_material'
+    bl_label   = "Replace Material (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     mat_org: StringProperty(
@@ -322,13 +323,15 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
             description = "Material to find and replace",
             maxlen = 63,
             )
-    mat_rep: StringProperty(name="Replacement",
+    mat_rep: StringProperty(
+            name = "Replacement",
             description = "Material that will be used instead of the Original material",
             maxlen = 63,
             )
     all_objects: BoolProperty(
             name = "All Objects",
-            description = "Replace for all objects in this blend file (otherwise only selected objects)",
+            description = "Replace for all objects in this blend file \
+                            (otherwise only selected objects)",
             default = True,
             )
     update_selection: BoolProperty(
@@ -340,24 +343,25 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
 
-        layout.prop_search(self, "mat_org", bpy.data, "materials")
-        layout.prop_search(self, "mat_rep", bpy.data, "materials")
+        layout.prop_search(self, 'mat_org', bpy.data, 'materials')
+        layout.prop_search(self, 'mat_rep', bpy.data, 'materials')
         layout.separator()
 
-        layout.prop(self, "all_objects", icon = "BLANK1")
-        layout.prop(self, "update_selection", icon = "SELECT_INTERSECT")
+        layout.prop(self, 'all_objects', icon = 'BLANK1')
+        layout.prop(self, 'update_selection', icon = 'SELECT_INTERSECT')
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_replace_material(self, self.mat_org, self.mat_rep, self.all_objects, self.update_selection)
+        return mu_replace_material(self, self.mat_org, self.mat_rep,
+                                   self.all_objects, self.update_selection)
 
 
 class VIEW3D_OT_materialutilities_replace_multiple_materials(bpy.types.Operator):
     """Replace a list of material by names"""
-    bl_idname = "view3d.materialutilities_replace_multiple_materials"
-    bl_label = "Replace Multiple Material (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_replace_multiple_materials'
+    bl_label   = "Replace Multiple Material (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     mats_org: StringProperty(
@@ -372,7 +376,8 @@ class VIEW3D_OT_materialutilities_replace_multiple_materials(bpy.types.Operator)
             )
     all_objects: BoolProperty(
             name = "All Objects",
-            description = "Replace for all objects in this blend file (otherwise only selected objects)",
+            description = "Replace for all objects in this blend file \
+                            (otherwise only selected objects)",
             default = True,
             )
     update_selection: BoolProperty(
@@ -384,24 +389,25 @@ class VIEW3D_OT_materialutilities_replace_multiple_materials(bpy.types.Operator)
     def draw(self, context):
         layout = self.layout
 
-        layout.prop_search(self, "mats_org", bpy.data, "texts")
-        layout.prop_search(self, "mats_rep", bpy.data, "texts")
+        layout.prop_search(self, 'mats_org', bpy.data, 'texts')
+        layout.prop_search(self, 'mats_rep', bpy.data, 'texts')
         layout.separator()
 
-        layout.prop(self, "all_objects", icon = "BLANK1")
-        layout.prop(self, "update_selection", icon = "SELECT_INTERSECT")
+        layout.prop(self, 'all_objects', icon = 'BLANK1')
+        layout.prop(self, 'update_selection', icon = 'SELECT_INTERSECT')
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_replace_multiple_materials(self, self.mats_org, self.mats_rep, self.all_objects, self.update_selection)
+        return mu_replace_multiple_materials(self, self.mats_org, self.mats_rep,
+                                             self.all_objects, self.update_selection)
 
 class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
     """Enable/disable fake user for materials"""
 
-    bl_idname = "view3d.materialutilities_fake_user_set"
-    bl_label = "Set Fake User (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_fake_user_set'
+    bl_label   = "Set Fake User (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     fake_user: EnumProperty(
@@ -429,13 +435,13 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "fake_user", expand = True)
+        layout.prop(self, 'fake_user', expand = True)
         layout.separator()
 
-        layout.prop(self, "affect")
+        layout.prop(self, 'affect')
 
         if self.affect == 'SELECTED_COLLECTION':
-            layout.prop_search(self, "selected_collection", bpy.data, "collections")
+            layout.prop_search(self, 'selected_collection', bpy.data, 'collections')
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
@@ -447,20 +453,22 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
 class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
     """Link the materials to Data or Object, while keepng materials assigned"""
 
-    bl_idname = "view3d.materialutilities_change_material_link"
-    bl_label = "Change Material Linking (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_change_material_link'
+    bl_label   = "Change Material Linking (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     override: BoolProperty(
             name = "Override Data material",
-            description = "Override the materials assigned to the object data/mesh when switching to 'Linked to Data'\n" +
-                            "(WARNING: This will override the materials of other linked objects, " +
-                             "which have the materials linked to Data)",
+            description = "Override the materials assigned to the object data/mesh \
+                            when switching to 'Linked to Data'\n"
+                           "(WARNING: This will override the materials of other linked objects, \
+                            which have the materials linked to Data)",
             default = False,
             )
     unlink_old: BoolProperty(
             name = "Unlink Material From Old Link",
-            description = "Unlink the material from what it is currently linked to, before it gets linked to the new option",
+            description = "Unlink the material from what it is currently linked to, \
+                            before it gets linked to the new option",
             default = False,
             )
     link_to: EnumProperty(
@@ -489,54 +497,61 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
 
-        layout.prop(self, "link_to", expand = True)
+        layout.prop(self, 'link_to', expand = True)
         layout.separator()
 
-        layout.prop(self, "affect")
+        layout.prop(self, 'affect')
 
         if self.affect == 'SELECTED_COLLECTION':
-            layout.prop_search(self, "selected_collection", bpy.data, "collections")
+            layout.prop_search(self, 'selected_collection', bpy.data, 'collections')
 
         layout.separator()
 
-        layout.prop(self, "override", icon = "DECORATE_OVERRIDE")
-        layout.prop(self, "unlink_old", icon = "UNLINKED")
+        layout.prop(self, 'override', icon = 'DECORATE_OVERRIDE')
+        layout.prop(self, 'unlink_old', icon = 'UNLINKED')
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        return mu_change_material_link(self, self.link_to, self.affect, self.override, self.selected_collection, self.unlink_old)
+        return mu_change_material_link(self, self.link_to, self.affect, self.override,
+                                       self.selected_collection, self.unlink_old)
 
 class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
     """Merges materials that has the same base names but ends with .xxx (.001, .002 etc)"""
 
-    bl_idname = "material.materialutilities_merge_base_names"
-    bl_label = "Merge Base Names"
-    bl_description = "Merge materials that has the same base names but ends with .xxx (.001, .002 etc)"
+    bl_idname  = 'material.materialutilities_merge_base_names'
+    bl_label   = "Merge Base Names"
+    bl_description = "Merge materials that has the same base names \
+                        but ends with .xxx (.001, .002 etc)"
 
     material_base_name: StringProperty(
                             name = "Material Base Name",
                             default = "",
-                            description = 'Base name for materials to merge ' +
-                                          '(e.g. "Material" is the base name of "Material.001", "Material.002" etc.)'
+                            description = "Base name for materials to merge \
+                                           (e.g. \"Material\" is the base name \
+                                           of \"Material.001\", \"Material.002\" etc.)"
                             )
     use_new_name: BoolProperty(
                             name = "New name",
-                            description = "Give the material a new name instead of the original base name"
+                            description = "Give the material a new name instead of \
+                                           the original base name"
                             )
     material_new_name: StringProperty(
                             name = "New Material Name",
                             default = "",
-                            description = 'Set a new name to use instead of the original Material Base Name'
+                            description = "Set a new name to use instead of \
+                                           the original Material Base Name"
                             )
     is_auto: BoolProperty(
                             name = "Auto Merge",
-                            description = "Find all available duplicate materials and Merge them"
+                            description = "Find all available duplicate materials \
+                                           and Merge them"
                             )
     pattern_to_use: EnumProperty(
                             name = "Pattern",
-                            description = "Use another pattern than Material.xxx for merging materials.",
+                            description = "Use another pattern than Material.xxx \
+                                           for merging materials.",
                             items = mu_merge_basse_names_pattern_enums,
                             default = 'DEFAULT',
                             )
@@ -549,32 +564,34 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             name = "RegEx pattern",
                             description = "The pattern to use for search and replace.\
                                             Use (Python Style) RegEx.\
-                                            Make sure you have to groups (one for the name and one for the suffix)",
+                                            Make sure you have to groups \
+                                            (one for the name and one for the suffix)",
                             default = "^%BASE_NAME\.(\d{1,3})$"
                             )
 
     is_not_undo = False
-    material_error = []          # collect mat for warning messages
+    material_error = [] # collect mat for warning messages
 
 
     def replace_name(self, name = ""):
-        """If the user chooses a material like 'Material.042', clean it up to get a base name ('Material')"""
+        """If the user chooses a material like 'Material.042',
+            clean it up to get a base name ('Material')"""
 
-        if (name != ""):
+        if name != "":
             self.material_base_name = name
 
         # use the chosen material as a base one, check if there is a name
-        self.check_no_name = (False if self.material_base_name in {""} else True)
+        self.check_no_name = False if self.material_base_name in {''} else True
 
         delimiter = '.'
 
-        if ( (self.pattern_to_use == 'REGEX') and (self.check_no_name is False) ):
+        if self.pattern_to_use == 'REGEX' and self.check_no_name is False:
             base, suffix = self.split_name_regex(self.material_base_name)
             self.material_base_name = base
 
             return
 
-        if (self.pattern_to_use == 'SIMPLE'):
+        if self.pattern_to_use == 'SIMPLE':
             delimiter = self.user_defined_pattern_simple
 
         # No need to do this if it's already "clean"
@@ -588,7 +605,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
                 if name == self.material_base_name:
                     try:
-                        if (self.pattern_to_use == 'REGEX'):
+                        if self.pattern_to_use == 'REGEX':
                             base, suffix = self.split_name_regex(name)
                         else:
                             base, suffix = name.rsplit(delimiter, 1)
@@ -619,7 +636,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
             print("Not matching regex:" + name)
             return name, None
 
-        base = matches.group(1)
+        base   = matches.group(1)
         suffix = matches.group(2)
 
         return base, suffix
@@ -630,10 +647,10 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
         delimiter = '.'
 
-        if (self.pattern_to_use == 'REGEX'):
+        if self.pattern_to_use == 'REGEX':
             return self.split_name_regex(name)
 
-        if (self.pattern_to_use == 'SIMPLE'):
+        if self.pattern_to_use == 'SIMPLE':
             delimiter = self.user_defined_pattern_simple
 
         # No need to do this if it's already "clean"/there is no suffix
@@ -648,8 +665,8 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         except ValueError:
             # Not a numeric suffix
             # Don't report on materials not actually included in the merge!
-            if ((self.is_auto or base == self.material_base_name)
-                 and (name not in self.material_error)):
+            if self.is_auto or base == self.material_base_name \
+                 and name not in self.material_error:
                 self.material_error.append(name)
             return name, None
 
@@ -679,15 +696,15 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
             try:
                 base_mat = bpy.data.materials[base]
             except KeyError:
-                print("\n[Materials Utilities Specials]\nLink to base names\nError:"
-                      "Base material %r not found\n" % base)
+                print("\n[Materials Utilities Specials]\nLink to base names\n"
+                      "Error: Base material %r not found\n" % base)
             return
 
         slot.material = base_mat
 
     def main_loop(self, context):
-        """Loops through all objects and material slots to make sure they are assigned to the right material"""
-        print("Main loop!")
+        """Loops through all objects and material slots to make sure
+            they are assigned to the right material"""
 
         for obj in context.scene.objects:
             for slot in obj.material_slots:
@@ -703,32 +720,32 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         box_1 = layout.box()
         col = box_1.column()
         row = col.split(factor = 0.93, align = True)
-        row.prop_search(self, "material_base_name", bpy.data, "materials")
-        row.prop(self, "use_new_name", text = "", icon = "STYLUS_PRESSURE")
+        row.prop_search(self, 'material_base_name', bpy.data, 'materials')
+        row.prop(self, 'use_new_name', text = "", icon = 'STYLUS_PRESSURE')
 
-        if (self.use_new_name):
-            box_1.prop(self, "material_new_name")
+        if self.use_new_name:
+            box_1.prop(self, 'material_new_name')
 
         box_1.enabled = not self.is_auto
 
         layout.separator()
 
         box_2 = layout.box()
-        box_2.prop(self, "pattern_to_use")
+        box_2.prop(self, 'pattern_to_use')
 
         if self.pattern_to_use == 'SIMPLE':
-            box_2.prop(self, "user_defined_pattern_simple")
+            box_2.prop(self, 'user_defined_pattern_simple')
         elif self.pattern_to_use == 'REGEX':
-            box_2.prop(self, "user_defined_pattern_regex")
+            box_2.prop(self, 'user_defined_pattern_regex')
 
-        layout.prop(self, "is_auto", text = "Auto Rename/Replace", icon = "SYNTAX_ON")
+        layout.prop(self, 'is_auto', text = "Auto Rename/Replace", icon = 'SYNTAX_ON')
 
     def invoke(self, context, event):
         self.is_not_undo = True
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        # Reset Material errors, otherwise we risk reporting errors erroneously..
+        # Reset Material errors, otherwise we risk reporting errors erroneously.
         self.material_error = []
 
         if not self.is_auto:
@@ -760,7 +777,8 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                 waswere = " were"
                 suff_s = "s"
 
-            self.report({'WARNING'}, materials + waswere + " not removed or set as Base" + suff_s)
+            self.report({'WARNING'},
+                        materials + waswere + " not removed or set as Base" + suff_s)
 
         self.is_not_undo = False
         return {'FINISHED'}
@@ -768,16 +786,16 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
     """Move the active material slot"""
 
-    bl_idname = "material.materialutilities_slot_move"
-    bl_label = "Move Slot"
+    bl_idname  = 'material.materialutilities_slot_move'
+    bl_label   = "Move Slot"
     bl_description = "Move the material slot"
     bl_options = {'REGISTER', 'UNDO'}
 
     movement: EnumProperty(
-                name = "Move",
-                description = "How to move the material slot",
-                items = mu_material_slot_move_enums
-                )
+                            name = "Move",
+                            description = "How to move the material slot",
+                            items = mu_material_slot_move_enums
+                            )
 
     @classmethod
     def poll(self, context):
@@ -785,7 +803,7 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
         obj = context.active_object
         if not obj:
             return False
-        if (obj.active_material_index < 0) or (len(obj.material_slots) <= 1):
+        if obj.active_material_index < 0 or len(obj.material_slots) <= 1:
             return False
         return True
 
@@ -804,12 +822,14 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
             steps = last_slot_index - active_object.active_material_index
 
         if steps == 0:
-            self.report({'WARNING'}, active_material.name + " already at " + self.movement.lower() + '!')
+            self.report({'WARNING'},
+                        active_material.name + " already at " + self.movement.lower() + "!")
         else:
             for i in range(steps):
                 bpy.ops.object.material_slot_move(direction = dir)
 
-            self.report({'INFO'}, active_material.name + ' moved to ' + self.movement.lower())
+            self.report({'INFO'},
+                        active_material.name + ' moved to ' + self.movement.lower())
 
         return {'FINISHED'}
 
@@ -818,8 +838,8 @@ class MATERIAL_OT_materialutilities_material_slot_move(bpy.types.Operator):
 class MATERIAL_OT_materialutilities_join_objects(bpy.types.Operator):
     """Join objects that have the same (selected) material(s)"""
 
-    bl_idname = "material.materialutilities_join_objects"
-    bl_label = "Join by material (Material Utilities)"
+    bl_idname  = 'material.materialutilities_join_objects'
+    bl_label   = "Join by material (Material Utilities)"
     bl_description = "Join objects that share the same material"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -829,12 +849,12 @@ class MATERIAL_OT_materialutilities_join_objects(bpy.types.Operator):
                             description = 'Material to use to join objects'
                             )
     is_auto: BoolProperty(
-                            name = "Auto Join",
-                            description = "Join objects for all materials"
-                            )
+                        name = "Auto Join",
+                        description = "Join objects for all materials"
+                        )
 
     is_not_undo = True
-    material_error = []          # collect material names for warning messages
+    material_error = [] # collect material names for warning messages
 
 
     @classmethod
@@ -846,18 +866,18 @@ class MATERIAL_OT_materialutilities_join_objects(bpy.types.Operator):
         layout = self.layout
 
         box_1 = layout.box()
-        box_1.prop_search(self, "material_name", bpy.data, "materials")
+        box_1.prop_search(self, 'material_name', bpy.data, 'materials')
         box_1.enabled = not self.is_auto
         layout.separator()
 
-        layout.prop(self, "is_auto", text = "Auto Join", icon = "SYNTAX_ON")
+        layout.prop(self, 'is_auto', text = "Auto Join", icon = 'SYNTAX_ON')
 
     def invoke(self, context, event):
         self.is_not_undo = True
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
-        # Reset Material errors, otherwise we risk reporting errors erroneously..
+        # Reset Material errors, otherwise we risk reporting errors erroneously.
         self.material_error = []
         materials = []
 
@@ -881,8 +901,8 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
     """Set Auto smooth values for selected objects"""
     # Inspired by colkai
 
-    bl_idname = "view3d.materialutilities_auto_smooth_angle"
-    bl_label = "Set Auto Smooth Angle (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_auto_smooth_angle'
+    bl_label   = "Set Auto Smooth Angle (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     affect: EnumProperty(
@@ -898,7 +918,8 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
     )
     angle: FloatProperty(
             name = "Angle",
-            description = "Maximum angle between face normals that will be considered as smooth",
+            description = "Maximum angle between face normals that \
+                            will be considered as smooth",
             subtype = 'ANGLE',
             min = 0,
             max = radians(180),
@@ -907,7 +928,8 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
     set_smooth_shading: BoolProperty(
             name = "Set Smooth",
             description = "Set Smooth shading for the affected objects\n"
-                   "This overrides the currenth smooth/flat shading that might be set to different parts of the object",
+                            "This overrides the currenth smooth/flat shading \
+                             that might be set to different parts of the object",
             default = True
             )
 
@@ -926,19 +948,20 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
         layout.prop(self, "affect")
 
         if self.affect == 'SELECTED_COLLECTION':
-            layout.prop_search(self, "selected_collection", bpy.data, "collections")
+            layout.prop_search(self, 'selected_collection', bpy.data, 'collections')
 
-        layout.prop(self, "set_smooth_shading", icon = "BLANK1")
+        layout.prop(self, 'set_smooth_shading', icon = 'BLANK1')
 
     def execute(self, context):
-        return mu_set_auto_smooth(self, self.angle, self.affect, self.set_smooth_shading, self.selected_collection)
+        return mu_set_auto_smooth(self, self.angle, self.affect,
+                                  self.set_smooth_shading, self.selected_collection)
 
 class MATERIAL_OT_materialutilities_remove_unused_materials(bpy.types.Operator):
     """Remove any unused (zero users) materials"""
     # On request by Hologram
 
-    bl_idname = "view3d.materialutilities_remove_unused_materials"
-    bl_label = "Remove unused materials (Material Utilities)"
+    bl_idname  = 'view3d.materialutilities_remove_unused_materials'
+    bl_label   = "Remove unused materials (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
 
@@ -974,7 +997,8 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             )
     use_alpha_channel: BoolProperty(
             name = "Connect Alpha channel",
-            description = "Connects the alpha channel (if detected) of Diffuse texture to the opacity/alpha input",
+            description = "Connects the alpha channel (if detected) of Diffuse texture \
+                            to the opacity/alpha input",
             default = False,
             )
     collapse_texture_nodes: BoolProperty(
@@ -996,19 +1020,19 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         name = "Add common gamma nodes",
         description = "Add (float value) node(s) for texture (legacy) gamma",
         default = False
-    )
+        )
     gamma_color: FloatProperty(
         name = "Color",
         description = "Default gamma value for color/RGB textures\n"
                         " Ignored when using Color space nodes (except for Linear RGB)",
         default = 2.2
-    )
+        )
     gamma_noncolor: FloatProperty(
         name = "Non-Color",
         description = "Default gamma value for non-color (greyscale and normal) textures\n"
                         " Ignored when using Color space nodes (except for Linear RGB)",
         default = 1.0
-    )
+        )
     height_map_option: EnumProperty(
             name = "Height map treatment",
             description = "How should height maps be treated",
@@ -1017,8 +1041,10 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             )
     go_wide: BoolProperty(
             name = "Wide search",
-            description = "Go through all nodes in the material, to find the right node, if not immediately found.\n"
-                            "This might take a longer time in complex materials, and might also replace unwanted textures",
+            description = "Go through all nodes in the material, to find the right node, \
+                            if not immediately found.\n"
+                            "This might take a longer time in complex materials, \
+                            and might also replace unwanted textures",
             default = True,
             )
     emission_map_option: EnumProperty(
@@ -1040,7 +1066,8 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             )
     material_name: StringProperty(
             name = "Material Name",
-            description = "Name of the new material\n (The name of the directory will be used if this is left empty)",
+            description = "Name of the new material\n"
+                            " (The name of the directory will be used if this is left empty)",
             default = '',
             maxlen = 63
             )
@@ -1171,7 +1198,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             out_node = mat.node_tree.nodes.get('Material Output')
             if out_node is not None and out_node.inputs['Surface'].is_linked:
                 first_node = out_node.inputs['Surface'].links[0].from_node
-                if first_node.bl_idname == 'OctaneStandardSurfaceMaterial':
+                if first_node.bl_idname  == 'OctaneStandardSurfaceMaterial':
                     self.material_node_type = 'STD_SURF'
 
         wm = context.window_manager
@@ -1179,7 +1206,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def execute(self, context):
-        print("Looking for textures in: ", self.directory)
+        print("Looking for textures in:", self.directory)
 
         mu_prefs = materialutilities_get_preferences(context)
         mu_prefs.tex_last_texture_directory = self.directory
@@ -1223,13 +1250,12 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     )
 
             return mu_replace_image_textures(self, prefs, **params)
-            #mu_replace_image_textures(self, self.image_path, self.only_selected, self.set_fake_user)
-    
+
 class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_texture_base):
     """Select image textures to import to shader setup"""
     
-    bl_idname = 'node.materialutilities_select_texture_files'
-    bl_label = "Select textures"
+    bl_idname  = 'node.materialutilities_select_texture_files'
+    bl_label   = "Select textures"
     bl_options = {'REGISTER', 'UNDO'}
 
     files: CollectionProperty(
@@ -1245,8 +1271,8 @@ class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_t
 class NODE_OT_materialutilites_select_texture_directory(MU_materialutilites_select_texture_base):
     """Select directory with image textures to import to shader setup"""
     
-    bl_idname = 'node.materialutilities_select_texture_directory'
-    bl_label = "Select directory"
+    bl_idname  = 'node.materialutilities_select_texture_directory'
+    bl_label   = "Select directory"
     bl_options = {'REGISTER', 'UNDO'}
 
     directory: StringProperty(
@@ -1261,8 +1287,8 @@ class NODE_OT_materialutilites_select_texture_directory(MU_materialutilites_sele
 class NODE_OT_materialutilities_add_image_textures(bpy.types.Operator):
     """Open a PBR image texture set"""
 
-    bl_idname = 'node.materialutilities_add_image_textures'
-    bl_label = "Open image texture set (Material Utilities)"
+    bl_idname  = 'node.materialutilities_add_image_textures'
+    bl_label   = "Open image texture set (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -1294,8 +1320,8 @@ class NODE_OT_materialutilities_add_image_textures(bpy.types.Operator):
 class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
     """Replace image textures with matching from another set"""
 
-    bl_idname = 'node.materialutilities_replace_image_textures'
-    bl_label = "Replace image texture set (Material Utilities)"
+    bl_idname  = 'node.materialutilities_replace_image_textures'
+    bl_label   = "Replace image texture set (Material Utilities)"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -1327,15 +1353,16 @@ class NODE_OT_materialutilities_replace_image_textures(bpy.types.Operator):
 class VIEW3D_OT_materialutilities_assign_pbr_material(bpy.types.Operator):
     """Import PBR textures in a new material"""
 
-    bl_idname = 'view3d.materialutilities_assign_pbr_material'
-    bl_label = "Assign PBR material"
+    bl_idname  = 'view3d.materialutilities_assign_pbr_material'
+    bl_label   = "Assign PBR material"
     bl_description = "Import PBR textures in a new material"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
     def poll(cls, context):
         if bpy.data.scenes['Scene'].render.engine not in mu_supported_engines:
-            print("Material Utilities - Assign PBR Material: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
+            print("Material Utilities - Assign PBR Material: Unsupported render engine: ",
+                  bpy.data.scenes['Scene'].render.engine)
             return False
         return context.active_object is not None
 
@@ -1349,10 +1376,14 @@ class VIEW3D_OT_materialutilities_assign_pbr_material(bpy.types.Operator):
             mode = 'DIR'
 
         if mode == 'FILES':
-            bpy.ops.node.materialutilities_select_texture_files('INVOKE_DEFAULT', add = True, add_material = True)
+            bpy.ops.node.materialutilities_select_texture_files('INVOKE_DEFAULT',
+                                                                add = True,
+                                                                add_material = True)
             return  {'RUNNING_MODAL'}
         elif mode == 'DIR':
-            bpy.ops.node.materialutilities_select_texture_directory('INVOKE_DEFAULT', add = True, add_material = True)
+            bpy.ops.node.materialutilities_select_texture_directory('INVOKE_DEFAULT',
+                                                                    add = True,
+                                                                    add_material = True)
             return  {'RUNNING_MODAL'}
 
     def execute(self, context):

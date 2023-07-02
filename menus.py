@@ -11,8 +11,8 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
     """Menu for choosing which material should be assigned to current selection"""
     # The menu is filled programmatically with available materials
 
-    bl_idname = "VIEW3D_MT_materialutilities_assign_material"
-    bl_label = "Assign Material"
+    bl_idname = 'VIEW3D_MT_materialutilities_assign_material'
+    bl_label  = "Assign Material"
 
     def draw(self, context):
         layout = self.layout
@@ -21,8 +21,8 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
         materials = bpy.data.materials.items()
 
+        obj   = context.object
         bl_id = VIEW3D_OT_materialutilities_assign_material_object.bl_idname
-        obj = context.object
         mu_prefs = materialutilities_get_preferences(context)
 
         if (not obj is None) and obj.mode == 'EDIT':
@@ -31,20 +31,20 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 
         if len(materials) > mu_prefs.search_show_limit:
             op = layout.operator(bl_id,
-                            text = 'Search',
-                            icon = 'VIEWZOOM')
+                                 text = "Search",
+                                 icon = 'VIEWZOOM')
             op.material_name = ""
-            op.new_material = False
-            op.show_dialog = True
+            op.new_material  = False
+            op.show_dialog   = True
             if not edit_mode:
                 op.override_type = mu_prefs.override_type
 
         op = layout.operator(bl_id,
-                text = "Add New Material",
-                icon = 'ADD')
+                             text = "Add New Material",
+                             icon = 'ADD')
         op.material_name = mu_new_material_name(mu_prefs.new_material_name)
-        op.new_material = True
-        op.show_dialog = True
+        op.new_material  = True
+        op.show_dialog   = True
         if not edit_mode:
             op.override_type = mu_prefs.override_type
 
@@ -66,17 +66,17 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
             #  So, if the material has a preview, use that
             if (type(material.preview) is bpy.types.ImagePreview):
                 op = layout.operator(bl_id,
-                        text = material_name,
-                        icon_value = material.preview.icon_id)
+                                     text = material_name,
+                                     icon_value = material.preview.icon_id)
             # If the material does not have a preview, use standard material icon
             else:
                 op = layout.operator(bl_id,
-                        text = material_name,
-                        icon = 'MATERIAL_DATA')
+                                     text = material_name,
+                                     icon = 'MATERIAL_DATA')
 
             op.material_name = material_name
-            op.new_material = False
-            op.show_dialog = False
+            op.new_material  = False
+            op.show_dialog   = False
             if not edit_mode:
                 op.override_type = mu_prefs.override_type
 
@@ -86,16 +86,16 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
         if mat_count > mu_prefs.search_show_btm_limit:
             layout.separator()
             layout.operator(bl_id,
-                            text = 'Search',
+                            text = "Search",
                             icon = 'VIEWZOOM'
                             ).show_dialog = True
 
             op = layout.operator(bl_id,
-                    text = "Add New Material",
-                    icon = 'ADD')
+                                 text = "Add New Material",
+                                 icon = 'ADD')
             op.material_name = mu_new_material_name(mu_prefs.new_material_name)
-            op.new_material = True
-            op.show_dialog = True
+            op.new_material  = True
+            op.show_dialog   = True
             if not edit_mode:
                 op.override_type = mu_prefs.override_type
 
@@ -103,8 +103,8 @@ class VIEW3D_MT_materialutilities_assign_material(bpy.types.Menu):
 class VIEW3D_MT_materialutilities_clean_slots(bpy.types.Menu):
     """Menu for cleaning up the material slots"""
 
-    bl_idname = "VIEW3D_MT_materialutilities_clean_slots"
-    bl_label = "Clean Slots"
+    bl_idname = 'VIEW3D_MT_materialutilities_clean_slots'
+    bl_label  = "Clean Slots"
 
     def draw(self, context):
         layout = self.layout
@@ -126,14 +126,14 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
     """Menu for choosing which material should be used for selection"""
     # The menu is filled programmatically with available materials
 
-    bl_idname = "VIEW3D_MT_materialutilities_select_by_material"
-    bl_label = "Select by Material"
+    bl_idname = 'VIEW3D_MT_materialutilities_select_by_material'
+    bl_label  = "Select by Material"
 
     def draw(self, context):
         layout = self.layout
 
+        obj   = context.object
         bl_id = VIEW3D_OT_materialutilities_select_by_material_name.bl_idname
-        obj = context.object
         mu_prefs = materialutilities_get_preferences(context)
 
         layout.label
@@ -145,7 +145,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
 
             if len(materials) > mu_prefs.search_show_limit:
                 layout.operator(bl_id,
-                                text = 'Search',
+                                text = "Search",
                                 icon = 'VIEWZOOM'
                                 ).show_dialog = True
 
@@ -154,7 +154,8 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
             # Show all used materials in entire blend file
             for material_name, material in materials:
                 # If Theres a limit, and we reached it, stop!
-                if (mu_prefs.material_show_limit > 0) and (mat_count >= mu_prefs.material_show_limit):
+                if (mu_prefs.material_show_limit > 0) \
+                   and (mat_count >= mu_prefs.material_show_limit):
                     break
 
                 # Should we show Grease Pencil materials?
@@ -169,15 +170,15 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     #  So, if the material has a preview, use that
                     if (type(material.preview) is bpy.types.ImagePreview):
                         op = layout.operator(bl_id,
-                                text = material_name,
-                                icon_value = material.preview.icon_id)
+                                             text = material_name,
+                                             icon_value = material.preview.icon_id)
                     # If the material does not have a preview, use standard material icon
                     else:
                         op = layout.operator(bl_id,
-                                text = material_name,
-                                icon = 'MATERIAL_DATA')
+                                             text = material_name,
+                                             icon = 'MATERIAL_DATA')
                     op.material_name = material_name
-                    op.show_dialog = False
+                    op.show_dialog   = False
 
                 mat_count += 1
 
@@ -204,15 +205,15 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
                     #  So, if the material has a preview, use that
                     if (type(material.preview) is bpy.types.ImagePreview):
                         op = layout.operator(bl_id,
-                                text = material.name,
-                                icon_value = material.preview.icon_id)
+                                             text = material.name,
+                                             icon_value = material.preview.icon_id)
                     # If the material does not have a preview, use standard material icon
                     else:
                         op = layout.operator(bl_id,
-                                text = material.name,
-                                icon = 'MATERIAL_DATA')
+                                             text = material.name,
+                                             icon = 'MATERIAL_DATA')
                     op.material_name = material.name
-                    op.show_dialog = False
+                    op.show_dialog   = False
 
                     materials_added.append(material.name)
 
@@ -221,7 +222,7 @@ class VIEW3D_MT_materialutilities_select_by_material(bpy.types.Menu):
         if mat_count > mu_prefs.search_show_btm_limit:
             layout.separator()
             layout.operator(bl_id,
-                            text = 'Search',
+                            text = "Search",
                             icon = 'VIEWZOOM'
                             ).show_dialog = True
 
@@ -229,7 +230,7 @@ class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
     """Specials menu for Material Utilities"""
 
     bl_idname = 'VIEW3D_MT_materialutilities_specials'
-    bl_label = "Specials"
+    bl_label  = "Specials"
 
     def draw(self, context):
         mu_prefs = materialutilities_get_preferences(context)
@@ -252,41 +253,41 @@ class VIEW3D_MT_materialutilities_specials(bpy.types.Menu):
         layout.separator()
 
         op = layout.operator(MATERIAL_OT_materialutilities_remove_unused_materials.bl_idname,
-                        text = "Remove unused materials",
-                        icon = 'TRASH')
+                             text = "Remove unused materials",
+                             icon = 'TRASH')
 
         layout.separator()
 
         op = layout.operator(MATERIAL_OT_materialutilities_auto_smooth_angle.bl_idname,
-                        text = "Set Auto Smooth",
-                        icon = 'SHADING_SOLID')
+                             text = "Set Auto Smooth",
+                             icon = 'SHADING_SOLID')
         op.affect = mu_prefs.set_smooth_affect
-        op.angle = mu_prefs.auto_smooth_angle
+        op.angle  = mu_prefs.auto_smooth_angle
 
 class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
     """Main menu for Material Utilities"""
 
     bl_idname = 'VIEW3D_MT_materialutilities_main'
-    bl_label = "Material Utilities"
+    bl_label  = "Material Utilities"
 
     def draw(self, context):
-        obj = context.object
         mu_prefs = materialutilities_get_preferences(context)
 
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
 
         layout.menu(VIEW3D_MT_materialutilities_assign_material.bl_idname,
-                     icon = 'ADD')
+                    icon = 'ADD')
         layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname,
-                     icon = 'VIEWZOOM')
+                    icon = 'VIEWZOOM')
         layout.separator()
 
         active_object = bpy.context.active_object
-        copy_lbl = 'Copy Material to Selected' if active_object != None and active_object.mode == 'EDIT' else 'Copy Materials to Selected'
+        copy_lbl = 'Copy Material to Selected' if active_object != None \
+                        and active_object.mode == 'EDIT' else 'Copy Materials to Selected'
         layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
-                         text = copy_lbl,
-                         icon = 'COPY_ID')
+                        text = copy_lbl,
+                        icon = 'COPY_ID')
 
         layout.separator()
 
@@ -296,49 +297,47 @@ class VIEW3D_MT_materialutilities_main(bpy.types.Menu):
         layout.separator()
 
         layout.operator(VIEW3D_OT_materialutilities_replace_material.bl_idname,
-                        text = 'Replace Material',
+                        text = "Replace Material",
                         icon = 'OVERLAY')
 
         if mu_prefs.show_multiple_materials_replacement:
             layout.operator(VIEW3D_OT_materialutilities_replace_multiple_materials.bl_idname,
-                            text = 'Replace Multiple Materials',
+                            text = "Replace Multiple Materials",
                             icon = 'OVERLAY')
 
         op = layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
-                       text = 'Set Fake User',
-                       icon = 'FAKE_USER_OFF')
+                             text = "Set Fake User",
+                             icon = 'FAKE_USER_OFF')
         op.fake_user = mu_prefs.fake_user
-        op.affect = mu_prefs.fake_user_affect
+        op.affect    = mu_prefs.fake_user_affect
 
         op = layout.operator(VIEW3D_OT_materialutilities_change_material_link.bl_idname,
-                       text = 'Change Material Link',
-                       icon = 'LINKED')
+                             text = "Change Material Link",
+                             icon = 'LINKED')
         op.link_to = mu_prefs.link_to
-        op.affect = mu_prefs.link_to_affect
+        op.affect  = mu_prefs.link_to_affect
         layout.separator()
 
         layout.menu(VIEW3D_MT_materialutilities_specials.bl_idname,
-                        icon = 'SOLO_ON')
+                    icon = 'SOLO_ON')
 
 
 class NODE_MT_materialutilities_shadereditor_menu(bpy.types.Menu):
     """Shader editor menu for Material Utilities"""
 
-    bl_idname = "NODE_MT_materialutilities_shader_menu"
-    bl_label = "Material Utilities"
+    bl_idname = 'NODE_MT_materialutilities_shader_menu'
+    bl_label  = "Material Utilities"
 
     def draw(self, context):
-        mu_prefs = materialutilities_get_preferences(context)
-
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
 
-        op = layout.operator(NODE_OT_materialutilities_add_image_textures.bl_idname,
-                             text = 'Open image texture set',
-                             icon = 'FILE_IMAGE')
-        op = layout.operator(NODE_OT_materialutilities_replace_image_textures.bl_idname,
-                             text = 'Replace image texture set',
-                             icon = 'FILE_REFRESH')
+        layout.operator(NODE_OT_materialutilities_add_image_textures.bl_idname,
+                        text = "Open image texture set",
+                        icon = 'FILE_IMAGE')
+        layout.operator(NODE_OT_materialutilities_replace_image_textures.bl_idname,
+                        text = "Replace image texture set",
+                        icon = 'FILE_REFRESH')
         
 def materialutilities_shadereditor_menu(self, context):
     self.layout.menu(NODE_MT_materialutilities_shadereditor_menu.bl_idname)
@@ -354,10 +353,10 @@ def materialutilities_menu_move(self, context):
 
     layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
                     icon = 'TRIA_UP_BAR',
-                    text = 'Move Slot to the Top').movement = 'TOP'
+                    text = "Move Slot to the Top").movement = 'TOP'
     layout.operator(MATERIAL_OT_materialutilities_material_slot_move.bl_idname,
                     icon = 'TRIA_DOWN_BAR',
-                    text = 'Move Slot to the Bottom').movement = 'BOTTOM'
+                    text = "Move Slot to the Bottom").movement = 'BOTTOM'
     layout.separator()
 
 def materialutilities_menu_functions(self, context):
@@ -367,14 +366,14 @@ def materialutilities_menu_functions(self, context):
     layout.separator()
 
     layout.menu(VIEW3D_MT_materialutilities_assign_material.bl_idname,
-                 icon = 'ADD')
+                icon = 'ADD')
     layout.menu(VIEW3D_MT_materialutilities_select_by_material.bl_idname,
-                 icon = 'VIEWZOOM')
+                icon = 'VIEWZOOM')
     layout.separator()
 
     layout.operator(VIEW3D_OT_materialutilities_copy_material_to_others.bl_idname,
-                     text = 'Copy Materials to Selected',
-                     icon = 'COPY_ID')
+                    text = "Copy Materials to Selected",
+                    icon = 'COPY_ID')
 
     layout.separator()
 
@@ -383,17 +382,17 @@ def materialutilities_menu_functions(self, context):
 
     layout.separator()
     layout.operator(VIEW3D_OT_materialutilities_replace_material.bl_idname,
-                    text = 'Replace Material',
+                    text = "Replace Material",
                     icon = 'OVERLAY')
 
     layout.operator(VIEW3D_OT_materialutilities_fake_user_set.bl_idname,
-                   text = 'Set Fake User',
+                   text = "Set Fake User",
                    icon = 'FAKE_USER_OFF')
 
     layout.operator(VIEW3D_OT_materialutilities_change_material_link.bl_idname,
-                   text = 'Change Material Link',
-                   icon = 'LINKED')
+                    text = "Change Material Link",
+                    icon = 'LINKED')
     layout.separator()
 
     layout.menu(VIEW3D_MT_materialutilities_specials.bl_idname,
-                    icon = 'SOLO_ON')
+                icon = 'SOLO_ON')

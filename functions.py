@@ -17,8 +17,9 @@ def mu_ui_col_split(layout, factor=0.02):
     return spl2.column()
 
 def mu_assign_material_slots(object, material_list):
-    """Given an object and a list of material names removes all material slots from the object
-       adds new ones for each material in the material list, adds the materials to the slots as well."""
+    """Given an object and a list of material names, removes all material slots from the object
+       adds new ones for each material in the material list,
+       adds the materials to the slots as well."""
 
     scene = bpy.context.scene
     active_object = bpy.context.active_object
@@ -56,14 +57,15 @@ def mu_assign_to_data(object, material, index, edit_mode, all = True):
         mesh.update()
 
     elif object.type in {'CURVE', 'SURFACE', 'TEXT'}:
-        bpy.ops.object.mode_set(mode = 'EDIT')    # This only works in Edit mode
+        bpy.ops.object.mode_set(mode = 'EDIT') # This only works in Edit mode
 
         # If operator was run in Object mode
         if not edit_mode:
             # Select everything in Edit mode
             bpy.ops.curve.select_all(action = 'SELECT')
 
-        bpy.ops.object.material_slot_assign()   # Assign material of the current slot to selection
+        # Assign material of the current slot to selection
+        bpy.ops.object.material_slot_assign()
 
         if not edit_mode:
             bpy.ops.object.mode_set(mode = 'OBJECT')
@@ -119,10 +121,9 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
 
     if not found:
         target = bpy.data.materials.new(mu_new_material_name(material_name))
-        target.use_nodes = True         # When do we not want nodes today?
+        target.use_nodes = True
 
-
-    index = 0
+    index   = 0
     objects = bpy.context.selected_editable_objects
 
     for obj in objects:
@@ -160,7 +161,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
                 bpy.ops.object.material_slot_add()
 
             # Assign the material to that slot
-            obj.material_slots[0].link = link
+            obj.material_slots[0].link     = link
             obj.material_slots[0].material = target
 
             if obj.type == 'META':
@@ -209,17 +210,19 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
 
             if not found:
                 # In Edit mode, or if there's not a slot, append the assigned material
-                #  If we're overriding, there's currently no materials at all, so after this there will be 1
+                #  If we're overriding, there's currently no materials at all,
+                #  so after this there will be 1
                 #  If not, this adds another slot with the assigned material
 
                 index = len(obj.material_slots)
                 bpy.ops.object.material_slot_add()
-                obj.material_slots[index].link = link
+                obj.material_slots[index].link     = link
                 obj.material_slots[index].material = target
                 obj.active_material_index = index
 
             if obj.type == 'GPENCIL':
-                self.report({'WARNING'}, "Material not assigned to Grease Pencil Stroke! Only appended to object!")
+                self.report({'WARNING'},
+                            "Material not assigned to Grease Pencil Stroke! Only appended to object!")
             else:
                 mu_assign_to_data(obj, target, index, edit_mode, all_polygons)
 
@@ -234,7 +237,8 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
     return {'FINISHED'}
 
 
-def mu_select_by_material_name(self, find_material_name, extend_selection = False, internal = False):
+def mu_select_by_material_name(self, find_material_name, extend_selection = False,
+                               internal = False):
     """Searches through all objects, or the polygons/curves of the current object
     to find and select objects/data with the desired material"""
 
@@ -357,17 +361,20 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
             elif not internal:
                 # Some object types are not supported
-                #  mostly because don't really support selecting by material (like Font/Text objects)
-                #  ore that they don't support multiple materials/are just "weird" (i.e. Meta balls)
-                self.report({'WARNING'}, "The type '" +
-                                            obj.type +
-                                            "' isn't supported in Edit mode by Material Utilities!")
+                #  mostly because don't really support selecting by material
+                #  (like Font/Text objects)
+                #  ore that they don't support multiple materials/are just "weird"
+                # (i.e. Meta balls)
+                self.report({'WARNING'}, "The type '"
+                                            + obj.type
+                                            + "' isn't supported in Edit mode by Material Utilities!")
                 #return {'CANCELLED'}
 
         bpy.context.view_layer.objects.active = active_object
 
         if (not found_material) and (not internal):
-            self.report({'INFO'}, "Material " + find_material_name + " isn't assigned to anything!")
+            self.report({'INFO'},
+                        "Material " + find_material_name + " isn't assigned to anything!")
 
     return {'FINISHED'} if not internal else 1
 
@@ -433,9 +440,9 @@ def mu_cleanmatslots(self, affect, selected_collection = ""):
 
     for obj in objects:
         used_mat_index = []  # we'll store used materials indices here
-        assigned_materials = []
-        material_list = []
+        material_list  = []
         material_names = []
+        assigned_materials = []
 
         materials = obj.material_slots.keys()
 
@@ -537,13 +544,13 @@ def mu_remove_material(self, for_active_object = False):
         bpy.ops.object.material_slot_remove()
     else:
         last_active = bpy.context.active_object
-        objects = bpy.context.selected_editable_objects
+        objects     = bpy.context.selected_editable_objects
 
         for obj in objects:
             bpy.context.view_layer.objects.active = obj
             bpy.ops.object.material_slot_remove()
 
-        bpy.context.view_layer.objects.active =  last_active
+        bpy.context.view_layer.objects.active = last_active
 
     return {'FINISHED'}
 
@@ -558,7 +565,7 @@ def mu_remove_all_materials(self, for_active_object = False):
 
     else:
         last_active = bpy.context.active_object
-        objects = bpy.context.selected_editable_objects
+        objects     = bpy.context.selected_editable_objects
 
         for obj in objects:
             obj.data.materials.clear()
@@ -571,8 +578,6 @@ def mu_do_replace_material(self, mat_org, mat_rep, all_objects=False, update_sel
     """Replace one material with another material"""
 
     if mat_org != mat_rep and None not in (mat_org, mat_rep):
-        scn = bpy.context.scene
-
         if all_objects:
             objs = bpy.data.objects
         else:
@@ -594,8 +599,10 @@ def mu_do_replace_material(self, mat_org, mat_rep, all_objects=False, update_sel
                 if update_selection and not match:
                     obj.select_set(state = False)
 
-def mu_do_replace_multiple_materials(self, mats_org_list, mats_rep_list, all_objects=False, update_selection=False):
-    """Take a list of materials, and replace each of them with the matching one in the second list"""
+def mu_do_replace_multiple_materials(self, mats_org_list, mats_rep_list,
+                                     all_objects=False, update_selection=False):
+    """Take a list of materials, and replace each of them
+        with the matching one in the second list"""
 
     mats_org_list_len = len(mats_org_list)
     mats_rep_list_len = len(mats_rep_list)
@@ -621,7 +628,8 @@ def mu_do_replace_multiple_materials(self, mats_org_list, mats_rep_list, all_obj
 
     return {'FINISHED'}
 
-def mu_replace_material(self, material_a, material_b, all_objects=False, update_selection=False):
+def mu_replace_material(self, material_a, material_b, all_objects=False,
+                        update_selection=False):
     """Replace one material with another material"""
 
     # material_a is the name of original material
@@ -636,7 +644,8 @@ def mu_replace_material(self, material_a, material_b, all_objects=False, update_
     return {'FINISHED'}
 
 def mu_get_materials_as_list(self, material_str_list):
-    """Take a list of material names as strings, and return a list with matching materials"""
+    """Take a list of material names as strings,
+        and return a list with matching materials"""
 
     material_list = []
 
@@ -644,13 +653,15 @@ def mu_get_materials_as_list(self, material_str_list):
         mat = bpy.data.materials.get(mat_str)
 
         if (mat is None):
-            self.report({'WARNING'}, "Could not find material '" + mat_str + "'! Skipping!")
+            self.report({'WARNING'},
+                        "Could not find material '" + mat_str + "'! Skipping!")
         else:
             material_list.append(mat)
 
     return material_list
 
-def mu_replace_multiple_materials(self, materials_a, materials_b, all_objects=False, update_selection=False):
+def mu_replace_multiple_materials(self, materials_a, materials_b,
+                                  all_objects=False, update_selection=False):
     """Replace multiple materials with another material"""
 
     # material_a is a text block with materials to replace
@@ -698,10 +709,13 @@ def mu_replace_multiple_materials(self, materials_a, materials_b, all_objects=Fa
 
     if (mats_org_list_len != mats_rep_list_len):
         self.report({'WARNING'},
-                    "Mismatching length of material lists, unexpected results might occur! %d original materials, %d replacement materials" %
+                    "Mismatching length of material lists, \
+                    unexpected results might occur! %d original materials, \
+                    %d replacement materials" %
                     (mats_org_list_len, mats_rep_list_len))
 
-    return mu_do_replace_multiple_materials(self, mats_org_list, mats_rep_list, all_objects, update_selection)
+    return mu_do_replace_multiple_materials(self, mats_org_list, mats_rep_list,
+                                            all_objects, update_selection)
 
 def mu_set_fake_user(self, fake_user, materials, selected_collection = ""):
     """Set the fake user flag for the objects material"""
@@ -751,7 +765,8 @@ def mu_set_fake_user(self, fake_user, materials, selected_collection = ""):
 
 def mu_change_material_link(self, link, affect, override_data_material = False,
                             selected_collection = "", unlink_old = False):
-    """Change what the materials are linked to (Object or Data), while keeping materials assigned"""
+    """Change what the materials are linked to (Object or Data),
+        while keeping materials assigned"""
 
     objects = []
 
@@ -787,8 +802,10 @@ def mu_change_material_link(self, link, affect, override_data_material = False,
                 override_data_material = True
             elif not override_data_material:
                 self.report({'INFO'},
-                            'The object Data for object ' + object.name_full + ' already had a material assigned ' +
-                            'to slot #' + str(index) + ' (' + slot.material.name + '), it was not overriden!')
+                            'The object Data for object ' + object.name_full
+                            + ' already had a material assigned '
+                            + 'to slot #' + str(index)
+                            + ' (' + slot.material.name + '), it was not overriden!')
 
             if override_data_material:
                 slot.material = present_material
@@ -844,8 +861,9 @@ def mu_set_auto_smooth(self, angle, affect, set_smooth_shading, selected_collect
 
             objects_affected += 1
 
-    self.report({'INFO'}, 'Auto smooth angle set to %.0f° on %d of %d objects' %
-                            (degrees(angle), objects_affected, len(objects)))
+    self.report({'INFO'},
+                'Auto smooth angle set to %.0f° on %d of %d objects' %
+                 (degrees(angle), objects_affected, len(objects)))
 
     return {'FINISHED'}
 
@@ -873,10 +891,10 @@ def mu_get_filetype(filename):
 
     filename = filename.lower()
 
-    ext = os.path.splitext(filename)[1].strip('.')
+    ext  = os.path.splitext(filename)[1].strip('.')
     type = 'NOT_IMG'
-    colorspace = 'NA'
     override_colorspace = False
+    colorspace  = 'NA'
     texture_map = 'UNKNOWN'
     non_color = False
     has_alpha = False
@@ -972,8 +990,7 @@ def mu_faux_shader_node(out_node):
                            width=out_node.width)
 
 def mu_create_default_shader_node(nodes, engine, node, out_node = None,
-                                  links = None, prefs = None,
-                                  set_target = False):
+                                  links = None, prefs = None):
     """Create a "default" shader node appropriate for the current render engine"""
 
     if out_node is None:
@@ -1034,11 +1051,11 @@ def mu_get_ocio_colorspace(colsp, imgtype):
 
 def mu_calc_node_location(first_node, node, filetype,
                           engine='', x_offset=300, y_offset=0,
-                          map=None, prefs = None):
+                          map=None, prefs=None):
     """Caculate the proper location of the, to be, added texture node, based on the map type"""
 
     location = [0,0]
-    ft_map = 'COLOR'
+    ft_map   = 'COLOR'
     if map is None:
         map = filetype.map
     grp = 'EXP' if prefs is None else prefs.pos_group
@@ -1168,7 +1185,8 @@ def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[],
 def mu_add_image_texture(filename, filetype, prefs,
                          nodes = None, links = None, material = None,
                          out_node = None, first_node = None, engine = ''):
-    """Add an image texture to the material node tree, and (if selected) try to connect it up"""
+    """Add an image texture to the material node tree,
+        and (if selected) try to connect it up"""
 
     x_offset = 300 if prefs.x_offset is None else prefs.x_offset
 
@@ -1177,13 +1195,14 @@ def mu_add_image_texture(filename, filetype, prefs,
     except:
         raise NameError("Cannot load image %s" % filename)
 
-    mu_set_image_colorspace(img.colorspace_settings, filetype) # Octane will ignore this, but for Cycles the colorspace is connected to the image data
+    # Octane will ignore this, but for Cycles the colorspace is connected to the image data
+    mu_set_image_colorspace(img.colorspace_settings, filetype)
 
     if engine == 'CYCLES':
         node = nodes.new('ShaderNodeTexImage')
 
         name = 'MUAdded' + filetype.map
-        node.name = name
+        node.name  = name
         node.image = img
         if prefs.set_label:
             node.label = filetype.orig_map
@@ -1249,7 +1268,8 @@ def mu_add_image_texture(filename, filetype, prefs,
                     links.new(node.outputs['Alpha'], first_node.inputs[input])
 
     elif engine == 'OCTANE':
-        node = mu_add_octane_node('image', filetype=filetype, nodes=nodes, prefs=prefs, name='_MAP')
+        node = mu_add_octane_node('image', filetype=filetype, nodes=nodes,
+                                  prefs=prefs, name='_MAP')
         node.image = img
 
         if prefs.connect and filetype.map != 'UNKNOWN':
@@ -1269,7 +1289,7 @@ def mu_add_image_texture(filename, filetype, prefs,
                     if prefs.emission_option == 'NODE':
                         first_node.inputs['Emission color'].default_value = (1.0, 1.0, 1.0)
                     else:
-                        skip = True
+                        skip  = True
                         input = mu_node_inputs[engine][first_node.bl_idname]['EMISSION_COLOR']
 
                 if not skip:
@@ -1296,10 +1316,12 @@ def mu_add_image_texture(filename, filetype, prefs,
                 links.new(link_node.outputs[0], first_node.inputs[input])
             else:
                 if msg is None:
-                    msg = "No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname)
+                    msg = "No input for %s to %s found, skipping link" % \
+                            (filetype.map, first_node.bl_idname)
                 print("Material Utilities - " + msg)
 
-    node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs)
+    node.location = mu_calc_node_location(first_node, node, filetype, engine,
+                                          x_offset=x_offset, prefs=prefs)
 
     return node
 
@@ -1315,22 +1337,26 @@ def mu_replace_image(self, filename, filetype, prefs, node, engine):
     if prefs.set_fake_user:
         node.image.use_fake_user = True
 
-    mu_set_image_colorspace(img.colorspace_settings, filetype) # Octane will ignore this, but for Cycles the colorspace is connected to the image data
+    # Octane will ignore this, but for Cycles the colorspace is connected to the image data
+    mu_set_image_colorspace(img.colorspace_settings, filetype)
 
     node.image = img
+
     print("Replaced file in node '%s' ('%s') with %s" % (node.name, node.label, filename))
 
 def mu_replace_selected_image_textures(self, filename, filetype, prefs,
                                        nodes=[], engine=''):
     """Replace the image files in the selected nodes, if matching, with a new set"""
 
-    found      = False
+    found = False
     found_node = None
 
     for node in nodes:
-        if (engine == 'CYCLES' and node.bl_idname == 'ShaderNodeTexImage') or \
-           (engine == 'OCTANE' and node.bl_idname in ['OctaneGreyscaleImage', 'OctaneRGBImage']):
+        if (engine == 'CYCLES' and node.bl_idname == 'ShaderNodeTexImage') \
+           or (engine == 'OCTANE' \
+               and node.bl_idname in ['OctaneGreyscaleImage', 'OctaneRGBImage']):
             ft = mu_get_filetype(node.image.name)
+
             if node.label.upper() == filetype.map or ft.map == filetype.map:
                 found      = True
                 found_node = node
@@ -1349,7 +1375,8 @@ def mu_replace_image_texture(self, filename, filetype, prefs,
     found = False
     found_node = None
 
-    # If it's a height/displacement map, look for it in the Displacement input on the Material out node
+    # If it's a height/displacement map,
+    # look for it in the Displacement input on the Material out node
     if filetype.map == 'DISPLACEMENT' or filetype.map == 'HEIGHT':
         if out_node.inputs['Displacement'].is_linked:
             disp_node = out_node.inputs['Displacement'].links[0].from_node
@@ -1373,11 +1400,13 @@ def mu_replace_image_texture(self, filename, filetype, prefs,
                 found = True
                 found_node = node
 
-    # Just search through all nodes if we haven't found the right one yet (and wide search is enabled)
+    # Just search through all nodes if we haven't found the right one yet
+    #  (and wide search is enabled)
     if not found and prefs.go_wide:
-        # Use the replaced selected textures functions, but use all nodes as "selected" nodes
-        return mu_replace_selected_image_textures(self, filename, filetype, prefs,
-                                                  nodes, engine)
+        # Use the replaced selected textures functions,
+        #  but use all nodes as "selected" nodes
+        return mu_replace_selected_image_textures(self, filename, filetype, 
+                                                  prefs, nodes, engine)
 
     if found:
         mu_replace_image(self, filename, filetype, prefs, found_node, engine)
@@ -1405,7 +1434,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     engine = bpy.data.scenes['Scene'].render.engine
 
-    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE': # Cycles and Eevee uses the same nodes
+    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE':
+        # Cycles and Eevee uses the same nodes
         engine = 'CYCLES'
     elif engine == 'octane':
         engine = engine.upper()
@@ -1429,11 +1459,13 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         out_node = nodes.get('Material Output')
 
         # Remove the default shader node
-        #  (we're not sure that the default node is the one we want, so we try to start with an "empty" material)
+        #  (we're not sure that the default node is the one we want,
+        #   so we try to start with an "empty" material)
         if out_node.inputs['Surface'].is_linked:
             nodes.remove(out_node.inputs['Surface'].links[0].from_node)
 
-        mu_create_default_shader_node(nodes, engine, first_node, links=links, out_node=out_node, prefs=prefs)
+        mu_create_default_shader_node(nodes, engine, first_node, links=links,
+                                      out_node=out_node, prefs=prefs)
     else:
         mat = bpy.context.active_object.active_material
 
@@ -1449,6 +1481,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     bump_tex_node   = None
     normal_tex_node = None
     displace_tex_node = None
+
     colorspaces = {}
     gammas = { 'COLOR': [], 'NONCOLOR': [] }
 
@@ -1529,7 +1562,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                    has_displace = True
                    displace_tex_node = node
             elif engine == 'OCTANE':
-                color = 'GREYSCALE' if filetype.is_greyscale else 'RGB'
+                color    = 'GREYSCALE' if filetype.is_greyscale else 'RGB'
                 datatype = 'NONCOLOR' if filetype.non_color else 'COLOR'
 
                 if color not in colorspaces:
@@ -1544,7 +1577,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     alpha_node = mu_add_octane_node('alpha_image', nodes=nodes,
                                                     name='MUAddedAlphaImageNode',
                                                     prefs=prefs)
-                    alpha_node.image = node.image
+                    alpha_node.image    = node.image
                     alpha_node.location = mu_calc_node_location(first_node, node,
                                                                 None, engine,
                                                                 x_offset=prefs.x_offset,
@@ -1563,6 +1596,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     if gloss_node is not None and rough_node is not None:
         connected = "one"
+
         if rough_node.outputs[0].is_linked:
             gloss_node.location.x -= 150
             connected = "Roughness"
@@ -1570,7 +1604,9 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             rough_node.location.x -= 150
             connected = "Glossiness"
 
-        self.report({'WARNING'}, "Texture set has both Roughness and Glossiness, " + connected + " has taken presidence!")
+        self.report({'WARNING'},
+                    "Texture set has both Roughness and Glossiness, "
+                    + connected + " has taken presidence!")
 
     if prefs.connect:
         uvmap     = None
@@ -1596,12 +1632,16 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 uvmap = nodes.new('ShaderNodeUVMap')
                 uvmap.name     = 'MUAddedUVMap'
                 uvmap.label    = dir_name + " - UV"
-                uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
+                uvmap.location = mu_calc_node_location(first_node, uvmap, None,
+                                                       engine, map='_UVNODE',
+                                                       prefs=prefs)
 
             if reroute is None:
                 reroute = nodes.new('NodeReroute')
                 reroute.name     = 'MUAddedUVReroute'
-                reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
+                reroute.location = mu_calc_node_location(first_node, uvmap, None,
+                                                         engine, map='_UVREROUTE',
+                                                         prefs=prefs)
 
                 links.new(uvmap.outputs['UV'], reroute.inputs['Input'])
 
@@ -1610,7 +1650,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 uvmap.location.y   += 150
 
             if has_bump:
-                bump_node   = nodes['MUAddedBumpNode']
+                bump_node = nodes['MUAddedBumpNode']
             if has_normal:
                 normal_node = nodes['MUAddedNormalMapNode']
 
@@ -1635,7 +1675,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             if prefs.align_nodes and not prefs.pos_group == 'COL':
                 from operator import attrgetter
                 added_nodes.sort(key=attrgetter('location.y'), reverse=True)
-                pos_y = first_node.location.y
+
+                pos_y   = first_node.location.y
                 offs_y1 = 250
                 offs_y2 = 40
                 offs_x1 = 250
@@ -1655,7 +1696,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
                 for node in added_nodes:
                     if node.name == 'MUAddedGLOSSINESS' or not node.outputs[0].is_linked:
-                        if node.name == 'MUAddedGLOSSINESS' or node.name == 'MUAddedROUGHNESS':
+                        if node.name == 'MUAddedGLOSSINESS' \
+                            or node.name == 'MUAddedROUGHNESS':
                             node.location.x -= offs_x2
                             node.location.y = first_node.location.y + offs_y1 + offs_y2
                             if node.name == 'MUAddedGLOSSINESS':
@@ -1679,7 +1721,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     odd = not odd
 
                 if has_displace:
-                    pos_t = mu_calc_node_location(first_node, displace_tex_node, None, engine, prefs=prefs, map='None')
+                    pos_t = mu_calc_node_location(first_node, displace_tex_node, None,
+                                                  engine, prefs=prefs, map='None')
                     pos_t[1] = pos_y
 
                     displace_tex_node.location = pos_t
@@ -1695,7 +1738,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     odd = not odd
 
                 if has_bump:
-                    pos_t = mu_calc_node_location(first_node, bump_node, None, engine, prefs=prefs, map='None')
+                    pos_t = mu_calc_node_location(first_node, bump_node, None,
+                                                  engine, prefs=prefs, map='None')
                     pos_t[1] = pos_y
 
                     bump_tex_node.location = pos_t
@@ -1711,7 +1755,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     odd = not odd
 
                 if has_normal:
-                    pos_t = mu_calc_node_location(first_node, normal_node, None, engine, prefs=prefs, map='None')
+                    pos_t = mu_calc_node_location(first_node, normal_node, None,
+                                                  engine, prefs=prefs, map='None')
                     pos_t[1] = pos_y
 
                     normal_tex_node.location = pos_t
@@ -1722,9 +1767,9 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                         normal_node.location.x -= offs_x4
 
         elif engine == 'OCTANE':
-            transform  = None
-            reroute_tr = None
-            extra_nodes   = []
+            transform   = None
+            reroute_tr  = None
+            extra_nodes = []
 
             if mu_prefs.tex_add_new_uvmap:
                 if nodes.find('MUAddedUVMapOctane') >= 0:
@@ -1745,13 +1790,19 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 if uvmap.outputs['Projection out'].links[0].to_node.bl_idname == 'NodeReroute':
                     reroute = uvmap.outputs['Projection out'].links[0].to_node
             else:
-                uvmap = mu_add_octane_node('uvmap', name='MUAddedUVMapOctane', label=dir_name + " - UV", nodes=nodes, prefs=prefs)
-                uvmap.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVNODE', prefs=prefs)
+                uvmap = mu_add_octane_node('uvmap', name='MUAddedUVMapOctane',
+                                           label=dir_name + " - UV", nodes=nodes,
+                                           prefs=prefs)
+                uvmap.location = mu_calc_node_location(first_node, uvmap, None,
+                                                       engine, map='_UVNODE',
+                                                       prefs=prefs)
 
             if reroute is None:
                 reroute = nodes.new('NodeReroute')
                 reroute.name     = 'MUAddedUVReroute'
-                reroute.location = mu_calc_node_location(first_node, uvmap, None, engine, map='_UVREROUTE', prefs=prefs)
+                reroute.location = mu_calc_node_location(first_node, uvmap, None,
+                                                         engine, map='_UVREROUTE',
+                                                         prefs=prefs)
 
                 links.new(uvmap.outputs['Projection out'], reroute.inputs['Input'])
 
@@ -1816,7 +1867,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 uvmap.location.y   -= 150
 
             for node in added_nodes:
-                links.new(reroute.outputs['Output'], node.inputs['Projection'])
+                links.new(reroute.outputs['Output'],    node.inputs['Projection'])
                 links.new(reroute_tr.outputs['Output'], node.inputs['UV transform'])
 
             if prefs.align_nodes and not prefs.pos_group == 'COL':
@@ -1848,11 +1899,14 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     if not node.outputs[0].is_linked:
                         if node.name == 'MUAddedAO':
                             node.location.y = first_node.location.y + offs_y1 + offs_y2
-                        elif node.name == 'MUAddedGLOSSINESS' or node.name == 'MUAddedROUGHNESS':
+                        elif node.name == 'MUAddedGLOSSINESS' \
+                             or node.name == 'MUAddedROUGHNESS':
                             node.location.x -= offs_x2
                             node.location.y = first_node.location.y + offs_y1 + offs_y2
-                        elif node.name == 'MUAddedHEIGHT' or node.name == 'MUAddedBUMP':
-                            pos_t = mu_calc_node_location(first_node, node, None, engine, prefs=prefs, map='None')
+                        elif node.name == 'MUAddedHEIGHT' \
+                             or node.name == 'MUAddedBUMP':
+                            pos_t = mu_calc_node_location(first_node, node, None,
+                                                          engine, prefs=prefs, map='None')
                             node.location.x = pos_t[0] - offs_x1
                             node.location.y = first_node.location.y + offs_y1 + offs_y2
 
@@ -1866,9 +1920,11 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                         pos_y -= offs_y2
                         node.location.x -= offs_x1
 
-                    if node.name == 'MUAddedDISPLACEMENT' or node.name == 'MUAddedEMISSION':
+                    if node.name == 'MUAddedDISPLACEMENT' \
+                       or node.name == 'MUAddedEMISSION':
                         nid = 'MUAddedDisplacementNode' if node.name == 'MUAddedDISPLACEMENT' else 'MUAddedEmissionNode'
-                        pos_t = mu_calc_node_location(first_node, node, None, engine, prefs=prefs, map='None')
+                        pos_t = mu_calc_node_location(first_node, node, None,
+                                                      engine, prefs=prefs, map='None')
                         node.location.x = pos_t[0]
                         nodes[nid].location = node.location
                         node.location.x -= offs_x3
@@ -1876,13 +1932,17 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                     odd = not odd
 
     if prefs.new_material:
-        mu_assign_material(self, material_name=mat.name, override_type=prefs.override_type)
+        mu_assign_material(self, material_name=mat.name,
+                           override_type=prefs.override_type)
 
     return {'FINISHED'}
 
 def mu_replace_image_textures(self, prefs, directory = None,
                               file_list = [], file_path = ''):
-    """Try to find and replace image files in existing texture nodes with a new set (Does NOT add a new texture if there's an new image texture without matching node!)"""
+    """Try to find and replace image files in
+       existing texture nodes with a new set
+        (Does NOT add a new texture if there's an new image texture
+         without matching node!)"""
 
     files = []
 
@@ -1901,14 +1961,18 @@ def mu_replace_image_textures(self, prefs, directory = None,
     engine = bpy.data.scenes['Scene'].render.engine
     mat    = bpy.context.active_object.active_material
 
-    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE': # Cycles and Eevee uses the same nodes
+    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE':
+        # Cycles and Eevee uses the same nodes
         engine = 'CYCLES'
     elif engine == 'octane':
         engine = engine.upper()
     else:
-        print("Material Utilities - Add image Textures: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
-        self.report({'WARNING'}, "The render engine '" + bpy.data.scenes['Scene'].render.engine +
-                                    "' isn't supported by Material Utilities!")
+        print("Material Utilities - Add image Textures: Unsupported render engine: ",
+              bpy.data.scenes['Scene'].render.engine)
+        self.report({'WARNING'},
+                    "The render engine '"
+                    + bpy.data.scenes['Scene'].render.engine
+                    + "' isn't supported by Material Utilities!")
         return {'CANCELLED'}
 
     nodes = mat.node_tree.nodes
@@ -1920,7 +1984,8 @@ def mu_replace_image_textures(self, prefs, directory = None,
     elif out_node.inputs['Surface'].is_linked:
         first_node = out_node.inputs['Surface'].links[0].from_node
 
-    if first_node is not None and first_node.bl_idname not in mu_node_inputs[engine].keys():
+    if (first_node is not None
+        and first_node.bl_idname not in mu_node_inputs[engine].keys()):
         first_node = None
 
     for file in files:
@@ -1932,8 +1997,12 @@ def mu_replace_image_textures(self, prefs, directory = None,
             continue
 
         if prefs.only_selected:
-            mu_replace_selected_image_textures(self, file, filetype=filetype, prefs=prefs, nodes=prefs.context.selected_nodes, engine=engine)
+            mu_replace_selected_image_textures(self, file, filetype=filetype, prefs=prefs,
+                                               nodes=prefs.context.selected_nodes,
+                                               engine=engine)
         else:
-            mu_replace_image_texture(self, file, filetype=filetype, prefs=prefs, nodes=nodes, out_node=out_node, first_node=first_node, engine=engine)
+            mu_replace_image_texture(self, file, filetype=filetype, prefs=prefs,
+                                     nodes=nodes, out_node=out_node,
+                                     first_node=first_node, engine=engine)
 
     return {'FINISHED'}
