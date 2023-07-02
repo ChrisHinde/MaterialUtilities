@@ -210,6 +210,28 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         description = "Add appropriate Color space nodes",
         default = True,
         )
+    tex_add_gamma_nodes: BoolProperty(
+        name = "Add common gamma nodes",
+        description = "Add (float value) node(s) for texture (legacy) gamma",
+        default = False
+    )
+    tex_gamma_color: FloatProperty(
+        name = "Gamma (Color)",
+        description = "Default gamma value for color/RGB textures",
+        default = 2.2
+    )
+    tex_gamma_noncolor: FloatProperty(
+        name = "Gamma (Non-Color)",
+        description = "Default gamma value for non-color textures",
+        default = 1.0
+    )
+    tex_hide_gamma_values: BoolProperty(
+        name = "Hide gamma values on import",
+        description = "Hide the gamma value inputs in the import dialog.\n"
+                        "If you don't have any plans to change the gamma values, beyond the defaults set here, on imports, "
+                        "hiding them will declutter the import options some",
+        default = False
+    )
     tex_stair_step: BoolProperty(
         name = "Stair step nodes",
         description = "Arrange the image nodes in a \"stair step\" (alternating) layout (Does not affect collapsed nodes).",
@@ -397,8 +419,16 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                         else 'DISCLOSURE_TRI_RIGHT')
             if self.textures_octane_specific_expanded:
                 layout.separator()
-                col = mu_ui_col_split(layout)
-                col.prop(self, 'tex_add_colorspaces', expand = False)
+                col = mu_ui_col_split(layout).split()
+                col1 = col.column()
+                col1.prop(self, 'tex_add_colorspaces', expand = False)
+                col2 = col.column()
+                col2.prop(self, 'tex_add_gamma_nodes', expand = False)
+                col2.prop(self, 'tex_hide_gamma_values', expand = False)
+                col2.separator()
+                col2.label(text="Defaults")
+                col2.prop(self, 'tex_gamma_color', expand = False)
+                col2.prop(self, 'tex_gamma_noncolor', expand = False)
 
             layout.separator()
 

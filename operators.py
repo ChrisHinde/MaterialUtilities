@@ -992,6 +992,23 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             description = "Add appropriate Color space nodes",
             default = True,
             )
+    add_gamma_nodes: BoolProperty(
+        name = "Add common gamma nodes",
+        description = "Add (float value) node(s) for texture (legacy) gamma",
+        default = False
+    )
+    gamma_color: FloatProperty(
+        name = "Color",
+        description = "Default gamma value for color/RGB textures\n"
+                        " Ignored when using Color space nodes (except for Linear RGB)",
+        default = 2.2
+    )
+    gamma_noncolor: FloatProperty(
+        name = "Non-Color",
+        description = "Default gamma value for non-color (greyscale and normal) textures\n"
+                        " Ignored when using Color space nodes (except for Linear RGB)",
+        default = 1.0
+    )
     height_map_option: EnumProperty(
             name = "Height map treatment",
             description = "How should height maps be treated",
@@ -1038,6 +1055,10 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
     add_material: BoolProperty(
             default = False,
             )
+    
+    hide_gamma_values: BoolProperty(
+            default = False,
+            )
 
     add: BoolProperty(
             default = False,
@@ -1072,6 +1093,16 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                 row = col.row()
                 row.prop(self, 'add_colorspaces')
                 row.enabled = self.connect
+                row = col.row()
+                row.prop(self, 'add_gamma_nodes')
+                row.enabled = self.connect
+
+                if not self.hide_gamma_values:
+                    box = layout.box()
+                    box.label(text = "Default Gamma:")
+                    col = mu_ui_col_split(box)
+                    col.prop(self, 'gamma_color')
+                    col.prop(self, 'gamma_noncolor')
 
             box = layout.box()
             box.label(text = "Appearance:")
@@ -1083,7 +1114,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             row.prop(self, 'stair_step')
 
             box = layout.box()
-            box.label(text = "Map options:")
+            box.label(text = "Map Options:")
             col = mu_ui_col_split(box)
             col.prop(self, 'reflection_as_specular')
             col.label(text = "Height Map Treatment")
@@ -1095,7 +1126,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
 
             if self.add_material:
                 box = layout.box()
-                box.label(text = "Material options:")
+                box.label(text = "Material Options:")
                 col = mu_ui_col_split(box)
 
                 if context.active_object.mode == 'OBJECT':
@@ -1128,6 +1159,10 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
         self.collapse_texture_nodes = mu_prefs.tex_collapse_texture_nodes
         self.reflection_as_specular = mu_prefs.tex_reflection_as_specular
         self.add_colorspaces        = mu_prefs.tex_add_colorspaces
+        self.add_gamma_nodes        = mu_prefs.tex_add_gamma_nodes
+        self.hide_gamma_values      = mu_prefs.tex_hide_gamma_values
+        self.gamma_color            = mu_prefs.tex_gamma_color
+        self.gamma_noncolor         = mu_prefs.tex_gamma_noncolor
         self.height_map_option      = mu_prefs.tex_height_map_option
         self.stair_step             = mu_prefs.tex_stair_step
 
@@ -1164,6 +1199,9 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     collapse_texture_nodes = self.collapse_texture_nodes,
                                     reflection_as_specular = self.reflection_as_specular,
                                     add_colorspace  = self.add_colorspaces,
+                                    add_gamma_nodes = self.add_gamma_nodes,
+                                    gamma_color     = self.gamma_color,
+                                    gamma_noncolor  = self.gamma_noncolor,
                                     stairstep       = self.stair_step,
                                     align_nodes     = True,
                                     new_material    = self.add_material,
@@ -1172,7 +1210,6 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                                     mat_node_type   = self.material_node_type,
                                     emission_option = self.emission_map_option,
                                     pos_group       = 'COL' if self.collapse_texture_nodes else 'EXP',
-                                    gamma           = 2.2,
                                     x_offset        = 300,
                                     context         = context
                                     )

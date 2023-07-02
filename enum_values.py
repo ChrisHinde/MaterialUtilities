@@ -339,7 +339,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
 
                 '_TRANSFORM': 750, '_TRANSFORMREROUTE': 783,
                 '_UVNODE': 980, '_UVREROUTE': 1013,
-                '_COLORSPACENODE': 450,
+                '_COLORSPACENODE': 450, '_GAMMANODE': 420,
                 'UNKNOWN': -1500,
 
                 # 'AO': -240, 'REFLECTION': -320,
@@ -367,7 +367,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
 
                 '_TRANSFORM': 750, '_TRANSFORMREROUTE': 783,
                 '_UVNODE': 980, '_UVREROUTE': 1013,
-                '_COLORSPACENODE': 450,
+                '_COLORSPACENODE': 450, '_GAMMANODE': 420,
                 'UNKNOWN': -1500,
             },
             'FAUX': {
@@ -379,7 +379,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'BUMP': 600, 'NORMAL': 700,
                 'HEIGHT': 800, 'DISPLACEMENT': 900,
                 'UNKNOWN': -500,
-                '_COLORSPACENODE': 100,
+                '_COLORSPACENODE': 100, '_GAMMANODE': 150,
                 '_UVNODE': 50, '_UVREROUTE': 50,
             }
         },
@@ -399,7 +399,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
 
                 '_UVNODE': 750, '_UVREROUTE': 760,
                 '_TRANSFORM': 710, '_TRANSFORMREROUTE': 720,
-                '_COLORSPACENODE': 500,
+                '_COLORSPACENODE': 500, '_GAMMANODE': 600
             },
             'OctaneStandardSurfaceMaterial': {
                 'AO': -100, 'REFLECTION': -300,
@@ -416,7 +416,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
 
                 '_UVNODE': 750, '_UVREROUTE': 760,
                 '_TRANSFORM': 710, '_TRANSFORMREROUTE': 720,
-                '_COLORSPACENODE': 500,
+                '_COLORSPACENODE': 500, '_GAMMANODE': 600
             },
             'FAUX': {
                 'AO': -240, 'REFLECTION': -320, 'ALPHA': -160, 'MASK': -80,
@@ -428,7 +428,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'HEIGHT': 640, 'DISPLACEMENT': 720,
                 'UNKNOWN': -500,
                 '_UVNODE': 50, '_UVREROUTE': 50, '_TRANSFORM': 150, '_TRANSFORMREROUTE': 150,
-                '_COLORSPACENODE': 230,
+                '_COLORSPACENODE': 230, '_GAMMANODE': 310
             }
         }
     }

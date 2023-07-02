@@ -749,7 +749,8 @@ def mu_set_fake_user(self, fake_user, materials, selected_collection = ""):
     return {'FINISHED'}
 
 
-def mu_change_material_link(self, link, affect, override_data_material = False, selected_collection = "", unlink_old = False):
+def mu_change_material_link(self, link, affect, override_data_material = False,
+                            selected_collection = "", unlink_old = False):
     """Change what the materials are linked to (Object or Data), while keeping materials assigned"""
 
     objects = []
@@ -918,7 +919,8 @@ def mu_get_filetype(filename):
         texture_map = 'NORMAL'
     elif 'col' in filename or 'base' in filename:
         texture_map = 'COLOR'
-    elif 'alpha' in filename or 'opacity' in filename or 'transparent' in filename:
+    elif 'alpha' in filename or 'opacity' in filename \
+        or 'transparent' in filename:
         texture_map = 'ALPHA'
     elif 'mask' in filename:
         texture_map = 'MASK'
@@ -955,16 +957,23 @@ def mu_get_filetype(filename):
         elif 'srgb' in filename:
             colorspace = 'sRGB'
 
-    return SimpleNamespace(type=type, colorspace=colorspace, map=texture_map, orig_map=texture_map,
-                           override_colorspace=override_colorspace, non_color=non_color, is_greyscale=is_greyscale,
-                           has_alpha=has_alpha, tagged_alpha=tagged_alpha, ignore=ignore, invert=invert)
+    return SimpleNamespace(type=type, colorspace=colorspace,
+                           map=texture_map, orig_map=texture_map,
+                           override_colorspace=override_colorspace,
+                           non_color=non_color,is_greyscale=is_greyscale,
+                           has_alpha=has_alpha, tagged_alpha=tagged_alpha,
+                           ignore=ignore, invert=invert)
 
 def mu_faux_shader_node(out_node):
     """Create a 'faux shader', to be used instead of an existing shader node"""
 
-    return SimpleNamespace(name='FAUX', bl_idname='FAUX', location=out_node.location, width=out_node.width)
+    return SimpleNamespace(name='FAUX', bl_idname='FAUX',
+                           location=out_node.location,
+                           width=out_node.width)
 
-def mu_create_default_shader_node(nodes, engine, node, out_node = None, links = None, prefs = None, set_target = False):
+def mu_create_default_shader_node(nodes, engine, node, out_node = None,
+                                  links = None, prefs = None,
+                                  set_target = False):
     """Create a "default" shader node appropriate for the current render engine"""
 
     if out_node is None:
@@ -974,7 +983,8 @@ def mu_create_default_shader_node(nodes, engine, node, out_node = None, links = 
 
     if engine == 'OCTANE':
         if prefs.mat_node_type not in mu_default_shader_nodes[engine].keys():
-            print("Material Utilities - No matching node for '%s' found, using default node!" % prefs.mat_node_type)
+            print("Material Utilities - No matching node for '%s' found, using default node!"
+                  % prefs.mat_node_type)
             def_node = '_DEFAULT'
 
         def_node = mu_default_shader_nodes[engine][prefs.mat_node_type]
@@ -1022,7 +1032,9 @@ def mu_get_ocio_colorspace(colsp, imgtype):
 
     return cs
 
-def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=300, y_offset=0, map=None, prefs = None):
+def mu_calc_node_location(first_node, node, filetype,
+                          engine='', x_offset=300, y_offset=0,
+                          map=None, prefs = None):
     """Caculate the proper location of the, to be, added texture node, based on the map type"""
 
     location = [0,0]
@@ -1031,7 +1043,8 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=300, y
         map = filetype.map
     grp = 'EXP' if prefs is None else prefs.pos_group
 
-    if filetype is None or (engine == 'CYCLES' and map == '_DISPLACEMENT'):
+    if filetype is None \
+        or (engine == 'CYCLES' and map == '_DISPLACEMENT'):
         ft_map = map
     else:
         ft_map = filetype.map
@@ -1056,11 +1069,14 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=300, y
         elif map == 'GLOSSINESS':
             x_offset += 100 + 50
     elif engine == 'OCTANE':
-        if map == 'EMISSION' and prefs.mat_node_type == 'STD_SURF' and prefs.emission_option != 'NODE':
+        if (map == 'EMISSION' and prefs.mat_node_type == 'STD_SURF' \
+            and prefs.emission_option != 'NODE'):
             y_offset = -15
-        elif map == '_UVNODE' or map == '_TRANSFORM' or map == '_COLORSPACENODE':
+        elif map == '_UVNODE' or map == '_TRANSFORM' \
+             or map == '_COLORSPACENODE' or map == '_GAMMANODE':
             x_offset += 530 + 50
-        elif map == 'HEIGHT' or map == 'DISPLACEMENT' or map == 'EMISSION':
+        elif map == 'HEIGHT' or map == 'DISPLACEMENT' \
+             or map == 'EMISSION':
             x_offset += 190 + 50
         elif map == '_UVREROUTE' or map == '_TRANSFORMREROUTE':
             x_offset += 300 + 50
@@ -1077,10 +1093,12 @@ def mu_calc_node_location(first_node, node, filetype, engine='', x_offset=300, y
 
     return location
 
-def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[], name=None, label=None):
-    node    = None
-    is_img  = False
-    lbl_sfx = ''
+def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[],
+                       name=None, label=None, non_color=False):
+    node     = None
+    is_img   = False
+    is_gamma = False
+    lbl_sfx  = ''
 
     if type == 'uvmap':
         type = 'OctaneMeshUVProjection'
@@ -1090,6 +1108,9 @@ def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[], name=None, lab
         type = 'Octane3DTransformation'
     elif type == 'colorspace':
         type = 'OctaneOCIOColorSpace'
+    elif type == 'gamma':
+        type = 'OctaneFloatValue'
+        is_gamma = True
     elif type == 'displacement':
         type = 'OctaneTextureDisplacement'
     elif type == 'emission':
@@ -1126,12 +1147,18 @@ def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[], name=None, lab
     if type == 'OctaneTextureDisplacement':
         node.inputs['Height'].default_value = prefs.bump_distance
         return node
+    if is_gamma:
+        if non_color:
+            node.a_value[0] = prefs.gamma_noncolor
+        else:
+            node.a_value[0] = prefs.gamma_color
+        return node
 
     if is_img:
         if filetype.non_color:
-            node.inputs['Legacy gamma'].default_value = 1.0
+            node.inputs['Legacy gamma'].default_value = prefs.gamma_noncolor
         else:
-            node.inputs['Legacy gamma'].default_value = prefs.gamma
+            node.inputs['Legacy gamma'].default_value = prefs.gamma_color
 
         if filetype.invert:
             node.inputs['Invert'].default_value = True
@@ -1170,7 +1197,9 @@ def mu_add_image_texture(filename, filetype, prefs,
             if filetype.map == 'BUMP':
                 bump_node = nodes.new('ShaderNodeBump')
                 bump_node.name = 'MUAddedBumpNode'
-                bump_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_BUMPNODE', prefs=prefs)
+                bump_node.location = mu_calc_node_location(first_node, node, filetype,
+                                                           engine, x_offset=x_offset,
+                                                           map='_BUMPNODE', prefs=prefs)
                 bump_node.inputs['Distance'].default_value = prefs.bump_distance
 
                 i = mu_node_inputs[engine]['ShaderNodeBump'][filetype.map]
@@ -1180,7 +1209,9 @@ def mu_add_image_texture(filename, filetype, prefs,
             elif filetype.map == 'NORMAL':
                 nrm_node = nodes.new('ShaderNodeNormalMap')
                 nrm_node.name = 'MUAddedNormalMapNode'
-                nrm_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_NORMALNODE', prefs=prefs)
+                nrm_node.location = mu_calc_node_location(first_node, node, filetype,
+                                                          engine, x_offset=x_offset,
+                                                          map='_NORMALNODE', prefs=prefs)
 
                 i = mu_node_inputs[engine]['ShaderNodeNormalMap'][filetype.map]
                 links.new(node.outputs['Color'], nrm_node.inputs[i])
@@ -1189,7 +1220,9 @@ def mu_add_image_texture(filename, filetype, prefs,
             elif filetype.invert: # map == 'GLOSSINESS':
                 inv_node = nodes.new('ShaderNodeInvert')
                 inv_node.name = 'MUAddedInvertNode'
-                inv_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_INVERT', prefs=prefs)
+                inv_node.location = mu_calc_node_location(first_node, node, filetype,
+                                                          engine, x_offset=x_offset,
+                                                          map='_INVERT', prefs=prefs)
                 inv_node.hide = True
 
                 links.new(node.outputs['Color'], inv_node.inputs['Color'])
@@ -1197,7 +1230,9 @@ def mu_add_image_texture(filename, filetype, prefs,
             elif filetype.map == 'DISPLACEMENT':
                 dsp_node = nodes.new('ShaderNodeDisplacement')
                 dsp_node.name = 'MUAddedDisplacementNode'
-                dsp_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, map='_DISPLACEMENT', prefs=prefs)
+                dsp_node.location = mu_calc_node_location(first_node, node, filetype,
+                                                          engine, x_offset=x_offset,
+                                                          map='_DISPLACEMENT', prefs=prefs)
 
                 links.new(node.outputs['Color'], dsp_node.inputs['Height'])
                 links.new(dsp_node.outputs['Displacement'], out_node.inputs['Displacement'])
@@ -1205,7 +1240,8 @@ def mu_add_image_texture(filename, filetype, prefs,
             if input is not None:
                 links.new(link_node.outputs[0], first_node.inputs[input])
             else:
-                print("Material Utilities - No input for %s to %s found, skipping link" % (filetype.map, first_node.bl_idname))
+                print("Material Utilities - No input for %s to %s found, skipping link" % 
+                      (filetype.map, first_node.bl_idname))
 
             if prefs.connect_alpha and filetype.has_alpha:
                 input = mu_node_inputs[engine][first_node.bl_idname]['ALPHA']
@@ -1237,14 +1273,21 @@ def mu_add_image_texture(filename, filetype, prefs,
                         input = mu_node_inputs[engine][first_node.bl_idname]['EMISSION_COLOR']
 
                 if not skip:
-                    emit_node = mu_add_octane_node('emission', nodes=nodes, prefs=prefs, name='MUAddedEmissionNode')
-                    emit_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs, map='_EMISSION')
+                    emit_node = mu_add_octane_node('emission', nodes=nodes,
+                                                   name='MUAddedEmissionNode',
+                                                   prefs=prefs)
+                    emit_node.location = mu_calc_node_location(first_node, node, filetype,
+                                                               engine, x_offset=x_offset,
+                                                               prefs=prefs, map='_EMISSION')
 
                     links.new(node.outputs[0], emit_node.inputs['Texture'])
                     link_node = emit_node
             elif filetype.map == 'DISPLACEMENT':
-                disp_node = mu_add_octane_node('displacement', nodes=nodes, prefs=prefs, name='MUAddedDisplacementNode')
-                disp_node.location = mu_calc_node_location(first_node, node, filetype, engine, x_offset=x_offset, prefs=prefs, map='_DISPLACEMENT')
+                disp_node = mu_add_octane_node('displacement', nodes=nodes,
+                                               name='MUAddedDisplacementNode', prefs=prefs)
+                disp_node.location = mu_calc_node_location(first_node, node, filetype,
+                                                           engine, x_offset=x_offset,
+                                                           prefs=prefs, map='_DISPLACEMENT')
 
                 links.new(node.outputs[0], disp_node.inputs['Texture'])
                 link_node = disp_node
@@ -1277,7 +1320,8 @@ def mu_replace_image(self, filename, filetype, prefs, node, engine):
     node.image = img
     print("Replaced file in node '%s' ('%s') with %s" % (node.name, node.label, filename))
 
-def mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes=[], engine=''):
+def mu_replace_selected_image_textures(self, filename, filetype, prefs,
+                                       nodes=[], engine=''):
     """Replace the image files in the selected nodes, if matching, with a new set"""
 
     found      = False
@@ -1297,8 +1341,9 @@ def mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes=[]
     else:
         print("Didn't find a texture node for '%s'" % filename)
 
-def mu_replace_image_texture(self, filename, filetype, prefs, nodes = None,
-                             out_node = None, first_node = None, engine=''):
+def mu_replace_image_texture(self, filename, filetype, prefs,
+                             nodes = None, out_node = None,
+                             first_node = None, engine=''):
     """Try to find and replace the image file in an existing texture node"""
 
     found = False
@@ -1331,7 +1376,8 @@ def mu_replace_image_texture(self, filename, filetype, prefs, nodes = None,
     # Just search through all nodes if we haven't found the right one yet (and wide search is enabled)
     if not found and prefs.go_wide:
         # Use the replaced selected textures functions, but use all nodes as "selected" nodes
-        return mu_replace_selected_image_textures(self, filename, filetype, prefs, nodes, engine)
+        return mu_replace_selected_image_textures(self, filename, filetype, prefs,
+                                                  nodes, engine)
 
     if found:
         mu_replace_image(self, filename, filetype, prefs, found_node, engine)
@@ -1364,8 +1410,10 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     elif engine == 'octane':
         engine = engine.upper()
     else:
-        print("Material Utilities - Add image Textures: Unsupported render engine: ", bpy.data.scenes['Scene'].render.engine)
-        self.report({'WARNING'}, "The render engine '" + bpy.data.scenes['Scene'].render.engine +
+        print("Material Utilities - Add image Textures: Unsupported render engine: ",
+              bpy.data.scenes['Scene'].render.engine)
+        self.report({'WARNING'}, "The render engine '" +
+                                    bpy.data.scenes['Scene'].render.engine +
                                     "' isn't supported by Material Utilities!")
         return {'CANCELLED'}
 
@@ -1402,13 +1450,15 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
     normal_tex_node = None
     displace_tex_node = None
     colorspaces = {}
+    gammas = { 'COLOR': [], 'NONCOLOR': [] }
 
     if out_node is None:
         self.report({'WARNING'}, "Couldn't find an Material Output! Creating one!")
         out_node = nodes.new(type="ShaderNodeOutputMaterial")
         out_node.location = (400, 100)
 
-        mu_create_default_shader_node(nodes, engine, first_node, links=links, out_node=out_node)
+        mu_create_default_shader_node(nodes, engine, first_node, links=links,
+                                      out_node=out_node)
 
     if out_node.inputs['Surface'].is_linked:
         first_node = out_node.inputs['Surface'].links[0].from_node
@@ -1458,8 +1508,10 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 filetype.map = 'SPECULAR'
 
         try:
-            node = mu_add_image_texture(file, filetype=filetype, prefs=prefs, nodes=nodes, links=links, material=mat,
-                                        out_node=out_node, first_node=first_node, engine=engine)
+            node = mu_add_image_texture(file, filetype=filetype, prefs=prefs,
+                                        nodes=nodes, links=links, material=mat,
+                                        out_node=out_node, first_node=first_node,
+                                        engine=engine)
 
             if filetype.map == 'GLOSSINESS':
                 gloss_node = node
@@ -1478,18 +1530,25 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                    displace_tex_node = node
             elif engine == 'OCTANE':
                 color = 'GREYSCALE' if filetype.is_greyscale else 'RGB'
+                datatype = 'NONCOLOR' if filetype.non_color else 'COLOR'
 
-                if filetype.colorspace not in colorspaces:
-                    colorspaces[filetype.colorspace] = {}
-                if color not in colorspaces[filetype.colorspace]:
-                    colorspaces[filetype.colorspace][color] = []
+                if color not in colorspaces:
+                    colorspaces[color] = {}
+                if filetype.colorspace not in colorspaces[color]:
+                    colorspaces[color][filetype.colorspace] = []
 
-                colorspaces[filetype.colorspace][color].append(node)
+                colorspaces[color][filetype.colorspace].append(node)
+                gammas[datatype].append(node)
 
                 if prefs.connect_alpha and filetype.tagged_alpha:
-                    alpha_node = mu_add_octane_node('alpha_image', nodes=nodes, prefs=prefs, name='MUAddedAlphaImageNode')
+                    alpha_node = mu_add_octane_node('alpha_image', nodes=nodes,
+                                                    name='MUAddedAlphaImageNode',
+                                                    prefs=prefs)
                     alpha_node.image = node.image
-                    alpha_node.location = mu_calc_node_location(first_node, node, None, engine, x_offset=prefs.x_offset, prefs=prefs, map='ALPHA')
+                    alpha_node.location = mu_calc_node_location(first_node, node,
+                                                                None, engine,
+                                                                x_offset=prefs.x_offset,
+                                                                prefs=prefs, map='ALPHA')
 
                     alpha_input = mu_node_inputs[engine][first_node.bl_idname]['ALPHA']
                     if alpha_input is not None:
@@ -1665,7 +1724,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         elif engine == 'OCTANE':
             transform  = None
             reroute_tr = None
-            cs_nodes   = []
+            extra_nodes   = []
 
             if mu_prefs.tex_add_new_uvmap:
                 if nodes.find('MUAddedUVMapOctane') >= 0:
@@ -1712,19 +1771,45 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
             if prefs.add_colorspace:
                 y_offset = 0
-                for cs, nodetypes in colorspaces.items():
-                    for nt, texnodes in nodetypes.items():
-                        cs_node = mu_add_octane_node('colorspace', name='MUAddedColorSpace_' + cs + '_' + nt,
-                                                     label='ColorSpace - %s (%s)' % (cs, nt), nodes=nodes, prefs=prefs)
-                        cs_node.location = mu_calc_node_location(first_node, cs_node, None, engine, map='_COLORSPACENODE', prefs=prefs, y_offset=y_offset)
-                        cs_node.ocio_color_space_name = mu_get_ocio_colorspace(cs,nt)
+                for nt, nodetypes in colorspaces.items():
+                    for cs, texnodes in nodetypes.items():
+                        cs_node = mu_add_octane_node('colorspace',
+                                                     name='MUAddedColorSpace_' + cs + '_' + nt,
+                                                     label='ColorSpace - %s (%s)' % (cs, nt),
+                                                     nodes=nodes, prefs=prefs)
+                        cs_node.location = mu_calc_node_location(first_node, cs_node,
+                                                                 None, engine,
+                                                                 map='_COLORSPACENODE',
+                                                                 prefs=prefs,
+                                                                 y_offset=y_offset)
+                        cs_node.ocio_color_space_name = mu_get_ocio_colorspace(cs, nt)
 
-                        cs_nodes.append(cs_node)
+                        extra_nodes.append(cs_node)
 
                         for txnode in texnodes:
                             links.new(cs_node.outputs[0], txnode.inputs['Color space'])
 
                         y_offset -= 100 if prefs.pos_group == 'EXP' else 40
+
+            if prefs.add_gamma_nodes:
+                y_offset = 0
+                for dt, texnodes in gammas.items():
+                    nonco = dt == 'NONCOLOR'
+                    dt_hr = 'Non-Color' if nonco else 'Color'
+
+                    gv_node = mu_add_octane_node('gamma', name='MUAddedGamma_' + dt,
+                                                 label='Gamma - %s' % dt_hr,
+                                                 nodes=nodes, prefs=prefs, non_color=nonco)
+                    gv_node.location = mu_calc_node_location(first_node, gv_node,
+                                                             None, engine, map='_GAMMANODE',
+                                                             prefs=prefs, y_offset=y_offset)
+
+                    extra_nodes.append(gv_node)
+
+                    for txnode in texnodes:
+                        links.new(gv_node.outputs[0], txnode.inputs['Legacy gamma'])
+
+                    y_offset -= 100 if prefs.pos_group == 'EXP' else 40
 
             if has_uvmap:
                 reroute.location.y -= 150
@@ -1756,7 +1841,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 if transform is not None:
                     transform.location.x  -= offs_x2
                     reroute_tr.location.x -= offs_x2
-                for cs_node in cs_nodes:
+                for cs_node in extra_nodes:
                     cs_node.location.x -= offs_x2
 
                 for node in added_nodes:
@@ -1795,7 +1880,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     return {'FINISHED'}
 
-def mu_replace_image_textures(self, prefs, directory = None, file_list = [], file_path = ''):
+def mu_replace_image_textures(self, prefs, directory = None,
+                              file_list = [], file_path = ''):
     """Try to find and replace image files in existing texture nodes with a new set (Does NOT add a new texture if there's an new image texture without matching node!)"""
 
     files = []
