@@ -1,4 +1,4 @@
-# Material utilities v3.0.0 (Stable)
+# Material utilities v3.0.0 (Dev)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -29,7 +29,7 @@ So I welcome anyone that is willing to help, either by:
 - [Background](#background)
 - [Information](#information)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Usage](#usage--documentation)
 - [Known issues](#known-issues)
 - [Support](#support)
 - [Contributing](#contributing)
