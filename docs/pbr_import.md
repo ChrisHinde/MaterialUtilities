@@ -21,6 +21,13 @@ If you've already added a texture set to your material you can also automaticall
 
 You can access the functions of this feature in the same way as the main menu for Material Utilities: with the keyboard shortcut `Shift+Q` (by default), but in the *Shader Editor* instead of the *3D View*. There is also an [addition to the *Specials* in the Material Utilities menu in the *3D View*](#assign-new-pbr-material).
 
+### Demonstration
+
+The resulting node trees could look like this (these include all supported texture maps):
+
+- [**Cycles/Eevee example (screenshot)**](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportedNodes_CyclesPrincipled.png)
+- [**Octane (screenshot)**](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportedNodes_OctaneUniversal.png)
+
 ## Support and Compatibility
 
 ### Supported Render Engines
@@ -97,13 +104,13 @@ All other filetypes will be ignored.
 
 ## Color Spaces
 
-By default¤ the color space will be set to (sRGB) Linear for most filetypes, except for JPG and PNG, which will be set to sRGB. The default color space can be overridden if there's an appropriate tag in the filename (e.g. `brick_diffuse_aces.exr`). For JPG (but not JP2) and PNG files any such tags will be ignored (by default¤), and the sRGB color space kept.
+By default\* the color space will be set to (sRGB) Linear for most filetypes, except for JPG and PNG, which will be set to sRGB. The default color space can be overridden if there's an appropriate tag in the filename (e.g. `brick_diffuse_aces.exr`). For JPG (but not JP2) and PNG files any such tags will be ignored (by default\*), and the sRGB color space kept.
 
-Additionally some maps, that shouldn't contain any color data, will be treated as "non-color" (marked with ¤ in the [list of supported texture maps](#supported-texture-maps)).
+Additionally some maps, that shouldn't contain any color data, will be treated as "non-color" (marked with \* in the [list of supported texture maps](#supported-texture-maps)).
 For Cycles that means that the color space will set to *Non-Color*, unless the color space is overridden.
 For Octane those textures will be added as Greyscale (or *Grayscale*) images (except *Normal maps*), and (the option to) have different (legacy) gamma values.
 
-(¤You *can* change this behavior, but it isn't exposed in the preferences, so if you *really* want to, you can change it in `enum_values.py`, look for `mu_file_types` and `mu_texture_map_options`)
+(\*You *can* change this behavior, but it isn't exposed in the preferences, so if you *really* want to, you can change it in `enum_values.py`, look for `mu_file_types` and `mu_texture_map_options`)
 
 ### Color Spaces in Octane
 
@@ -137,7 +144,7 @@ You access the popup menu via `[Shift+Q]` in the *Shader Editor* (There is also 
 
 Either option in the menu will bring up a file selection dialog. By default this dialog will let you select a directory (but not specific files), you can change the default behavior in the preferences, or by holding `[Ctrl]` or `[Shift]` while clicking (or hitting `[Enter]`) on the option (`[Ctrl]` will always bring up directory selection, `[Shift]` will always bring up file selection)
 
-[IMG]
+[![PBR import - popup menu](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImport_Menu.png)](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImport_Menu.png)
 
 ### Open Image Texture Set
 
@@ -209,11 +216,15 @@ On import (if automatic connection is enabled) several extra nodes might be adde
   - **Add common gamma nodes**
   Will add one or two float value nodes (One for [color textures](#supported-texture-maps), one for [non-color textures](#supported-texture-maps)) to let you control the gamma value of several textures at the same time.
 
+  ![Connection options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportTextureProperties_Connections.png)
+
 - ##### Default Gamma (Octane only)
 
   Lets you set the gamma values (for for [color textures](#supported-texture-maps), one for [non-color textures](#supported-texture-maps) respectively) for the imported textures.
   **NB:** The gamma value is ignored, by Octane, if the texture has a color space (except for *Linear sRGB*)
   If you don't plan to change the gamma values on import, you can hide the options in the [addon preferences](#octane-specific)
+
+  ![Gamma options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportTextureProperties_Gamma.png)
 
 - ##### Appearance
 
@@ -226,6 +237,8 @@ On import (if automatic connection is enabled) several extra nodes might be adde
 
   - **Stair step nodes**
   If you don't want to have collapsed nodes you have the option to have the texture nodes arranged in two columns, in an alternating fashion. This will make the node setup more compact (vertically). Otherwise the texture nodes will be arranged in a single column (with no overlapping)
+
+  ![Appearance options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportTextureProperties_Appearance.png)
 
 - ##### Map options
 
@@ -258,6 +271,8 @@ On import (if automatic connection is enabled) several extra nodes might be adde
     - **Don't connect**
     The emission map will be imported, but not connected to the material node.
 
+  ![Map options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportTextureProperties_MapOptions_StdSurf.png)
+
 ### Replace Image Texture Set
 
 When using *Replace Image Texture Set* no additional nodes will be added, instead the selected texture maps will be matched to the existing texture nodes. If a matching node is found, the image in the existing node will be replaced with the image in the texture set being imported.
@@ -274,6 +289,8 @@ Go through all nodes in the material, if the matching node is not immediately fo
 - **Set Fake user**
 Will set the *Fake user* flag on the images that gets replaced (to keep them in the .blend-file)
 
+![Replace Texture Set options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ReplaceTextureProperties.png)
+
 ## Assign New PBR Material
 
 *Assign new PBR material* functions like *Open Image Texture Set*, but it will create a whole new material, with a Principled BSDF shader for Cycles, or Universal Material (or Stand Surface Material) for Octane, that the texture set then will be added to.
@@ -283,7 +300,7 @@ The import settings in the right properties panel is the same as for [Open Image
 
 You can access *Assign new PBR material* via *Specials* in the [3D viewport menu](usage.md#popup-menu), by holding `[Ctrl]` or `[Shift]` (see [opening the Popup menu](#popup-menu)), or it can be added as an button to the [*Assign Material* dialog](usage.md#assign-material) (needs to be enabled in the [preferences](#preferences)).
 
-[IMG]
+![Assign PBR Material](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_AssignPBRMat.png)
 
 ### Material Options
 
@@ -296,6 +313,8 @@ Lets you set whether to base the new material on an *Universal Material* Node, o
 - **Material Name**
 The name you want the material to have, if it is left empty the name of the directory will be used.
 
+![Material Options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImport_MaterialOptions.png)
+
 ## Preferences
 
 In the [add-on preferences](usage.md#preferences) you can find and change several preferences that affects how the PBR texture import works.
@@ -305,6 +324,8 @@ Adds an extra *Material Utilities* menu option to the shader editor header, wher
 
 - **Add to Assign Material dialog**
 Will add an button to the upper left in the [Assign Material dialog](usage.md#assign-material)
+
+![General options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImport_Pref_General.png)
 
 ### File Selection
 
@@ -319,6 +340,8 @@ Will add an button to the upper left in the [Assign Material dialog](usage.md#as
 
 - **File selection**
 Set whether you want to choose a directory or specific texture files, by default, when importing textures.
+
+![File Selection](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImp_Pref_FileSelection2.png)
 
 ### Connections & Support Nodes
 
@@ -335,9 +358,13 @@ Enable importing Reflection maps as Specular maps, by default.
 Always add new UV map nodes when importing ([Opening](#open-image-texture-set)) texture sets.
 (This isn't exposed in the import dialog)
 
+![Connections & Support nodes](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImp_Pref_Connections2.png)
+
 ### Placement & Appearance
 
 These options set the defaults for the properties under [Appearance](#appearance) in the import dialog.
+
+![Appearance](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImp_Pref_Appearance2.png)
 
 ### Height & Bump Options
 
@@ -348,9 +375,13 @@ Will set the default option for how to treat height maps, under [*Map options*](
 The default value for *Distance* on added *Bump* nodes (only Cycles/Eevee).
 (This isn't exposed in the import dialog)
 
+![Height & Bump Options](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImp_Pref_Height2.png)
+
 ### Replacing Textures
 
 These options set the defaults for the properties in the [Replace textures](#replace-image-texture-set) dialog.
+
+![Replacing Textures](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImp_Pref_Replacing2.png)
 
 ### Octane Specific
 
@@ -368,7 +399,9 @@ The gamma values will still be set according to the default values (bellow).
 - **Defaults - Gamma**
 Set the default gamma values for [non-color and color textures](#supported-texture-maps).
 
+![Octane Specific preferences](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_PBRImp_Pref_Octane2.png)
+
 ## Document info
 
-Written by ChrisHinde for version 3.0.0 of Material Utilities (2023-07-03, v1)
+Written by ChrisHinde for version 3.0.0 of Material Utilities (2023-07-04, v1)
 CC-BY-SA
