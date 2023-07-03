@@ -1080,7 +1080,7 @@ def mu_calc_node_location(first_node, node, filetype,
         elif map == '_INVERT':
             x_offset -= 0 + 50
         elif map == '_UVNODE':
-            x_offset += 385 + 50
+            x_offset += 560 + 50
         elif map == '_UVREROUTE':
             x_offset += 370 + 50
         elif map == 'GLOSSINESS':
@@ -1500,7 +1500,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         if prefs.connect:
             prefs.connect = False
             msg += " Wont try to connect added textures!"
-        print("Material Utilies - " + msg)
+        print("Material Utilities - " + msg)
         self.report({'WARNING'},  msg)
 
         # Create a "faux-node" so to aid in further operations
@@ -1514,7 +1514,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             if prefs.connect:
                 prefs.connect = False
                 msg += " Wont try to connect added textures!"
-            print("Material Utilites - " + msg)
+            print("Material Utilities - " + msg)
             self.report({'WARNING'}, msg)
 
         location = first_node.location
@@ -1655,10 +1655,10 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 normal_node = nodes['MUAddedNormalMapNode']
 
             if has_normal and has_bump:
-                uvmap.location.x   -= 200
+                uvmap.location.x   -= 20
                 reroute.location.x -= 20
 
-                # Seperate the bump and normal nodes
+                # Separate the bump and normal nodes
                 bump_node.location.x       += 75
                 bump_tex_node.location.x   -= 100
                 normal_node.location.x     -= 90
