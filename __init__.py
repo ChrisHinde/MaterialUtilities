@@ -1,4 +1,4 @@
-# Material Utilities v2.4.4
+# Material Utilities v3.0.0
 #
 #  Usage: Shift + Q in the 3D viewport or Shader Node Editor
 #
@@ -35,8 +35,8 @@
 bl_info = {
     "name": "Material Utilities",
     "author": "MichaleW, ChrisHinde",
-    "version": (2, 4, 5),
-    "blender": (3, 00, 0),
+    "version": (3, 0, 0),
+    "blender": (3, 4, 1),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
     "doc_url": "{BLENDER_MANUAL_URL}/addons/materials/material_utils.html",
@@ -115,7 +115,7 @@ from bpy.types import (
     )
 
 
-# All classes used by Material Utilities, that need to be registred
+# All classes used by Material Utilities, that need to be registered
 classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
     VIEW3D_OT_materialutilities_assign_material_edit,

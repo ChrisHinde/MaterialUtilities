@@ -2,10 +2,11 @@
 
 <a name="v3.0.0"></a>
 
-## v3.0.0 (2023-06-19)
+## v3.0.0 (2023-07-05)
 
 * Add PBR Texture Set Import (see [README_PBR_Import.md](docs/pbr_import.md))
 * Redesign of Add-on preferences panel (this was inspired by [@nutti](https://github.com/nutti) and the preference panel for [Magic UV](https://github.com/nutti/Magic-UV))
+* Restructure (and update) of documentation
 
 <a name="v2.4.4"></a>
 
