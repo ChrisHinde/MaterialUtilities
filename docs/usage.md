@@ -14,7 +14,7 @@
   - [Specials](#specials)
     - [Merge Base Names](#merge-base-names)
     - [Join By Material](#join-by-material)
-    - [Assign New PBR Material](#assign-new-pbr-waterial)
+    - [Assign New PBR Material](#assign-new-pbr-material)
     - [Remove Unused Materials](#remove-unused-materials)
     - [Set Auto Smooth](#set-auto-smooth)
 - [Material Specials Menu](#material-specials-menu)
@@ -230,4 +230,3 @@ This last tab is for settings that doesn't fit in the other two, divided in two 
 - **Extra / Experimental**
   - By default any Grease Pencil materials are excluded from the lists/menus shown by Material Utilities, but you can choose to include them by enabling `Show Grease Pencil materials`
   - By checking `Enable Replace Multiple Materials` you'll be able to use [Replace Multiple Material](#replace-multiple-materials) from the Material Utilities menu. This feature is functional, but perhaps not very polished.
-  

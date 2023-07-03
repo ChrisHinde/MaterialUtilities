@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
+  - [Demonstration](#demonstration)
 - [Support and Compatibility](#support-and-compatibility)
   - [Supported Render Engines](#supported-render-engines)
   - [Supported Texture Maps](#supported-texture-maps)
