@@ -2,7 +2,7 @@ import bpy
 import re
 import os
 from types import SimpleNamespace
-from math import radians, degrees
+from math import degrees
 
 from .enum_values import *
 from .preferences import *
