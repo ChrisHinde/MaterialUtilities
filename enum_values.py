@@ -505,8 +505,8 @@ mu_node_inputs = { # input <-> output mappings for adding nodes to the shader no
             'AO': None, 'REFLECTION': None,                              # NOT AUTOMATICALLY CONNECTED TO NODE
             'HEIGHT': None,                                              # Not connected to shader node
             'DIFFUSE': 'Base color', 'ALBEDO': 'Base color', 'COLOR': 'Base color',  # Treating Albedo/Diffuse/Color as the same
-            'ROUGHNESS': 'Specular roughness', 'GLOSSINESS': 'Specular roughness',     # Same input, but different values
-            'SPECULAR': 'Specular color',
+            'ROUGHNESS': 'Specular roughness', 'GLOSSINESS': 'Specular roughness',   # Same input, but different values
+            'SPECULAR': 'Specular weight',
             'METALNESS': 'Metalness',
             'BUMP': 'Bump', 'NORMAL': 'Normal', 'DISPLACEMENT': 'Displacement',
             'ALPHA': 'Opacity', 'MASK': 'Opacity',                       # Currently treating Alpha and Mask as the same thing
