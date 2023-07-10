@@ -948,7 +948,8 @@ def mu_get_filetype(filename):
         texture_map = 'EMISSION'
     elif 'ao' in filename or 'occlusion' in filename:
         texture_map = 'AO'
-    elif 'render' in filename or 'sample' in filename:
+    elif 'render' in filename or 'sample' in filename \
+        or 'preview' in filename or '_sphere' in filename:
         texture_map = 'RENDER'
 
     if texture_map in mu_texture_map_options:
