@@ -552,7 +552,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             name = "Pattern",
                             description = "Use another pattern than Material.xxx \
                                            for merging materials.",
-                            items = mu_merge_basse_names_pattern_enums,
+                            items = mu_merge_base_names_pattern_enums,
                             default = 'DEFAULT',
                             )
     user_defined_pattern_simple: StringProperty(
@@ -1033,6 +1033,11 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
                         " Ignored when using Color space nodes (except for Linear RGB)",
         default = 1.0
         )
+    invert_normals_y: BoolProperty(
+        name = "Invert Normals Y channel",
+        description = "Invert the Y channel for normals texture (for DirectX normals)",
+        default = False
+        )
     height_map_option: EnumProperty(
             name = "Height map treatment",
             description = "How should height maps be treated",
@@ -1144,6 +1149,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             box.label(text = "Map Options:")
             col = mu_ui_col_split(box)
             col.prop(self, 'reflection_as_specular')
+            col.prop(self, 'invert_normals_y')
             col.label(text = "Height Map Treatment")
             mu_ui_col_split(col).prop(self, 'height_map_option', text = "")
 
@@ -1176,6 +1182,11 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
             self.directory = mu_prefs.tex_last_texture_directory
         else:
             self.directory = mu_prefs.tex_texture_directory_path
+
+        if mu_prefs.tex_invert_normals_y == 'LAST':
+            self.invert_normals_y = mu_prefs.tex_last_invert_normals_y
+        else:
+            self.invert_normals_y = mu_prefs.tex_invert_normals_y == 'ENABLED'
 
         self.set_fake_user          = mu_prefs.tex_set_fake_user
         self.only_selected          = mu_prefs.tex_only_selected
@@ -1218,11 +1229,13 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
 
         if self.add:
             override_type = self.override_type if context.active_object.mode == 'OBJECT' else 'APPEND_MATERIAL'
-            prefs = SimpleNamespace(set_label      = self.set_label,
-                                    connect        = self.connect,
-                                    connect_alpha  = self.use_alpha_channel,
-                                    height_map     = self.height_map_option,
-                                    bump_distance  = mu_prefs.tex_bump_distance,
+            prefs = SimpleNamespace(set_label        = self.set_label,
+                                    connect          = self.connect,
+                                    connect_alpha    = self.use_alpha_channel,
+                                    height_map       = self.height_map_option,
+                                    bump_distance    = mu_prefs.tex_bump_distance,
+                                    invert_normals_y = self.invert_normals_y,
+                                    inv_normals_node_group = True,
                                     collapse_texture_nodes = self.collapse_texture_nodes,
                                     reflection_as_specular = self.reflection_as_specular,
                                     add_colorspace  = self.add_colorspaces,

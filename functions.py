@@ -983,77 +983,10 @@ def mu_get_filetype(filename):
                            has_alpha=has_alpha, tagged_alpha=tagged_alpha,
                            ignore=ignore, invert=invert)
 
-def mu_faux_shader_node(out_node):
-    """Create a 'faux shader', to be used instead of an existing shader node"""
-
-    return SimpleNamespace(name='FAUX', bl_idname='FAUX',
-                           location=out_node.location,
-                           width=out_node.width)
-
-def mu_create_default_shader_node(nodes, engine, node, out_node = None,
-                                  links = None, prefs = None):
-    """Create a "default" shader node appropriate for the current render engine"""
-
-    if out_node is None:
-        out_node = nodes.get('Material Output')
-        
-    def_node = ''
-
-    if engine == 'OCTANE':
-        if prefs.mat_node_type not in mu_default_shader_nodes[engine].keys():
-            print("Material Utilities - No matching node for '%s' found, using default node!"
-                  % prefs.mat_node_type)
-            def_node = '_DEFAULT'
-
-        def_node = mu_default_shader_nodes[engine][prefs.mat_node_type]
-    else:
-        def_node = mu_default_shader_nodes[engine]
-
-    node = nodes.new(def_node)
-
-    node.location = out_node.location
-    node.location.x -= 300
-
-    if links is not None:
-        links.new(node.outputs[0], out_node.inputs['Surface'])
-
-def mu_set_image_colorspace(colsp, filetype):
-    """Set the colorspace of an internal image block to match the colorspace in the texture file"""
-
-    if filetype.non_color and not filetype.override_colorspace:
-        colsp.name = 'Non-Color'
-    elif filetype.colorspace == 'FILMIC_sRGB':
-        colsp.name = 'Filmic sRGB'
-    elif filetype.colorspace == 'FILMIC_LOG':
-        colsp.name = 'Filmic Log'
-    elif filetype.colorspace == 'LINEAR':
-        colsp.name = 'Linear'
-    elif filetype.colorspace == 'ACES':
-        colsp.name = 'Linear ACES'
-    elif filetype.colorspace == 'ACEScg':
-        colsp.name = 'Linear ACEScg'
-    elif filetype.colorspace == 'sRGB':
-        colsp.name = 'sRGB'
-
-def mu_get_ocio_colorspace(colsp, imgtype):
-    """Get the OCIO Color Space based on incoming colorspace"""
-
-    cs = 'Other'
-
-    if colsp in mu_ocio_colorspace_map:
-        if imgtype in mu_ocio_colorspace_map[colsp]:
-            cs = mu_ocio_colorspace_map[colsp][imgtype]
-        else:
-            cs = mu_ocio_colorspace_map[colsp]['_DEFAULT']
-    else:
-        cs = mu_ocio_colorspace_map['_DEFAULT']
-
-    return cs
-
 def mu_calc_node_location(first_node, node, filetype,
                           engine='', x_offset=300, y_offset=0,
                           map=None, prefs=None):
-    """Caculate the proper location of the, to be, added texture node, based on the map type"""
+    """Calculate the proper location of the, to be, added texture node, based on the map type"""
 
     location = [0,0]
     ft_map   = 'COLOR'
@@ -1071,13 +1004,15 @@ def mu_calc_node_location(first_node, node, filetype,
         if map == 'BUMP':
             x_offset += 90 + 50
         elif map == 'HEIGHT' or map == 'DISPLACEMENT':
-            x_offset -= 120
+            x_offset -= 150
         elif map == '_DISPLACEMENT':
-            x_offset -= node.width + 160
+            x_offset -= 260
         elif map == 'NORMAL':
             x_offset += 220 + 50
         elif map == '_BUMPNODE' or map == '_NORMALNODE':
-            x_offset -= 0 + 0
+            x_offset -= 100
+        elif map == '_NORMALINVNODE':
+            x_offset += 75
         elif map == '_INVERT':
             x_offset -= 0 + 50
         elif map == '_UVNODE':
@@ -1098,6 +1033,11 @@ def mu_calc_node_location(first_node, node, filetype,
             x_offset += 190 + 50
         elif map == '_UVREROUTE' or map == '_TRANSFORMREROUTE':
             x_offset += 300 + 50
+        elif map == '_CHANNELINV':
+            pass
+            #x_offset = 100 + 50
+        elif map == 'NORMAL' and prefs.invert_normals_y:
+            x_offset += 190 + 50
         # elif map == '_DISPLACEMENT':
         #     x_offset -= 40
         # elif map == '_EMISSION':
@@ -1183,6 +1123,141 @@ def mu_add_octane_node(type, prefs=None, filetype=None, nodes=[],
 
     return node
 
+def mu_faux_shader_node(out_node):
+    """Create a 'faux shader', to be used instead of an existing shader node"""
+
+    return SimpleNamespace(name='FAUX', bl_idname='FAUX',
+                           location=out_node.location,
+                           width=out_node.width)
+
+def mu_create_default_shader_node(nodes, engine, node, out_node = None,
+                                  links = None, prefs = None):
+    """Create a "default" shader node appropriate for the current render engine"""
+
+    if out_node is None:
+        out_node = nodes.get('Material Output')
+        
+    def_node = ''
+
+    if engine == 'OCTANE':
+        if prefs.mat_node_type not in mu_default_shader_nodes[engine].keys():
+            print("Material Utilities - No matching node for '%s' found, using default node!"
+                  % prefs.mat_node_type)
+            def_node = '_DEFAULT'
+
+        def_node = mu_default_shader_nodes[engine][prefs.mat_node_type]
+    else:
+        def_node = mu_default_shader_nodes[engine]
+
+    node = nodes.new(def_node)
+
+    node.location = out_node.location
+    node.location.x -= 300
+
+    if links is not None:
+        links.new(node.outputs[0], out_node.inputs['Surface'])
+
+def mu_create_normals_y_invert_nodes(nodes, engine, node, first_node = None,
+                                     prefs = None, x_offset = 300):
+    """Create a node (group) to invert Y channel of the normal map"""
+
+    if engine == 'OCTANE':
+        ch_inv = nodes.new('OctaneChannelInverter')
+        ch_inv.name = 'MUAddedChannelInvert'
+        ch_inv.location = mu_calc_node_location(first_node, ch_inv, prefs=prefs,
+                                                engine=engine, filetype=None,
+                                                x_offset=x_offset, map='_CHANNELINV')
+        ch_inv.inputs['Invert green channel'].default_value = True
+        ch_inv.hide = prefs.pos_group == 'COL'
+        return ch_inv 
+
+    node_grp = None
+    node_grp_name = 'InvertNormalsY_' + engine
+
+    if node_grp_name in bpy.data.node_groups:
+        node_grp = bpy.data.node_groups[node_grp_name]
+    else:
+        node_grp = bpy.data.node_groups.new(node_grp_name, 'ShaderNodeTree')
+        spacing = 200
+
+        # Create the input and output nodes for the node group
+        input = node_grp.nodes.new('NodeGroupInput')
+        input.location.x = -2 * spacing
+        output = node_grp.nodes.new('NodeGroupOutput')
+        output.location.x = 2 * spacing
+
+        # Create nodes for separating and combining (RGB) channels
+        sep = node_grp.nodes.new('ShaderNodeSeparateColor')
+        sep.location.x = -1 * spacing
+        cmb = node_grp.nodes.new('ShaderNodeCombineColor')
+        cmb.location.x = 1 * spacing
+
+        # Add an Math (subtract) node for inverting (1-y) the y channel
+        inv = node_grp.nodes.new('ShaderNodeMath')
+        inv.location.x = 0
+        inv.operation = 'SUBTRACT'
+        inv.inputs[0].default_value = 1.0
+        
+        # Create input and output (values) for the node group
+        node_grp.inputs.new('NodeSocketColor', 'Normal Map In')
+        node_grp.outputs.new('NodeSocketColor', 'Normal Map Out')
+
+        # Link node group input to separator node
+        node_grp.links.new(input.outputs[0], sep.inputs[0])
+        # Link separated Red and Blue (X & Z) from separator to combiner
+        node_grp.links.new(sep.outputs[0], cmb.inputs[0])
+        node_grp.links.new(sep.outputs[2], cmb.inputs[2])
+        # Link separated Green (Y) from separator to invert node (2nd input)
+        node_grp.links.new(sep.outputs[1], inv.inputs[1])
+        # Link inverted Green (Y) to combine node (2nd input)
+        node_grp.links.new(inv.outputs[0], cmb.inputs[1])
+
+        # Link combine node to node group output
+        node_grp.links.new(cmb.outputs[0], output.inputs[0])
+
+    # bpy.ops.node.add_node(type="ShaderNodeGroup", use_transform=True, settings=[{"name":"node_tree", "value":"bpy.data.node_groups['Test']"}])
+
+    grp_node = nodes.new('ShaderNodeGroup')
+    grp_node.name = 'MUAddedNormalsInvertNode'
+    grp_node.node_tree = node_grp
+    grp_node.location = mu_calc_node_location(first_node, node, filetype=None,
+                                                engine=engine, x_offset=x_offset,
+                                                map='_NORMALINVNODE', prefs=prefs)
+    return grp_node
+
+def mu_set_image_colorspace(colsp, filetype):
+    """Set the colorspace of an internal image block to match the colorspace in the texture file"""
+
+    if filetype.non_color and not filetype.override_colorspace:
+        colsp.name = 'Non-Color'
+    elif filetype.colorspace == 'FILMIC_sRGB':
+        colsp.name = 'Filmic sRGB'
+    elif filetype.colorspace == 'FILMIC_LOG':
+        colsp.name = 'Filmic Log'
+    elif filetype.colorspace == 'LINEAR':
+        colsp.name = 'Linear'
+    elif filetype.colorspace == 'ACES':
+        colsp.name = 'Linear ACES'
+    elif filetype.colorspace == 'ACEScg':
+        colsp.name = 'Linear ACEScg'
+    elif filetype.colorspace == 'sRGB':
+        colsp.name = 'sRGB'
+
+def mu_get_ocio_colorspace(colsp, imgtype):
+    """Get the OCIO Color Space based on incoming colorspace"""
+
+    cs = 'Other'
+
+    if colsp in mu_ocio_colorspace_map:
+        if imgtype in mu_ocio_colorspace_map[colsp]:
+            cs = mu_ocio_colorspace_map[colsp][imgtype]
+        else:
+            cs = mu_ocio_colorspace_map[colsp]['_DEFAULT']
+    else:
+        cs = mu_ocio_colorspace_map['_DEFAULT']
+
+    return cs
+
 def mu_add_image_texture(filename, filetype, prefs,
                          nodes = None, links = None, material = None,
                          out_node = None, first_node = None, engine = ''):
@@ -1234,7 +1309,17 @@ def mu_add_image_texture(filename, filetype, prefs,
                                                           map='_NORMALNODE', prefs=prefs)
 
                 i = mu_node_inputs[engine]['ShaderNodeNormalMap'][filetype.map]
-                links.new(node.outputs['Color'], nrm_node.inputs[i])
+
+                if prefs.invert_normals_y:
+                    inv_node = mu_create_normals_y_invert_nodes(nodes, engine, nrm_node,
+                                                                first_node, prefs,
+                                                                x_offset=x_offset)
+                    x_offset += 75
+                    links.new(node.outputs['Color'], inv_node.inputs[0])
+                    links.new(inv_node.outputs[0], nrm_node.inputs[i])
+                else:
+                    links.new(node.outputs['Color'], nrm_node.inputs[i])
+
                 link_node = nrm_node
                 #links.new(nrm_node.outputs[0], first_node.inputs[input])
             elif filetype.invert: # map == 'GLOSSINESS':
@@ -1278,7 +1363,13 @@ def mu_add_image_texture(filename, filetype, prefs,
             link_node = node
             msg = None
 
-            if filetype.map == 'EMISSION':
+            if filetype.map == 'NORMAL' and prefs.invert_normals_y:
+                inv_node = mu_create_normals_y_invert_nodes(nodes, engine, node,
+                                                            first_node, prefs,
+                                                            x_offset=x_offset)
+                links.new(node.outputs[0], inv_node.inputs[0])
+                link_node = inv_node
+            elif filetype.map == 'EMISSION':
                 skip = False
 
                 if prefs.emission_option == 'NC':
@@ -1323,6 +1414,9 @@ def mu_add_image_texture(filename, filetype, prefs,
 
     node.location = mu_calc_node_location(first_node, node, filetype, engine,
                                           x_offset=x_offset, prefs=prefs)
+    if filetype.map == 'NORMAL':
+        print("Normal loc:", node.location.y, first_node.location.y - node.location.y)
+        print("First loc:", first_node.location.y)
 
     return node
 
@@ -1653,7 +1747,9 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
             if has_bump:
                 bump_node = nodes['MUAddedBumpNode']
             if has_normal:
-                normal_node = nodes['MUAddedNormalMapNode']
+                normal_node  = nodes['MUAddedNormalMapNode']
+                if prefs.invert_normals_y:
+                    nrm_inv_node = nodes['MUAddedNormalsInvertNode']
 
             if has_normal and has_bump:
                 uvmap.location.x   -= 20
@@ -1666,6 +1762,13 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 normal_node.location.y     -= 140
                 normal_tex_node.location.x -= 100
                 normal_tex_node.location.y -= 240
+                if nrm_inv_node is not None:
+                    nrm_inv_node.location.x -= 120
+                    nrm_inv_node.location.y -= 180
+                    bump_node.location.x   -= 50
+                    normal_node.location.x -= 50
+                    uvmap.location.x   -= 100
+                    reroute.location.x -= 100
 
                 links.new(normal_node.outputs['Normal'], bump_node.inputs['Normal'])
                 links.new(bump_node.outputs['Normal'], first_node.inputs['Normal'])

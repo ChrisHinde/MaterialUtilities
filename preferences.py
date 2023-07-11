@@ -127,7 +127,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         )
     tex_texture_directory_path: StringProperty(
         name = "Custom directory",
-        description = "Default custem directory for loading PBR textures",
+        description = "Default custom directory for loading PBR textures",
         subtype = 'DIR_PATH',
         default = '//',
         )
@@ -204,6 +204,17 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         name = "Reflection as Specular",
         description = "Connect Reflection maps as Specular",
         default = True,
+        )
+    tex_invert_normals_y: EnumProperty(
+        name = "Invert Normals Y channel",
+        description = "Default option for adding invert the normals texture Y channel",
+        items = mu_texture_invert_normals_options_enums,
+        default = 'LAST'
+        )
+    tex_last_invert_normals_y: BoolProperty(
+        name = "Last value of 'Invert Normals Y channel'",
+        description = "",
+        default = False
         )
     tex_add_colorspaces: BoolProperty(
         name = "Add Color spaces",
@@ -373,6 +384,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                 col1 = col.column()
                 col1.prop(self, 'tex_connect',           expand = False)
                 col1.prop(self, 'tex_use_alpha_channel', expand = False)
+                col1.prop(self, 'tex_invert_normals_y',  expand = False)
                 col2 = col.column()
                 col2.prop(self, 'tex_reflection_as_specular', expand = False)
                 col2.prop(self, 'tex_add_new_uvmap',          expand = False)

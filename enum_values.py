@@ -40,13 +40,13 @@ mu_link_affect_enums = (('ACTIVE', "Active object", "Materials of active object 
                         ('SCENE', "Scene objects", "Materials of objects in current scene"),
                         ('ALL', "All", "All materials in this blend file"))
 
-mu_material_slot_move_enums = (('TOP', "Top", "Move slot to the top"),
+mu_material_slot_move_enums = (('TOP',    "Top", "Move slot to the top"),
                                ('BOTTOM', "Bottom", "Move slot to the bottom"))
 
-mu_merge_basse_names_pattern_enums = (
+mu_merge_base_names_pattern_enums = (
                         ('DEFAULT', "Default", "Use the default pattern: Material.xxx (eg. Metal.001, Metal.002)"),
-                        ('SIMPLE', "Define delimiter", "Use another delimiter (as _ or -) instead of the default . (dot)"),
-                        ('REGEX', "Regex pattern", "Define a custom pattern using (Python style) Regular Expressions")
+                        ('SIMPLE',  "Define delimiter", "Use another delimiter (as _ or -) instead of the default . (dot)"),
+                        ('REGEX',   "Regex pattern", "Define a custom pattern using (Python style) Regular Expressions")
                         )
 
 mu_texture_directory_enums = (
@@ -58,20 +58,26 @@ mu_import_dialog_enums = (
     ('DIR',   "Select directory", "Open a dialog to select a directory"),
     ('FILES', "Select files", "Open a dialog to select individual files"),
 )
+mu_texture_invert_normals_options_enums = (
+    ('ENABLED',  "Enabled by default",  "Always have 'Invert Normals Y' enabled on import"),
+    ('DISABLED', "Disabled by default", "Always have 'Invert Normals Y' disabled on import"),
+    ('LAST',     "Remember last used",  "Remember what it was set to on last import\n"
+                                        " Resets on a new session (when you reopen Blender)")
+)
 mu_height_map_option_enums = (
-    ('DISPLACEMENT', "As Displacement", "Connect the Height map to Displacemnt"),
+    ('DISPLACEMENT', "As Displacement", "Connect the Height map to Displacement"),
     ('BUMP', "As Bump", "Connect the Height map to Bump"),
     ('NC',   "Don't connect", "Add the map, but don't connect it to the node setup"),
 )
 mu_emission_map_option_enums = (
     ('NODE',  "Use Texture Emission Node", "Connect the Emission map to the Emission input via an Texture Emission node\n" +
-                                        " NB: Emission color will be set to 100% white, and Emission weight to 1.0"),
+                                            " NB: Emission color will be set to 100% white, and Emission weight to 1.0"),
     ('COLOR', "Connect to Emission color", "Connect the Emission map to the Emission color input directly\n NB: Emission weight will be set to 1.0"),
     ('NC',    "Don't connect", "Add the map, but don't connect it to the node setup")
 )
 mu_octane_std_material_enums = (
     ('UNIVERSAL', "Universal Material", "Use Octane Universal Material"),
-    ('STD_SURF',  "Standard Surface Material", "Use the (Autodesk) Standard Surfaco Material")
+    ('STD_SURF',  "Standard Surface Material", "Use the (Autodesk) Standard Surface Material")
 )
 
 mu_supported_engines = ['CYCLES', 'BLENDER_EEVEE', 'octane'] # Octane is reported in all lower case, but MU will transform it to upper case for further use
@@ -218,6 +224,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'METALNESS': 206,
             'HEIGHT': 700, 'DISPLACEMENT': 750,         # MAY BE AUTOMATICALLY CONNECTED, Place bellow
             'BUMP': 546, 'NORMAL': 546,                 # In Cycles Bump and Normal is done via the same input
+            '_NORMALINVNODE': 546,
             'ALPHA': 525, 'MASK': 525,                  # Currently treating Alpha and Mask as the same thing
             'TRANSMISSION': 440,
             'EMISSION': 482,
@@ -234,6 +241,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'DIFFUSE': 24, 'ALBEDO': 24, 'COLOR': 24,   # Treating Albedo/Diffuse/Color as the same
             'ROUGHNESS': 45,
             'BUMP': 66, 'NORMAL': 66,                   # In Cycles Bump and Normal is done via the same input
+            '_NORMALINVNODE': 66,
             'HEIGHT': 126, 'DISPLACEMENT': 126,         # MAY BE AUTOMATICALLY CONNECTED, Place bellow
             'UNKNOWN': -700,
             '_DISPLACEMENT': 150,
@@ -248,6 +256,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'DIFFUSE': 66, 'ALBEDO': 66, 'COLOR': 66,   # Treating Albedo/Diffuse/Color as the same
             'ROUGHNESS': 87,                            # Same input, but different values
             'BUMP': 108, 'NORMAL': 108,                 # In Cycles Bump and Normal is done via the same input
+            '_NORMALINVNODE': 108,
             'HEIGHT': 168, 'DISPLACEMENT': 168,         # MAY BE AUTOMATICALLY CONNECTED, Place bellow
             'UNKNOWN': -700,
             '_DISPLACEMENT': 150,
@@ -260,6 +269,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'ROUGHNESS': 150, 'GLOSSINESS': 300,
             'TRANSMISSION': 450, 'EMISSION': 600,
             'BUMP': 750, 'NORMAL': 750,
+            '_NORMALINVNODE': 750,
             'HEIGHT': 900, 'DISPLACEMENT': 900,
             'UNKNOWN': -700,
             '_DISPLACEMENT': 950,
@@ -274,8 +284,9 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'ROUGHNESS': 331, 'GLOSSINESS': 298,          # Same input, but different values
             'SPECULAR': 264,
             'METALNESS': 230,
-            'HEIGHT': 600, 'DISPLACEMENT': 750,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
+            'HEIGHT': 800, 'DISPLACEMENT': 750,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
             'BUMP': 570, 'NORMAL': 570,                   # In Cycles Bump and Normal is done via the same input
+            '_NORMALINVNODE': 570,
             'ALPHA': 540, 'MASK': 540,                    # Currently treating Alpha and Mask as the same thing
             'TRANSMISSION': 459,
             'EMISSION': 500,
@@ -291,8 +302,9 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'SPECULAR': -150, 'METALNESS': -100,        # NOT AUTOMATICALLY CONNECTED TO NODE, Place above
             'DIFFUSE': 34, 'ALBEDO': 34, 'COLOR': 34,   # Treating Albedo/Diffuse/Color as the same
             'ROUGHNESS': 75,
-            'BUMP': 125, 'NORMAL': 125,                   # In Cycles Bump and Normal is done via the same input
-            'HEIGHT': 250, 'DISPLACEMENT': 300,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
+            'BUMP': 125, 'NORMAL': 125,                 # In Cycles Bump and Normal is done via the same input
+            '_NORMALINVNODE': 125,
+            'HEIGHT': 250, 'DISPLACEMENT': 300,         # MAY BE AUTOMATICALLY CONNECTED, Place bellow
             'UNKNOWN': -200,
             '_DISPLACEMENT': 300,
             '_UVNODE': 48, '_UVREROUTE': 80,
@@ -305,8 +317,9 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'SPECULAR': -150, 'METALNESS': -100,        # NOT AUTOMATICALLY CONNECTED TO NODE, Place above
             'DIFFUSE': 34, 'ALBEDO': 34, 'COLOR': 34,   # Treating Albedo/Diffuse/Color as the same
             'ROUGHNESS': 75,
-            'BUMP': 125, 'NORMAL': 125,                   # In Cycles Bump and Normal is done via the same input
-            'HEIGHT': 150, 'DISPLACEMENT': 300,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
+            'BUMP': 125, 'NORMAL': 125,                 # In Cycles Bump and Normal is done via the same input
+            '_NORMALINVNODE': 125,
+            'HEIGHT': 150, 'DISPLACEMENT': 300,         # MAY BE AUTOMATICALLY CONNECTED, Place bellow
             'UNKNOWN': -200,
             '_DISPLACEMENT': 300,
             '_UVNODE': 48, '_UVREROUTE': 80,
@@ -318,6 +331,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'ROUGHNESS': 150, 'GLOSSINESS': 200,
             'TRANSMISSION': 250, 'EMISSION': 300,
             'BUMP': 350, 'NORMAL': 400,
+            '_NORMALINVNODE': 400,
             'HEIGHT': 450, 'DISPLACEMENT': 500,
             'UNKNOWN': -300,
             '_UVNODE': 50, '_UVREROUTE': 50,
@@ -340,6 +354,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 '_TRANSFORM': 750, '_TRANSFORMREROUTE': 783,
                 '_UVNODE': 980, '_UVREROUTE': 1013,
                 '_COLORSPACENODE': 450, '_GAMMANODE': 420,
+                '_CHANNELINV': 2000,
                 'UNKNOWN': -1500,
 
                 # 'AO': -240, 'REFLECTION': -320,
@@ -368,6 +383,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 '_TRANSFORM': 750, '_TRANSFORMREROUTE': 783,
                 '_UVNODE': 980, '_UVREROUTE': 1013,
                 '_COLORSPACENODE': 450, '_GAMMANODE': 420,
+                '_CHANNELINV': 2000,
                 'UNKNOWN': -1500,
             },
             'FAUX': {
@@ -380,6 +396,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'HEIGHT': 800, 'DISPLACEMENT': 900,
                 'UNKNOWN': -500,
                 '_COLORSPACENODE': 100, '_GAMMANODE': 150,
+                '_CHANNELINV': 700,
                 '_UVNODE': 50, '_UVREROUTE': 50,
             }
         },
@@ -399,7 +416,8 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
 
                 '_UVNODE': 750, '_UVREROUTE': 760,
                 '_TRANSFORM': 710, '_TRANSFORMREROUTE': 720,
-                '_COLORSPACENODE': 500, '_GAMMANODE': 600
+                '_COLORSPACENODE': 500, '_GAMMANODE': 600,
+                '_CHANNELINV': 1116
             },
             'OctaneStandardSurfaceMaterial': {
                 'AO': -100, 'REFLECTION': -300,
@@ -416,7 +434,8 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
 
                 '_UVNODE': 750, '_UVREROUTE': 760,
                 '_TRANSFORM': 710, '_TRANSFORMREROUTE': 720,
-                '_COLORSPACENODE': 500, '_GAMMANODE': 600
+                '_COLORSPACENODE': 500, '_GAMMANODE': 600,
+                '_CHANNELINV': 1116
             },
             'FAUX': {
                 'AO': -240, 'REFLECTION': -320, 'ALPHA': -160, 'MASK': -80,
@@ -428,7 +447,8 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
                 'HEIGHT': 640, 'DISPLACEMENT': 720,
                 'UNKNOWN': -500,
                 '_UVNODE': 50, '_UVREROUTE': 50, '_TRANSFORM': 150, '_TRANSFORMREROUTE': 150,
-                '_COLORSPACENODE': 230, '_GAMMANODE': 310
+                '_COLORSPACENODE': 230, '_GAMMANODE': 310,
+                '_CHANNELINV': 560
             }
         }
     }
