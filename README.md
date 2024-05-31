@@ -1,8 +1,8 @@
-# Material utilities v3.0.0 (Dev)
+# Material utilities v3.0.11 (Dev)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-An add-on for Blender 2.8x and 3.x that lets the user assign materials directly in the 3D viewport
+An add-on for Blender 2.8x, and 3.x+, that lets the user assign materials directly in the 3D viewport
 (via a keyboard shortcut and a pop up menu), as well as select by material and more!
 
 Each part is tested thoroughly during development, but we can't guarantee that there in't a special case where a problem might occur!\
@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current stable version of Material Utilities is [**v3.0.0**](CHANGELOG.md#v3.0.0)\
+The current stable version of Material Utilities is [**v3.0.1**](CHANGELOG.md#v3.0.1)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -52,14 +52,14 @@ If you want to know what's different (including code wise), take a look at the [
 But here are some examples:
 
 - Some functions (like "Clean Material Slots") now also work on Curve and Surface objects
-- The Select By Material have the option to extend the current selecction
+- The Select By Material have the option to extend the current selection
 - Assign Material have options to override or append materials in Object Mode
 
 ## Information
 
 This Add-on is now included with the official Blender Builds (since 2.81), just go the *Preferences* > *Add-ons* > Select the *Material* category, or search for "Material", and then enable it.\
 **NB:** The version included with Blender might be, slightly, older than the latest version found in this repository.
-Plesae visit the [Changelog](CHANGELOG.md) to compare the difference in the versions.\
+Please visit the [Changelog](CHANGELOG.md) to compare the difference in the versions.\
 Thanks to Meta-Androcto for handling the inclusion into the Blender repository.
 
 ## Installation

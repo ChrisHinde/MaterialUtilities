@@ -242,7 +242,7 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
             name = "Only active object",
             description = "Only remove the material slots for the active object "
                           + "(otherwise do it for every selected object)",
-            default = True
+            default = False
             )
 
     @classmethod

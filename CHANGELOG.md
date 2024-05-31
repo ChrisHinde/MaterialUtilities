@@ -1,5 +1,11 @@
 # Changelog
 
+<a name="v3.0.1"></a>
+
+## v3.0.1 (2024-05-31)
+
+* Fix issue #15 where Clean Material Slots throws an error when there's no active object
+
 <a name="v3.0.0"></a>
 
 ## v3.0.0 (2023-07-05)
@@ -12,7 +18,7 @@
 
 ## v2.4.4 (2023-03-28)
 
-* Fix bug that occures when there's no active object e0603a51312070b1b68b4de170c2af94bf69b7e1
+* Fix bug that occurs when there's no active object e0603a51312070b1b68b4de170c2af94bf69b7e1
 
 <a name="v2.4.3"></a>
 
