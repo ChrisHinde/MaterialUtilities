@@ -165,7 +165,7 @@ def mu_assign_material(self, material_name = "Default", override_type = 'APPEND_
             obj.material_slots[0].material = target
 
             if obj.type == 'META':
-                self.report({'INFO'}, "Meta balls only support one material, all other materials overriden!")
+                self.report({'INFO'}, "Meta balls only support one material, all other materials gets overridden!")
 
         # If we should override each material slot
         elif override_type == 'OVERRIDE_SLOTS':
@@ -301,7 +301,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
         if active_object.type == 'MESH':
             # if not extending the selection, deselect all first
             #  (Without this, edges/faces were still selected
-            #   while the faces were deselcted)
+            #   while the faces were deselected)
             if not extend_selection:
                 bpy.ops.mesh.select_all(action = 'DESELECT')
 
@@ -316,17 +316,17 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
                 mat_slots = obj.material_slots
 
                 # same material can be on multiple slots
-                slot_indeces = []
+                slot_indexes = []
                 i = 0
                 for material in mat_slots:
                     if material.material == find_material:
-                        slot_indeces.append(i)
+                        slot_indexes.append(i)
                     i += 1
 
                 mesh = obj.data
 
                 for poly in mesh.polygons:
-                    if poly.material_index in slot_indeces:
+                    if poly.material_index in slot_indexes:
                         poly.select = True
                         found_material = True
                     elif not extend_selection:
@@ -380,7 +380,7 @@ def mu_select_by_material_name(self, find_material_name, extend_selection = Fals
 
 
 def mu_copy_material_to_others(self):
-    """Copy the material to of the current object to the other seleceted all_objects"""
+    """Copy the material to of the current object to the other selected all_objects"""
     # Currently uses the built-in method
 
     active_object = bpy.context.active_object
@@ -501,7 +501,7 @@ def mu_cleanmatslots(self, affect, selected_collection = ""):
                 current_mat = materials[material_index]
                 assigned_materials.append(current_mat)
 
-                # check if indek is already listed as used or not
+                # check if index is already listed as used or not
                 found = False
                 for mat in used_mat_index:
                     if mat == material_index:
@@ -805,7 +805,7 @@ def mu_change_material_link(self, link, affect, override_data_material = False,
                             'The object Data for object ' + object.name_full
                             + ' already had a material assigned '
                             + 'to slot #' + str(index)
-                            + ' (' + slot.material.name + '), it was not overriden!')
+                            + ' (' + slot.material.name + '), it was not overridden!')
 
             if override_data_material:
                 slot.material = present_material
@@ -1701,7 +1701,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
         self.report({'WARNING'},
                     "Texture set has both Roughness and Glossiness, "
-                    + connected + " has taken presidence!")
+                    + connected + " has taken precedence!")
 
     if prefs.connect:
         uvmap     = None
