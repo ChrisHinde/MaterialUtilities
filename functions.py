@@ -419,6 +419,17 @@ def mu_cleanmatslots(self, affect, selected_collection = ""):
     # check for edit mode
     edit_mode = False
     active_object = bpy.context.active_object
+
+    if active_object is None:
+        if len(bpy.context.selected_editable_objects) > 0:
+            active_object = bpy.context.selected_editable_objects[0]
+            if affect == 'ACTIVE':
+                affect = 'SELECTED'
+        else:
+            self.report({'ERROR'},
+                        "There are no selected objects! Cancelling!")
+            return {'CANCELLED'}
+
     if active_object.mode == 'EDIT':
         edit_mode = True
         bpy.ops.object.mode_set()
