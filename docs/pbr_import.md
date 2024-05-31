@@ -68,7 +68,7 @@ Will be connected through a *Normal Map* node, and then via the *Bump* node, if 
 - **Roughness** ¤
 - **Specular** ¤
 - **Transmission**
-- ***Render***/***Sample***
+- ***Render***/***Sample***/***Preview***
 Some texture sets might contain a sample render among the textures, if one is detected it will be ignored and not imported
 
 Maps marked with ¤ will be treated as "non-color" (see [Color Spaces](#color-spaces) for more information)

@@ -24,6 +24,8 @@ So I welcome anyone that is willing to help, either by:
 - Patching and making pull request
 - Be added to this repository as a collaborators (and so having a more direct access to the project)
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y3O0EEE)
+
 ## Table of Contents
 
 - [Background](#background)
