@@ -451,7 +451,7 @@ class VIEW3D_OT_materialutilities_fake_user_set(bpy.types.Operator):
 
 
 class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
-    """Link the materials to Data or Object, while keepng materials assigned"""
+    """Link the materials to Data or Object, while keeping materials assigned"""
 
     bl_idname  = 'view3d.materialutilities_change_material_link'
     bl_label   = "Change Material Linking (Material Utilities)"
@@ -907,7 +907,7 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
 
     affect: EnumProperty(
             name = "Affect",
-            description = "Which objects of to affect",
+            description = "Which objects to affect",
             items = mu_affect_enums,
             default = 'SELECTED'
             )
@@ -928,7 +928,7 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
     set_smooth_shading: BoolProperty(
             name = "Set Smooth",
             description = "Set Smooth shading for the affected objects\n"
-                            "This overrides the currenth smooth/flat shading \
+                            "This overrides the current smooth/flat shading \
                              that might be set to different parts of the object",
             default = True
             )
@@ -972,7 +972,7 @@ class MATERIAL_OT_materialutilities_remove_unused_materials(bpy.types.Operator):
     def execute(self, context):
         return mu_remove_unused_materials(self)
 
-class MU_materialutilites_select_texture_base(bpy.types.Operator):
+class MU_materialutilities_select_texture_base(bpy.types.Operator):
     """Base class to collect common functions & properties for texture selecting dialogs"""
     
     only_selected: BoolProperty(
@@ -1264,7 +1264,7 @@ class MU_materialutilites_select_texture_base(bpy.types.Operator):
 
             return mu_replace_image_textures(self, prefs, **params)
 
-class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_texture_base):
+class NODE_OT_materialutilities_select_texture_files(MU_materialutilities_select_texture_base):
     """Select image textures to import to shader setup"""
     
     bl_idname  = 'node.materialutilities_select_texture_files'
@@ -1281,7 +1281,7 @@ class NODE_OT_materialutilites_select_texture_files(MU_materialutilites_select_t
         self.selecting_files = True
         return self._invoke(context, event)
 
-class NODE_OT_materialutilites_select_texture_directory(MU_materialutilites_select_texture_base):
+class NODE_OT_materialutilities_select_texture_directory(MU_materialutilities_select_texture_base):
     """Select directory with image textures to import to shader setup"""
     
     bl_idname  = 'node.materialutilities_select_texture_directory'

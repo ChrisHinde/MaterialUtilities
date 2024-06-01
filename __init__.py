@@ -146,8 +146,8 @@ classes = (
 
     VIEW3D_MT_materialutilities_main,
 
-    NODE_OT_materialutilites_select_texture_files,
-    NODE_OT_materialutilites_select_texture_directory,
+    NODE_OT_materialutilities_select_texture_files,
+    NODE_OT_materialutilities_select_texture_directory,
     
     NODE_OT_materialutilities_add_image_textures,
     NODE_OT_materialutilities_replace_image_textures,
