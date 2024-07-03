@@ -113,6 +113,25 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         default = False
     )
 
+    use_legacy_cleanmatslots_ui: BoolProperty(
+        name = "Use Legacy Clean Material Slots",
+        description = "Use the legacy version (default) of the UI for the Clean Material Slots operator",
+        default = True
+    )
+
+    cleanmatslots_only_active: BoolProperty(
+        name = "Only active object",
+        description = "Have (clean material slots on) Only active object enabled by default",
+        default = False
+    )
+    cleanmatslots_affect: EnumProperty(
+            name = "Affect",
+            description = "Which object(s) to clean material slots on",
+            items = mu_affect_enums,
+            default = 'SELECTED'
+            )
+
+
     # Preferences for texture import
     add_pbr_import_to_assign_dlg: BoolProperty(
         name = "Add to Assign Material dialog (in the 3D viewport)",
@@ -273,6 +292,9 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
     defaults_auto_smooth_expanded: BoolProperty(
         name = "Set Auto Smooth"
     )
+    defaults_cleanmatslots_expanded: BoolProperty(
+        name = "Clean Material Slots"
+    )
     defaults_textures_expanded: BoolProperty(
         name = "PBR Texture Set Import"
     )
@@ -349,6 +371,18 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                 col = mu_ui_col_split(layout)
                 col.prop(self, "auto_smooth_angle", expand = False)
                 col.prop(self, "set_smooth_affect", expand = False)
+
+            layout.prop(self, 'defaults_cleanmatslots_expanded',
+                        icon='DISCLOSURE_TRI_DOWN' if self.defaults_cleanmatslots_expanded
+                        else 'DISCLOSURE_TRI_RIGHT')
+            if self.defaults_cleanmatslots_expanded:
+                layout.separator()
+                col = mu_ui_col_split(layout)
+                col.prop(self, "use_legacy_cleanmatslots_ui", expand = False)
+                if self.use_legacy_cleanmatslots_ui:
+                    col.prop(self, "cleanmatslots_only_active", expand = False)
+                else:
+                    col.prop(self, "cleanmatslots_affect", expand = False)
 
             layout.separator()
 
@@ -472,3 +506,6 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
 
 def materialutilities_get_preferences(context):
     return context.preferences.addons[__package__].preferences
+
+def materialutilities_get_preferences_static(context):
+    return context.preferences.addons['MaterialUtilities'].preferences

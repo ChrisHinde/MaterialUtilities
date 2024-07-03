@@ -35,7 +35,7 @@
 bl_info = {
     "name": "Material Utilities",
     "author": "MichaleW, ChrisHinde",
-    "version": (3, 0, 1),
+    "version": (3, 0, 4),
     "blender": (4, 1, 1),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",

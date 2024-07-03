@@ -245,16 +245,42 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
             default = False
             )
 
+    affect: EnumProperty(
+            name = "Affect",
+            description = "Which object(s) to clean material slots on",
+            items = mu_affect_enums,
+            default = 'SELECTED'
+            )
+
     @classmethod
     def poll(cls, context):
-        return len(context.selected_editable_objects) > 0
+        mu_prfs = context.preferences.addons[__package__].preferences
+        print(mu_prfs)
+
+        if mu_prfs.use_legacy_cleanmatslots_ui:
+            return len(context.selected_editable_objects) > 0
+        else:
+            return True
 
     def draw(self, context):
+        mu_prfs = context.preferences.addons[__package__].preferences
+
         layout = self.layout
-        layout.prop(self, 'only_active', icon = 'PIVOT_ACTIVE')
+        
+        if mu_prfs.use_legacy_cleanmatslots_ui:
+            self.only_active = mu_prfs.cleanmatslots_only_active
+            layout.prop(self, 'only_active', icon = 'PIVOT_ACTIVE')
+        else:
+            self.affect = mu_prfs.cleanmatslots_affect
+            layout.prop(self, 'affect')
 
     def execute(self, context):
-        affect = 'ACTIVE' if self.only_active else 'SELECTED'
+        mu_prfs = context.preferences.addons[__package__].preferences
+
+        if mu_prfs.use_legacy_cleanmatslots_ui:
+            affect = 'ACTIVE' if self.only_active else 'SELECTED'
+        else:
+            affect = self.affect
 
         return mu_cleanmatslots(self, affect)
 
