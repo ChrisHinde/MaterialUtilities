@@ -274,7 +274,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         name = "Category",
         description = "Preferences Category",
         items = [
-            ('DEFAULTS', "Defaults",           "Default options for Material Utilites in the 3D View"),
+            ('DEFAULTS', "Defaults",           "Default options for Material Utilities in the 3D View"),
             ('TEXTURE',  "Texture Set Import", "Default options for PBR texture import"),
             ('MISC',     "Miscellaneous",      "Miscellaneous settings for Material Utilities"),
         ],
@@ -330,7 +330,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
 
         if self.pref_category == 'DEFAULTS':
             layout.separator()
-            layout.label(text = "Here you can change the default values and behaviors of the Material Utilites, categorized by function")
+            layout.label(text = "Here you can change the default values and behaviors of the Material Utilities, categorized by function")
             layout.separator()
 
             layout.prop(self, 'defaults_assign_expanded',

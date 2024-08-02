@@ -414,7 +414,7 @@ def mu_copy_material_to_others(self):
 
 
 def mu_cleanmatslots(self, affect, selected_collection = ""):
-    """Clean the material slots of the selected objects"""
+    """Clean the material slots of the selected objects"""  
 
     # check for edit mode
     edit_mode = False
@@ -454,6 +454,8 @@ def mu_cleanmatslots(self, affect, selected_collection = ""):
         material_list  = []
         material_names = []
         assigned_materials = []
+        
+        print(obj.name)
 
         materials = obj.material_slots.keys()
 
