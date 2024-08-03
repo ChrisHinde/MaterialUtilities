@@ -454,8 +454,6 @@ def mu_cleanmatslots(self, affect, selected_collection = ""):
         material_list  = []
         material_names = []
         assigned_materials = []
-        
-        print(obj.name)
 
         materials = obj.material_slots.keys()
 

@@ -251,16 +251,33 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
             items = mu_affect_enums,
             default = 'SELECTED'
             )
+    selected_collection: StringProperty(
+            name = "Collection",
+            description = "Which collection with objects to clean material slots on"
+            )
+    show_dialog: BoolProperty(
+            name = "Show Dialog",
+            default = False
+            )
 
     @classmethod
     def poll(cls, context):
         mu_prfs = context.preferences.addons[__package__].preferences
-        print(mu_prfs)
 
         if mu_prfs.use_legacy_cleanmatslots_ui:
             return len(context.selected_editable_objects) > 0
         else:
             return True
+
+    def invoke(self, context, event):
+        mu_prfs = context.preferences.addons[__package__].preferences
+        self.affect = mu_prfs.cleanmatslots_affect
+        self.only_active = mu_prfs.cleanmatslots_only_active
+        
+        if event.shift or event.ctrl:
+            return self.execute(context)
+
+        return context.window_manager.invoke_props_dialog(self)
 
     def draw(self, context):
         mu_prfs = context.preferences.addons[__package__].preferences
@@ -268,11 +285,11 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
         layout = self.layout
         
         if mu_prfs.use_legacy_cleanmatslots_ui:
-            self.only_active = mu_prfs.cleanmatslots_only_active
             layout.prop(self, 'only_active', icon = 'PIVOT_ACTIVE')
         else:
-            self.affect = mu_prfs.cleanmatslots_affect
             layout.prop(self, 'affect')
+            if self.affect == 'SELECTED_COLLECTION':
+                layout.prop_search(self, 'selected_collection', bpy.data, 'collections')
 
     def execute(self, context):
         mu_prfs = context.preferences.addons[__package__].preferences
@@ -282,7 +299,7 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
         else:
             affect = self.affect
 
-        return mu_cleanmatslots(self, affect)
+        return mu_cleanmatslots(self, affect, self.selected_collection)
 
 
 class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
@@ -563,6 +580,11 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             description = "Give the material a new name instead of \
                                            the original base name"
                             )
+    use_selected_material: BoolProperty(
+                            name = "Use Selected Material",
+                            default = False,
+                            description = "Use the selected material (e.g. \"Material.004\") to be used instead of the \"base material\" (e.g. \"Material\")",
+                            )
     material_new_name: StringProperty(
                             name = "New Material Name",
                             default = "",
@@ -596,8 +618,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             )
 
     is_not_undo = False
-    material_error = [] # collect mat for warning messages
-
+    material_error = [] # collect materials for warning messages
 
     def replace_name(self, name = ""):
         """If the user chooses a material like 'Material.042',
