@@ -661,6 +661,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
                         self.material_base_name = base
                         mat.name = self.material_base_name
+
                         return
                     except ValueError:
                         if name not in self.material_error:
@@ -688,8 +689,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
         return base, suffix
 
-
-    def split_name(self, name):
+    def split_name(self, name, ignore_base_name=False):
         """Split the material name into a base and a suffix"""
 
         delimiter = '.'
@@ -717,7 +717,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                 self.material_error.append(name)
             return name, None
 
-        if self.is_auto is False:
+        if self.is_auto is False and not ignore_base_name:
             if base == self.material_base_name:
                 return base, suffix
             else:
@@ -768,7 +768,8 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         col = box_1.column()
         row = col.split(factor = 0.93, align = True)
         row.prop_search(self, 'material_base_name', bpy.data, 'materials')
-        row.prop(self, 'use_new_name', text = "", icon = 'STYLUS_PRESSURE')
+        row.prop(self, 'use_new_name', text = "", icon = 'SYNTAX_OFF')
+        row.prop(self, 'use_selected_material', text = "", icon = 'STYLUS_PRESSURE')
 
         if self.use_new_name:
             box_1.prop(self, 'material_new_name')
@@ -796,6 +797,27 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         self.material_error = []
 
         if not self.is_auto:
+            # Use the selected material (Could be Material.005, etc) instead of 
+            #  the material with the base name (Material) as a basis
+            if self.use_selected_material:
+                # We do this by simply renaming the selected material to the base material name
+                #  (and renaming the existing material with the "base name", essentially swapping them)
+                selected_material = self.material_base_name
+                base_name = self.split_name(selected_material, ignore_base_name=True)[0]
+
+                # If there is no material with the base name, we just rename the selected material directly
+                if base_name not in bpy.data.materials.keys():
+                    bpy.data.materials[selected_material].name = base_name
+                else:
+                    # We need a temporary name, since we can't rename them simultaneously
+                    temp_name = "_MU_" + selected_material + "_"
+
+                    bpy.data.materials[selected_material].name = temp_name
+                    bpy.data.materials[base_name].name = selected_material
+                    bpy.data.materials[temp_name].name = base_name
+
+                self.material_base_name = base_name
+
             self.replace_name()
 
             if self.check_no_name:
