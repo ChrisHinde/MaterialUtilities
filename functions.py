@@ -459,6 +459,10 @@ def mu_cleanmatslots(self, affect, selected_collection = ""):
 
         materials = obj.material_slots.keys()
 
+        # Sanity check, thanks to luckychris (Issue #17)
+        if len(materials) == 0:
+            continue
+
         if obj.type == 'MESH':
             # check the polygons on the mesh to build a list of used materials
             mesh = obj.data
