@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+*.code-workspace
+
 # Distribution / packaging
 .Python
 build/
@@ -112,5 +114,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-MaterialUtilities.code-workspace
+*.code-workspace
 .vscode/settings.json

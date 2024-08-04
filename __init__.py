@@ -1,9 +1,9 @@
-# Material Utilities v2.4.4
+# Material Utilities v3.0.2
 #
-#  Usage: Shift + Q in the 3D viewport
+#  Usage: Shift + Q in the 3D viewport or Shader Node Editor
 #
 # Ported from 2.6/2.7 to 2.8x+ by
-#    Christopher Hindefjord (chrishinde) 2019-2023
+#    Chris Hindefjord (chrishinde) 2019-2024
 #
 # ## Port based on 2010 version by MichaelW with some code added from latest 2.7x version
 # ## Same code may be attributed to one of the following awesome people!
@@ -34,9 +34,9 @@
 
 bl_info = {
     "name": "Material Utilities",
-    "author": "MichaleW, ChrisHinde",
-    "version": (2, 4, 3),
-    "blender": (3, 00, 0),
+    "author": "ChrisHinde, MichaleW",
+    "version": (3, 0, 2),
+    "blender": (4, 2, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
     "doc_url": "{BLENDER_MANUAL_URL}/addons/materials/material_utils.html",
@@ -115,7 +115,7 @@ from bpy.types import (
     )
 
 
-# All classes used by Material Utilities, that need to be registred
+# All classes used by Material Utilities, that need to be registered
 classes = (
     VIEW3D_OT_materialutilities_assign_material_object,
     VIEW3D_OT_materialutilities_assign_material_edit,
@@ -146,6 +146,15 @@ classes = (
 
     VIEW3D_MT_materialutilities_main,
 
+    NODE_OT_materialutilities_select_texture_files,
+    NODE_OT_materialutilities_select_texture_directory,
+    
+    NODE_OT_materialutilities_add_image_textures,
+    NODE_OT_materialutilities_replace_image_textures,
+    NODE_MT_materialutilities_shadereditor_menu,
+    
+    VIEW3D_OT_materialutilities_assign_pbr_material,
+
     VIEW3D_MT_materialutilities_preferences
 )
 
@@ -165,7 +174,6 @@ def materialutilities_manual_map():
 
 mu_classes_register, mu_classes_unregister = bpy.utils.register_classes_factory(classes)
 
-
 def register():
     """Register the classes of Material Utilities together with the default shortcut (Shift+Q)"""
     mu_classes_register()
@@ -175,11 +183,19 @@ def register():
     bpy.types.MATERIAL_MT_context_menu.prepend(materialutilities_menu_move)
     bpy.types.MATERIAL_MT_context_menu.append(materialutilities_menu_functions)
 
+    mu_prefs = materialutilities_get_preferences(bpy.context)
+    if mu_prefs.tex_add_to_editor_header:
+        bpy.types.NODE_HT_header.append(materialutilities_shadereditor_menu)
+
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
         km = kc.keymaps.new(name = "3D View", space_type = "VIEW_3D")
         kmi = km.keymap_items.new('wm.call_menu', 'Q', 'PRESS', ctrl = False, shift = True)
         kmi.properties.name = VIEW3D_MT_materialutilities_main.bl_idname
+
+        km_s = kc.keymaps.new(name = "Node Editor", space_type = "NODE_EDITOR")
+        kmi_s = km_s.keymap_items.new('wm.call_menu', 'Q', 'PRESS', ctrl = False, shift = True)
+        kmi_s.properties.name = NODE_MT_materialutilities_shadereditor_menu.bl_idname
 
         bpy.utils.register_manual_map(materialutilities_manual_map)
 
@@ -194,10 +210,11 @@ def unregister():
     bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_move)
     #kc = bpy.context.window_manager.keyconfigs.addon
     bpy.types.MATERIAL_MT_context_menu.remove(materialutilities_menu_functions)
+    bpy.types.NODE_HT_header.remove(materialutilities_shadereditor_menu)
 
     keyconfigs = bpy.context.window_manager.keyconfigs
-    defaultmap = keyconfigs.get("blender").keymaps
-    addonmap   = keyconfigs.get("blender addon").keymaps
+    defaultmap = keyconfigs.get("Blender").keymaps
+    addonmap   = keyconfigs.get("Blender addon").keymaps
 
     km = addonmap["3D View"]
     for kmi in km.keymap_items:
@@ -210,6 +227,19 @@ def unregister():
     for kmi in km.keymap_items:
         if kmi.idname == "wm.call_menu":
             if kmi.properties.name == VIEW3D_MT_materialutilities_main.bl_idname:
+                km.keymap_items.remove(kmi)
+                
+    km = addonmap["Node Editor"]
+    for kmi in km.keymap_items:
+        if kmi.idname == "wm.call_menu":
+            if kmi.properties.name == NODE_MT_materialutilities_shadereditor_menu.bl_idname:
+                km.keymap_items.remove(kmi)
+
+
+    km = defaultmap["Node Editor"]
+    for kmi in km.keymap_items:
+        if kmi.idname == "wm.call_menu":
+            if kmi.properties.name == NODE_MT_materialutilities_shadereditor_menu.bl_idname:
                 km.keymap_items.remove(kmi)
 
     mu_classes_unregister()
