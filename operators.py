@@ -175,7 +175,7 @@ class VIEW3D_OT_materialutilities_select_by_material_name(bpy.types.Operator):
     extend_selection: BoolProperty(
             name = "Extend Selection",
             description = "Keeps the current selection and adds faces "
-                            + "with the material to the selection"
+                            "with the material to the selection"
             )
     material_name: StringProperty(
             name = "Material Name",
@@ -241,7 +241,7 @@ class VIEW3D_OT_materialutilities_clean_material_slots(bpy.types.Operator):
     only_active: BoolProperty(
             name = "Only active object",
             description = "Only remove the material slots for the active object "
-                          + "(otherwise do it for every selected object)",
+                            "(otherwise do it for every selected object)",
             default = False
             )
 
@@ -313,7 +313,7 @@ class VIEW3D_OT_materialutilities_remove_material_slot(bpy.types.Operator):
     only_active: BoolProperty(
             name = "Only active object",
             description = "Only remove the active material slot for the active object "
-                            + "(otherwise do it for every selected object)",
+                           "(otherwise do it for every selected object)",
             default = True
             )
 
@@ -339,7 +339,7 @@ class VIEW3D_OT_materialutilities_remove_all_material_slots(bpy.types.Operator):
     only_active: BoolProperty(
             name = "Only active object",
             description = "Only remove the material slots for the active object "
-                          + "(otherwise do it for every selected object)",
+                            "(otherwise do it for every selected object)",
             default = True
             )
 
@@ -373,8 +373,8 @@ class VIEW3D_OT_materialutilities_replace_material(bpy.types.Operator):
             )
     all_objects: BoolProperty(
             name = "All Objects",
-            description = "Replace for all objects in this blend file \
-                            (otherwise only selected objects)",
+            description = "Replace for all objects in this blend file "
+                            "(otherwise only selected objects)",
             default = True,
             )
     update_selection: BoolProperty(
@@ -419,8 +419,8 @@ class VIEW3D_OT_materialutilities_replace_multiple_materials(bpy.types.Operator)
             )
     all_objects: BoolProperty(
             name = "All Objects",
-            description = "Replace for all objects in this blend file \
-                            (otherwise only selected objects)",
+            description = "Replace for all objects in this blend file "
+                            "(otherwise only selected objects)",
             default = True,
             )
     update_selection: BoolProperty(
@@ -502,16 +502,16 @@ class VIEW3D_OT_materialutilities_change_material_link(bpy.types.Operator):
 
     override: BoolProperty(
             name = "Override Data material",
-            description = "Override the materials assigned to the object data/mesh \
-                            when switching to 'Linked to Data'\n"
-                           "(WARNING: This will override the materials of other linked objects, \
-                            which have the materials linked to Data)",
+            description = "Override the materials assigned to the object data/mesh "
+                            "when switching to 'Linked to Data'\n"
+                           "(WARNING: This will override the materials of other linked objects, "
+                            "which have the materials linked to Data)",
             default = False,
             )
     unlink_old: BoolProperty(
             name = "Unlink Material From Old Link",
-            description = "Unlink the material from what it is currently linked to, \
-                            before it gets linked to the new option",
+            description = "Unlink the material from what it is currently linked to, "
+                            "before it gets linked to the new option",
             default = False,
             )
     link_to: EnumProperty(
@@ -565,41 +565,42 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
     bl_idname  = 'material.materialutilities_merge_base_names'
     bl_label   = "Merge Base Names"
-    bl_description = "Merge materials that has the same base names \
-                        but ends with .xxx (.001, .002 etc)"
+    bl_description = ("Merge materials that has the same base names "
+                        "but ends with .xxx (.001, .002 etc)")
 
     material_base_name: StringProperty(
                             name = "Material Base Name",
                             default = "",
-                            description = "Base name for materials to merge \
-                                           (e.g. \"Material\" is the base name \
-                                           of \"Material.001\", \"Material.002\" etc.)"
+                            description = "Base name for materials to merge "
+                                            "(e.g. \"Material\" is the base name "
+                                            "of \"Material.001\", \"Material.002\" etc.)"
                             )
     use_new_name: BoolProperty(
                             name = "New name",
-                            description = "Give the material a new name instead of \
-                                           the original base name"
+                            description = "Give the material a new name instead of "
+                                            "the original base name"
                             )
     use_selected_material: BoolProperty(
                             name = "Use Selected Material",
                             default = False,
-                            description = "Use the selected material (e.g. \"Material.004\") to be used instead of the \"base material\" (e.g. \"Material\")",
+                            description = "Use the selected material (e.g. \"Material.004\") instead of the \"base material\" "
+                                            "(e.g. \"Material\") as basis for the merged material",
                             )
     material_new_name: StringProperty(
                             name = "New Material Name",
                             default = "",
-                            description = "Set a new name to use instead of \
-                                           the original Material Base Name"
+                            description = "Set a new name to use instead of "
+                                            "the original Material Base Name"
                             )
     is_auto: BoolProperty(
                             name = "Auto Merge",
-                            description = "Find all available duplicate materials \
-                                           and Merge them"
+                            description = "Find all available duplicate materials "
+                                            "and Merge them"
                             )
     pattern_to_use: EnumProperty(
                             name = "Pattern",
-                            description = "Use another pattern than Material.xxx \
-                                           for merging materials.",
+                            description = "Use another pattern than Material.xxx"
+                                           "for merging materials.""",
                             items = mu_merge_base_names_pattern_enums,
                             default = 'DEFAULT',
                             )
@@ -610,10 +611,10 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             )
     user_defined_pattern_regex: StringProperty(
                             name = "RegEx pattern",
-                            description = "The pattern to use for search and replace.\
-                                            Use (Python Style) RegEx.\
-                                            Make sure you have to groups \
-                                            (one for the name and one for the suffix)",
+                            description = "The pattern to use for search and replace. "
+                                            "Use (Python Style) RegEx. "
+                                            "Make sure you have two groups "
+                                            "(one for the name and one for the suffix)",
                             default = "^%BASE_NAME\.(\d{1,3})$"
                             )
 
@@ -1005,8 +1006,8 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
     )
     angle: FloatProperty(
             name = "Angle",
-            description = "Maximum angle between face normals that \
-                            will be considered as smooth",
+            description = "Maximum angle between face normals that "
+                            "will be considered as smooth",
             subtype = 'ANGLE',
             min = 0,
             max = radians(180),
@@ -1015,8 +1016,8 @@ class MATERIAL_OT_materialutilities_auto_smooth_angle(bpy.types.Operator):
     set_smooth_shading: BoolProperty(
             name = "Set Smooth",
             description = "Set Smooth shading for the affected objects\n"
-                            "This overrides the current smooth/flat shading \
-                             that might be set to different parts of the object",
+                            "This overrides the current smooth/flat shading "
+                             "that might be set to different parts of the object",
             default = True
             )
 
@@ -1084,8 +1085,8 @@ class MU_materialutilities_select_texture_base(bpy.types.Operator):
             )
     use_alpha_channel: BoolProperty(
             name = "Connect Alpha channel",
-            description = "Connects the alpha channel (if detected) of Diffuse texture \
-                            to the opacity/alpha input",
+            description = "Connects the alpha channel (if detected) of Diffuse texture "
+                            "to the opacity/alpha input",
             default = False,
             )
     collapse_texture_nodes: BoolProperty(
@@ -1133,10 +1134,10 @@ class MU_materialutilities_select_texture_base(bpy.types.Operator):
             )
     go_wide: BoolProperty(
             name = "Wide search",
-            description = "Go through all nodes in the material, to find the right node, \
-                            if not immediately found.\n"
-                            "This might take a longer time in complex materials, \
-                            and might also replace unwanted textures",
+            description = "Go through all nodes in the material, to find the right node, "
+                            "if not immediately found.\n"
+                            "This might take a longer time in complex materials, "
+                            "and might also replace unwanted textures",
             default = True,
             )
     emission_map_option: EnumProperty(
