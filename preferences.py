@@ -125,12 +125,25 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         default = False
     )
     cleanmatslots_affect: EnumProperty(
-            name = "Affect",
-            description = "Which object(s) to clean material slots on",
-            items = mu_affect_enums,
-            default = 'SELECTED'
-            )
+        name = "Affect",
+        description = "Which object(s) to clean material slots on",
+        items = mu_affect_enums,
+        default = 'SELECTED'
+        )
 
+    merge_use_selected_material: BoolProperty(
+            name = "Use Selected Material",
+            default = False,
+            description = "Use the selected material (e.g. \"Material.004\") instead of the \"base material\" (e.g. \"Material\") "
+                            "as basis for the merge material",
+            )
+    merge_remove_unused: BoolProperty(
+            name = "Remove left over materials",
+            default = False,
+            description = "Remove the left over (unused) materials (e.g. \"Material.042\") after merging the materials.\n"
+                            "These will be automatically removed after save (and reopen) of the file.\n"
+                            "(NB: Only removes related materials, other unused materials will be left)",
+            )
 
     # Preferences for texture import
     add_pbr_import_to_assign_dlg: BoolProperty(
@@ -295,6 +308,9 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
     defaults_cleanmatslots_expanded: BoolProperty(
         name = "Clean Material Slots"
     )
+    defaults_mergematerials_expanded: BoolProperty(
+        name = "Merge materials"
+    )
     defaults_textures_expanded: BoolProperty(
         name = "PBR Texture Set Import"
     )
@@ -371,6 +387,15 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
                 col = mu_ui_col_split(layout)
                 col.prop(self, "auto_smooth_angle", expand = False)
                 col.prop(self, "set_smooth_affect", expand = False)
+
+            layout.prop(self, 'defaults_mergematerials_expanded',
+                        icon='DISCLOSURE_TRI_DOWN' if self.defaults_mergematerials_expanded
+                        else 'DISCLOSURE_TRI_RIGHT')
+            if self.defaults_mergematerials_expanded:
+                layout.separator()
+                col = mu_ui_col_split(layout)
+                col.prop(self, "merge_use_selected_material", expand = False)
+                col.prop(self, "merge_remove_unused", expand = False)
 
             layout.prop(self, 'defaults_cleanmatslots_expanded',
                         icon='DISCLOSURE_TRI_DOWN' if self.defaults_cleanmatslots_expanded

@@ -618,7 +618,13 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
                             )
 
     is_not_undo = False
+    remove_unused = False
     material_error = [] # collect materials for warning messages
+    merged_materials = []
+    
+    def reg_material(self, material):
+        if not material.name in self.merged_materials:
+            self.merged_materials.append(material.name)
 
     def replace_name(self, name = ""):
         """If the user chooses a material like 'Material.042',
@@ -735,6 +741,8 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         if suffix is None:
             return
 
+        self.reg_material(slot.material)
+
         try:
             base_mat = bpy.data.materials[base]
         except KeyError:
@@ -789,12 +797,17 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
         layout.prop(self, 'is_auto', text = "Auto Rename/Replace", icon = 'SYNTAX_ON')
 
     def invoke(self, context, event):
+        mu_prefs = materialutilities_get_preferences(context)
+        self.use_selected_material = mu_prefs.merge_use_selected_material
+        self.remove_unused = mu_prefs.merge_remove_unused
         self.is_not_undo = True
+
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
         # Reset Material errors, otherwise we risk reporting errors erroneously.
         self.material_error = []
+        self.merged_materials = []
 
         if not self.is_auto:
             # Use the selected material (Could be Material.005, etc) instead of 
@@ -835,6 +848,11 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
             self.main_loop(context)
 
             self.material_base_name = ""
+
+        if self.remove_unused:
+            for mat in self.merged_materials:
+                print("Removing " + mat)
+                bpy.data.materials.remove(bpy.data.materials[mat])
 
         if self.material_error:
             materials = ", ".join(self.material_error)
