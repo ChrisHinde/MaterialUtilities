@@ -1544,7 +1544,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
 
     engine = bpy.data.scenes['Scene'].render.engine
 
-    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE':
+    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE' or engine == 'BLENDER_EEVEE_NEXT':
         # Cycles and Eevee uses the same nodes
         engine = 'CYCLES'
     elif engine == 'octane':
@@ -1726,6 +1726,8 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
         mu_prefs = materialutilities_get_preferences(bpy.context)
 
         if engine == 'CYCLES':
+            nrm_inv_node = None
+
             if mu_prefs.tex_add_new_uvmap:
                 if nodes.find('MUAddedUVMap') >= 0:
                     has_uvmap = True
@@ -2080,7 +2082,7 @@ def mu_replace_image_textures(self, prefs, directory = None,
     engine = bpy.data.scenes['Scene'].render.engine
     mat    = bpy.context.active_object.active_material
 
-    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE':
+    if engine == 'CYCLES' or engine == 'BLENDER_EEVEE' or engine == 'BLENDER_EEVEE_NEXT':
         # Cycles and Eevee uses the same nodes
         engine = 'CYCLES'
     elif engine == 'octane':

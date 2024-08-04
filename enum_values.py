@@ -80,7 +80,7 @@ mu_octane_std_material_enums = (
     ('STD_SURF',  "Standard Surface Material", "Use the (Autodesk) Standard Surface Material")
 )
 
-mu_supported_engines = ['CYCLES', 'BLENDER_EEVEE', 'octane'] # Octane is reported in all lower case, but MU will transform it to upper case for further use
+mu_supported_engines = ['CYCLES', 'BLENDER_EEVEE', 'BLENDER_EEVEE_NEXT', 'octane'] # Octane is reported in all lower case, but MU will transform it to upper case for further use
 
 mu_default_shader_nodes = {
     'CYCLES': 'ShaderNodeBsdfPrincipled',
@@ -280,18 +280,18 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
         'ShaderNodeBsdfPrincipled': {
             'AO': -80,                                    # NOT AUTOMATICALLY CONNECTED TO NODE, Place above
             'REFLECTION': -120,                           # NOT AUTOMATICALLY CONNECTED TO NODE, Place above
-            'DIFFUSE': 106, 'ALBEDO': 106, 'COLOR': 106,  # Treating Albedo/Diffuse/Color as the same
-            'ROUGHNESS': 331, 'GLOSSINESS': 298,          # Same input, but different values
-            'SPECULAR': 264,
-            'METALNESS': 230,
-            'HEIGHT': 800, 'DISPLACEMENT': 750,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
-            'BUMP': 570, 'NORMAL': 570,                   # In Cycles Bump and Normal is done via the same input
-            '_NORMALINVNODE': 570,
-            'ALPHA': 540, 'MASK': 540,                    # Currently treating Alpha and Mask as the same thing
-            'TRANSMISSION': 459,
-            'EMISSION': 500,
+            'DIFFUSE': 36, 'ALBEDO': 36, 'COLOR': 36,  # Treating Albedo/Diffuse/Color as the same
+            'ROUGHNESS': 107, 'GLOSSINESS': 107,          # Same input, but different values
+            'SPECULAR': 194,
+            'METALNESS': 72,
+            'HEIGHT': 500, 'DISPLACEMENT': 550,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
+            'BUMP': 330, 'NORMAL': 330,                   # In Cycles Bump and Normal is done via the same input
+            '_NORMALINVNODE': 330,
+            'ALPHA': 141, 'MASK': 141,                    # Currently treating Alpha and Mask as the same thing
+            'TRANSMISSION': 227,
+            'EMISSION': 260,
             'UNKNOWN': -200,
-            '_DISPLACEMENT': 650,
+            '_DISPLACEMENT': 600,
             '_UVNODE': 268, '_UVREROUTE': 300,
         },
         'ShaderNodeBsdfDiffuse':{
@@ -463,13 +463,13 @@ mu_node_inputs = { # input <-> output mappings for adding nodes to the shader no
             'HEIGHT': None, 'DISPLACEMENT': None,                                    # Not connected to shader node
             'DIFFUSE': 'Base Color', 'ALBEDO': 'Base Color', 'COLOR': 'Base Color',  # Treating Albedo/Diffuse/Color as the same
             'ROUGHNESS': 'Roughness', 'GLOSSINESS': 'Roughness',                     # Same input, but different values
-            'SPECULAR': 'Specular',
+            'SPECULAR': 'Specular IOR Level',
             'METALNESS': 'Metallic',
             'BUMP': 'Normal', 'NORMAL': 'Normal',                                    # In Cycles Bump and Normal is done via the same input
             '_BUMPNODE': 'Normal', '_NORMALNODE': 'Normal',                          # Cycles converting nodes
             'ALPHA': 'Alpha', 'MASK': 'Alpha',                                       # Currently treating Alpha and Mask as the same thing
-            'TRANSMISSION': 'Transmission',
-            'EMISSION': 'Emission'
+            'TRANSMISSION': 'Transmission Weight',
+            'EMISSION': 'Emission Color'
         },
         'ShaderNodeBsdfDiffuse': {
             'AO': None, 'REFLECTION': None, 'GLOSSINESS': None,       # NOT AUTOMATICALLY CONNECTED TO NODE
