@@ -1,9 +1,9 @@
-# Material Utilities v3.0.1
+# Material Utilities v3.0.2
 #
 #  Usage: Shift + Q in the 3D viewport or Shader Node Editor
 #
 # Ported from 2.6/2.7 to 2.8x+ by
-#    Christopher Hindefjord (chrishinde) 2019-2024
+#    Chris Hindefjord (chrishinde) 2019-2024
 #
 # ## Port based on 2010 version by MichaelW with some code added from latest 2.7x version
 # ## Same code may be attributed to one of the following awesome people!
@@ -34,9 +34,9 @@
 
 bl_info = {
     "name": "Material Utilities",
-    "author": "MichaleW, ChrisHinde",
-    "version": (3, 0, 4),
-    "blender": (4, 1, 1),
+    "author": "ChrisHinde, MichaleW",
+    "version": (3, 0, 2),
+    "blender": (4, 2, 0),
     "location": "View3D > Shift + Q key",
     "description": "Menu of material tools (assign, select..) in the 3D View",
     "doc_url": "{BLENDER_MANUAL_URL}/addons/materials/material_utils.html",

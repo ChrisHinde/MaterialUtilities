@@ -1,4 +1,4 @@
-# Material utilities v3.0.1 (Dev)
+# Material utilities v3.0.2 (Dev)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -10,7 +10,7 @@ Please read the list of [Known issues](#known-issues) below, if your problem isn
 
 ## Version
 
-The current stable version of Material Utilities is [**v3.0.1**](CHANGELOG.md#v3.0.1)\
+The current stable version of Material Utilities is [**v3.0.2**](CHANGELOG.md#v3.0.2)\
 (Major version indicates big changes or feature adds, Minor version bigger bugfixes and changes to existing features,
   Patch version [last number] indicates small changes and fixes)
 
@@ -65,7 +65,7 @@ Thanks to Meta-Androcto for handling the inclusion into the Blender repository.
 ## Installation
 
 1. Download the Add-on as a ZIP-file.
-2. In Blender 2.8x go to *Edit* > *Preferences*, select *Add-ons* in the left panel, and then *Install* in the upper right.
+2. In Blender 4.x go to *Edit* > *Preferences*, select *Add-ons* in the left panel, and then *Install* in the upper right.
 3. Browse to where you saved the ZIP-file, select it and click on *Install Add-on from File*.
 4. Click the checkbox to the left to enable the Add-on.
 5. Click the menu icon in the lower left and select *Save Current State*

@@ -1,5 +1,13 @@
 # Changelog
 
+<a name="v3.0.2"></a>
+
+## v3.0.2 (2024-08-04)
+
+* Fix issue #17 where Clean Material Slots throws an error when there's no material b725cc66de5aafa6d1eed9652eab30088737ab11
+* Add select filter to Clean Material Slots 19e64b59046dea5ee1c14e99e52a8e59900eaaa7
+* The user can now choose what material to use as the base when merging materials (as per request in issue #16) 2d4b949fe07443f8adbb8fc3756c94fdabf75db7
+
 <a name="v3.0.1"></a>
 
 ## v3.0.1 (2024-05-31)
