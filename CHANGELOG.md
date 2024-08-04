@@ -1,23 +1,50 @@
 # Changelog
 
-<a name="v2.4.4"></a>
-# v2.4.4 (2023-03-28)
-* Fix bug that occures when there's no active object e0603a51312070b1b68b4de170c2af94bf69b7e1
+<a name="v3.0.2"></a>
 
+## v3.0.2 (2024-08-04)
+
+* Fix issue #17 where Clean Material Slots throws an error when there's no material b725cc66de5aafa6d1eed9652eab30088737ab11
+* Add select filter to Clean Material Slots 19e64b59046dea5ee1c14e99e52a8e59900eaaa7
+* The user can now choose what material to use as the base when merging materials (as per request in issue #16) 2d4b949fe07443f8adbb8fc3756c94fdabf75db7
+
+<a name="v3.0.1"></a>
+
+## v3.0.1 (2024-05-31)
+
+* Fix issue #15 where Clean Material Slots throws an error when there's no active object
+
+<a name="v3.0.0"></a>
+
+## v3.0.0 (2023-07-05)
+
+* Add PBR Texture Set Import (see [docs/PBR_Import.md](docs/pbr_import.md))
+* Redesign of Add-on preferences panel (this was inspired by [@nutti](https://github.com/nutti) and the preference panel for [Magic UV](https://github.com/nutti/Magic-UV))
+* Restructure (and update) of documentation
+
+<a name="v2.4.4"></a>
+
+## v2.4.4 (2023-03-28)
+
+* Fix bug that occurs when there's no active object e0603a51312070b1b68b4de170c2af94bf69b7e1
 
 <a name="v2.4.3"></a>
-# v2.4.3 (2022-04-15)
+
+## v2.4.3 (2022-04-15)
+
 * Add "Remove unused materials" (Removes any material with "zero users") eac6bf436165cde1806a8e25f3a6e31f54889fe6
 * Add "Replace multiple materials" (Needs to be enabled in the settings before use!) affdbd0755ac2bb2ac7a5c0171eb46789ff5bcfe
 
 <a name="v2.4.2"></a>
-# v2.4.2 (2022-04-04)
+
+## v2.4.2 (2022-04-04)
+
 * Fix issue #10 where a material slot wasn't removed properly when using "Clean material slots" 887ed7012deed6219c7136e29edf6d93b8b0dafd
 * Fix problem with Material Icons(/Previews) in Assign Material & Select By Material in Blender 3.x (Mentioned in comment to issue #10) db9522feafa9689162ea6f3453dbea25781d2336
 
-
 <a name="v2.4.1"></a>
-# v2.4.1 (2020-08-01)
+
+## v2.4.1 (2020-08-01)
 
 * Add options for whether or not to include Grease Pencil materials in the menus
 * Add option to unlink from Object/Data for Change Material Link. This addresses issue #8
@@ -26,7 +53,8 @@
 This is so it's easier to get to those options when there's more materials than can be shown in one "page" (screen height).
 
 <a name="v2.4.0"></a>
-# v2.4.0 (2020-04-10)
+
+## v2.4.0 (2020-04-10)
 
 * Fix Merge By Base Name to handle missing base names, This addresses issue #6
 * Added Collection as a "filter" for which object's materials to affect (similar to "Selected Objects" etc)
@@ -36,31 +64,36 @@ This is so it's easier to get to those options when there's more materials than 
   (even across multiple selected objects). NB: You need to have Face selection enabled to be able to use it!
 
 <a name="v2.3.1"></a>
-# v2.3.1 (2020-04-09)
+
+## v2.3.1 (2020-04-09)
 
 * Changed the "unregister" method to try to fix #7
 * Mark this as a **Stable** version
 
 <a name="v2.3.0"></a>
-# v2.3.0-beta (2019-11-05)
+
+## v2.3.0-beta (2019-11-05)
 
 * Added Pattern options (Simple/Delimiter choice and Regular Expressions) to Merge Base Names (Works for "Auto Merge" as well)
 * Added option to rename the merged material
 
 <a name="v2.2.0"></a>
-# v2.2.0-beta (2019-08-12)
+
+## v2.2.0-beta (2019-08-12)
 
 * Add "Set Auto Smooth" to Specials
 * Fix error when disabling Add-on
 
 <a name="v2.1.1"></a>
-# v2.1.1-beta (2019-08-06)
+
+## v2.1.1-beta (2019-08-06)
 
 * Add option for affecting selected/active objects to Clean Material slots
 * Fix bug with Assign Material menu in Edit mode
 
 <a name="v2.1.0"></a>
-# v2.1.0-beta (2019-08-03)
+
+## v2.1.0-beta (2019-08-03)
 
 * Add Add-on Preferences (for defaults like new/add material etc)
 * Add *Override Current material slot* as an option for *Assign Material*
@@ -69,18 +102,21 @@ This is so it's easier to get to those options when there's more materials than 
 * *Add New Material* is now at the top of the menu (instead of at the bottom)
 
 <a name="v2.0.0"></a>
-# v2.0.0-beta (2019-08-01)
+
+## v2.0.0-beta (2019-08-01)
 (New feature -> Bump of version)
 
 * Add new operator: Specials > Join By Material
 
 <a name="v1.0.6"></a>
-# v1.0.6-beta (2019-08-01)
+
+## v1.0.6-beta (2019-08-01)
 
 * Fix (naming of) new/add material (default "Unnamed material"), so it adds numeric suffix if it already exists
 
 <a name="v1.0.5"></a>
-# v1.0.5-beta (2019-07-16)
+
+## v1.0.5-beta (2019-07-16)
 
 * Fix Issue #4 (Assigning materials when slot is linked to object) bba48ad
 * Fix issue #3 (Error if cameras etc are selcted) bba48ad
@@ -88,28 +124,32 @@ This is so it's easier to get to those options when there's more materials than 
 * Fix issue #1 (Exception when no object is selected) 57afffd
 
 <a name="v1.0.4"></a>
-# v1.0.4-beta (2019-07-14)
+
+## v1.0.4-beta (2019-07-14)
 
 * Fix Select By Material in Edit mode for multiple selected objects dfcdb57
 * Fix problem with Assign Material in Edit Mode 70e50f0
 * Fix Select By Material menu in Edit Mode 759ee9c
 
 <a name="v1.0.3"></a>
-# v1.0.3-beta (2019-07-14)
+
+## v1.0.3-beta (2019-07-14)
 
 * Update UI for Replace Material Operator 0f5a4dc
 * Update UI for Assign Material Operator d5235fd
 * Update UI for Select By Material operator 51710ec
 
 <a name="v1.0.2"></a>
-# v1.0.2-beta (2019-07-14)
+
+## v1.0.2-beta (2019-07-14)
 
 * Update UI for Change Material Link operator c359798
 * Fix Change Material Link operator 0d462cb
 * Fix wrongly named unregister function 8be1de0
 
 <a name="1.0.1"></a>
-# v1.0.1-beta (2019-07-13)
+
+## v1.0.1-beta (2019-07-13)
 
 * Add "Copy material to ohers" for Object mode 90808e6
 * Add Assign material operators 26e083a
