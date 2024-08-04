@@ -77,7 +77,9 @@ In the operator panel `[F9]` you can choose to extend your current selection, ot
 ### Clean Slots
 
 - **Clean Material Slots**\
-Removes any material slots that aren't assigned to any part of the object
+Removes any material slots that aren't assigned to any part of the object.
+By default you can just select to only affect only the active object (otherwise all selected objects). But the new version gives you more options to select which objects to affect (similar to other tools in Material Utilities). To use this, you need to disable the legacy version of Clean Material Slots in the preference first (under Defaults).
+[![Clean Material slots, new and legacy](https://chris.hindefjord.se/wp-content/uploads/2024/08/MU_CleanMatSlots_Both.png)](https://chris.hindefjord.se/wp-content/uploads/2024/08/MU_CleanMatSlots_Both.png)
 - **Remove Active Slot** (Object Mode only)\
 Will remove the material slot that is currently selected.
 You can limit it to only the active object in the operator panel `[F9]`
@@ -140,11 +142,11 @@ If you enable **Unlink Material From Old Link** the material will be "unlinked" 
 Finds materials such as `Material`, `Material.001`, `Material.002` and merges them into a single material (`Material`).\
 You can select a specific **Material Base Name** (such as `MyMaterial`) to find duplicates of (`MyMaterial.001` etc.).\
 By enabling **Auto Rename/Replace** it will find all materials that are "duplicates" and merge them into a single material.\
-**Do note** that this only keeps the base material (`MyMaterial`) and ignores the other versions (`MyMaterial.001` etc.)\
-You can choose to give the material a new name after all the duplicates have been merged by "checking" the icon
-to the right of the material name (a box where you can enter the new name will appear).\
+You can choose to give the material a new name after all the duplicates have been merged by "checking" the icon to the right of the material name (a box where you can enter the new name will appear).
+**Do note**: By default the material with the "base name" (`MyMaterial`) will be the material setup used as the common material (essentially overwriting any possible changes in other related materials). If you want the selected material (`MyMaterial.003`) to be used instead, you can enable **Use Selected Material** (pen icon to the right).\
 
-[![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2019/11/MU_MergeBaseNames_3-e1572996566823.png)](https://chris.hindefjord.se/wp-content/uploads/2019/11/MU_MergeBaseNames_3.png)
+**Tip:** You can choose to have **Use Selected Material** enabled by default in the preferences (under **Defaults** and **Merge Base Names**). Here you can also choose (disabled by default) to have the leftover materials (`MyMaterial.001`, `MyMaterial.002`, etc), that are now *unused* to be removed automatically after the merging is done (This will otherwise be done on save/reopen).
+[![Merge Base Names](https://chris.hindefjord.se/wp-content/uploads/2024/08/MU_MergeMat_Tris.png)](https://chris.hindefjord.se/wp-content/uploads/2024/08/MU_MergeMat_Tris.png)
 
 - **Patterns**\
     If you want to merge materials based on another pattern than the the default Blender way (such as `Material_001` instead of `Material.001`)
@@ -206,7 +208,7 @@ And at the top two other options are added:
 
 The preferences panel have been updated with version 3.0.0 of Material Utilities. The preferences are now structures in three categories/tabs: `Defaults`, `Texture Set Import` and `Miscellaneous`, and each tab is divided into several subcategories (as "pulldowns").
 
-[![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2023/06/MU_Preferences_3.0.0_Defaults.png)](https://chris.hindefjord.se/wp-content/uploads/2023/06/MU_Preferences_3.0.0_Defaults.png)
+[![Material Utilities preferences](https://chris.hindefjord.se/wp-content/uploads/2024/08/MU_Prefs_Def_3.0.2.png)](https://chris.hindefjord.se/wp-content/uploads/2024/08/MU_Prefs_Def_3.0.2.png)
 
 ### Defaults
 

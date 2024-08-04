@@ -26,7 +26,7 @@ You can access the functions of this feature in the same way as the main menu fo
 
 The resulting node trees could look like this (these include all supported texture maps):
 
-- [**Cycles/Eevee example (screenshot)**](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportedNodes_CyclesPrincipled.png)
+- [**Cycles/Eevee example (screenshot)**](https://chris.hindefjord.se/wp-content/uploads/2024/08/MU_ImportedNodes_CyclesPrincipled_3.0.2.png)
 - [**Octane (screenshot)**](https://chris.hindefjord.se/wp-content/uploads/2023/07/MU_ImportedNodes_OctaneUniversal.png)
 
 ## Support and Compatibility
@@ -37,7 +37,7 @@ Unlike the rest of the Material Utilities, this feature is limited to specific r
 Currently the supported render engines are:
 
 - **Cycles**/**Eevee** (or any other engine that might use the same nodes)
-Tested with Blender 3.6.0
+Tested with Blender 4.2.0
 
 - **Octane Render** (Both add-on and the Octane Blender Build)
 Tested with Blender Octane 2022.1.1 (v.27.12) and Octane Addon 27.16.3 (Blender 3.6.0)
