@@ -284,7 +284,7 @@ mu_node_positions = {   # Y-positions for adding nodes to the shader node tree
             'ROUGHNESS': 107, 'GLOSSINESS': 107,          # Same input, but different values
             'SPECULAR': 194,
             'METALNESS': 72,
-            'HEIGHT': 500, 'DISPLACEMENT': 550,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
+            'HEIGHT': 540, 'DISPLACEMENT': 550,           # MAY BE AUTOMATICALLY CONNECTED, Place bellow
             'BUMP': 330, 'NORMAL': 330,                   # In Cycles Bump and Normal is done via the same input
             '_NORMALINVNODE': 330,
             'ALPHA': 141, 'MASK': 141,                    # Currently treating Alpha and Mask as the same thing

@@ -1019,13 +1019,14 @@ def mu_calc_node_location(first_node, node, filetype,
         if map == 'BUMP':
             x_offset += 90 + 50
         elif map == 'HEIGHT' or map == 'DISPLACEMENT':
-            x_offset -= 150
+            x_offset += 90
+            y_offset -= 100
         elif map == '_DISPLACEMENT':
-            x_offset -= 260
+            x_offset -= 270
         elif map == 'NORMAL':
             x_offset += 220 + 50
         elif map == '_BUMPNODE' or map == '_NORMALNODE':
-            x_offset -= 100
+            x_offset += 10
         elif map == '_NORMALINVNODE':
             x_offset += 75
         elif map == '_INVERT':
@@ -1997,7 +1998,7 @@ def mu_add_image_textures(self, prefs, directory = None, file_list = [], file_pa
                 pos_y = first_node.location.y
                 offs_y1 = 330
                 offs_y2 = 40
-                offs_x1 = 220
+                offs_x1 = 270
                 offs_x2 = 300
                 offs_x3 = offs_x1 * 2
                 odd = True
