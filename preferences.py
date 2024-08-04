@@ -309,7 +309,7 @@ class VIEW3D_MT_materialutilities_preferences(AddonPreferences):
         name = "Clean Material Slots"
     )
     defaults_mergematerials_expanded: BoolProperty(
-        name = "Merge materials"
+        name = "Merge Base Names"
     )
     defaults_textures_expanded: BoolProperty(
         name = "PBR Texture Set Import"

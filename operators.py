@@ -775,7 +775,7 @@ class MATERIAL_OT_materialutilities_merge_base_names(bpy.types.Operator):
 
         box_1 = layout.box()
         col = box_1.column()
-        row = col.split(factor = 0.93, align = True)
+        row = col.split(factor = 0.875, align = True)
         row.prop_search(self, 'material_base_name', bpy.data, 'materials')
         row.prop(self, 'use_new_name', text = "", icon = 'SYNTAX_OFF')
         row.prop(self, 'use_selected_material', text = "", icon = 'STYLUS_PRESSURE')
